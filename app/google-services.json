@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "900266082307",
+    "project_id": "fit-cheq",
+    "storage_bucket": "fit-cheq.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:900266082307:android:b8742a9317508f4d8e0e36",
+        "android_client_info": {
+          "package_name": "com.vayo.fitcheq"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRHOZSFtn9Hdxx1ZDWWs_bVKC43rgIqjg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
