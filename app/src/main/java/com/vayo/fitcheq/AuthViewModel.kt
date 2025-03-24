@@ -11,13 +11,24 @@ import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 //Wil handle Authentication logic
 class AuthViewModel: ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val firestore = FirebaseFirestore.getInstance()
 
     private val _authState = MutableStateFlow(auth.currentUser != null)
      val authState: StateFlow<Boolean> = _authState.asStateFlow()
+
+    private val _isProfileCompleted = MutableStateFlow<Boolean?>(null)
+    val isProfileCompleted: StateFlow<Boolean?> = _isProfileCompleted.asStateFlow()
+
+
 
     private  val _toastMessage = MutableStateFlow<String?>(null)
     val toastMessage: StateFlow<String?> = _toastMessage.asStateFlow()
@@ -64,5 +75,20 @@ class AuthViewModel: ViewModel() {
 
     fun clearToastMessage() {
         _toastMessage.value = null
+    }
+    fun checkUserProfile(){
+        val userId = auth.currentUser?.uid
+        if (userId != null) {
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val document = firestore.collection("users").document(userId).get().await()
+                    _isProfileCompleted.value = document.exists() && document.getBoolean("profileCompleted") == true
+                } catch (e: Exception) {
+                    _isProfileCompleted.value = false
+                }
+            }
+        } else {
+            _isProfileCompleted.value = false
+        }
     }
 }
