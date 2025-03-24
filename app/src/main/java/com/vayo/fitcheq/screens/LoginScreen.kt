@@ -29,7 +29,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.vayo.fitcheq.AuthScreen
 import com.vayo.fitcheq.AuthViewModel
+import com.vayo.fitcheq.HomeActivity
 import com.vayo.fitcheq.MainActivity
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun LoginScreen(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
@@ -37,6 +39,7 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel = vie
     var password by remember { mutableStateOf("") }
     val context = LocalContext.current
     val authState by authViewModel.authState.collectAsStateWithLifecycle()
+    val isProfileCompleted by authViewModel.isProfileCompleted.collectAsState()
     var loginAttempted by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxSize().padding(20.dp),
@@ -67,7 +70,23 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel = vie
         if (loginAttempted) { // Show toast only if login was attempted
             if (authState == true) {
                 Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
-                navController.navigate(AuthScreen.Home.route)
+
+                // Check if user profile exists
+                authViewModel.checkUserProfile()
+
+                // Wait for the first emitted profile completion status
+                authViewModel.isProfileCompleted.collectLatest { isProfileComplete ->
+                    if (isProfileComplete == true) {
+                        Toast.makeText(context, "Profile Exists", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(context, HomeActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    context.startActivity(intent)
+                     } else {
+                        navController.navigate(AuthScreen.UserProfile.route) {
+                            popUpTo(AuthScreen.Login.route) { inclusive = true }
+                        }
+                    }
+                }
             } else{
                 Toast.makeText(context, "Login Failed", Toast.LENGTH_SHORT).show()
             }
