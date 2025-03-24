@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -24,21 +25,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.vayo.fitcheq.AuthScreen
 import com.vayo.fitcheq.data.model.AgeGroup
 import com.vayo.fitcheq.data.model.PreferPlatform
 import com.vayo.fitcheq.data.model.UserProfile
 
-@Preview(showSystemUi = true)
+//@Preview(showSystemUi = true)
 @Composable
-fun ProfileScreen(){
-//    val context = LocalContext.current
-//    val firestore = FirebaseFirestore.getInstance()
-//    val currentUser = FirebaseAuth.getInstance().currentUser
+fun ProfileScreen(navController: NavController){
+    val context = LocalContext.current
+    val firestore = FirebaseFirestore.getInstance()
+    val currentUser = FirebaseAuth.getInstance().currentUser
 
     var name by remember { mutableStateOf("") }
     var gender by remember { mutableStateOf("") }
@@ -165,13 +169,16 @@ fun ProfileScreen(){
                 occupation = occupation,
                 preferPlatform = preferplatform
             )
-//            firestore.collection("users").document(currentUser?.uid ?: "").set(userProfile)
-//                .addOnSuccessListener {
-//                    Toast.makeText(context, "Profile Saved!", Toast.LENGTH_SHORT).show()
-////                    navController.navigate(if (gender == "Male") "maleHome" else "femaleHome")
-//                }
+            firestore.collection("users").document(currentUser?.uid ?: "").set(userProfile)
+                .addOnSuccessListener {
+                    Toast.makeText(context, "Profile Saved!", Toast.LENGTH_SHORT).show()
+                    navController.navigate(if (gender == "Male") AuthScreen.MaleHome.route else AuthScreen.FemaleHome.route){
+                        popUpTo(AuthScreen.UserProfile.route) { inclusive = true }
+                    }
+
+                }
         }) {
-            Text("Save Profile")
+            Text(text =  "Save Profile", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
         }
     }
 }
