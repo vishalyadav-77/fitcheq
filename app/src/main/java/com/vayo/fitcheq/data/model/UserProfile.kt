@@ -6,7 +6,8 @@ data class UserProfile(
     val gender: String = "", // "Male" or "Female"
     val occupation: String = "", // "College Student", working professional, school student , other
     val ageGroup: AgeGroup = AgeGroup.UNSPECIFIED, // Default value
-    val preferPlatform: PreferPlatform = PreferPlatform.moderate //default value
+    val preferPlatform: PreferPlatform = PreferPlatform.moderate, //default value
+    val profileCompleted: Boolean = false
 )
 
 enum class AgeGroup(val displayName: String) {

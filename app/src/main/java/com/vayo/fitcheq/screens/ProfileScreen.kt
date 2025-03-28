@@ -1,5 +1,6 @@
 package com.vayo.fitcheq.screens
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -162,12 +163,13 @@ fun ProfileScreen(navController: NavController){
 
         Button(onClick = {
             val userProfile = UserProfile(
-//                uId = currentUser?.uid ?: "",
+                uId = currentUser?.uid ?: "",
                 name = name,
                 gender = gender,
                 ageGroup = ageGroup,
                 occupation = occupation,
-                preferPlatform = preferplatform
+                preferPlatform = preferplatform,
+                profileCompleted = true
             )
             firestore.collection("users").document(currentUser?.uid ?: "").set(userProfile)
                 .addOnSuccessListener {
