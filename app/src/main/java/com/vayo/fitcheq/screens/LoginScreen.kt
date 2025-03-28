@@ -75,13 +75,17 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel = vie
                 authViewModel.checkUserProfile()
 
                 // Wait for the first emitted profile completion status
-                authViewModel.isProfileCompleted.collectLatest { isProfileComplete ->
-                    if (isProfileComplete == true) {
+                authViewModel.isProfileCompleted.collectLatest { isProfileCompleted ->
+                    if (isProfileCompleted == true) {
                         Toast.makeText(context, "Profile Exists", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(context, HomeActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    context.startActivity(intent)
+                        navController.navigate(AuthScreen.MaleHome.route) {
+                            popUpTo(AuthScreen.Login.route) { inclusive = true }
+                        }
+//                    val intent = Intent(context, HomeActivity::class.java)
+//                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+//                    context.startActivity(intent)
                      } else {
+                        Toast.makeText(context, "else part called", Toast.LENGTH_SHORT).show()
                         navController.navigate(AuthScreen.UserProfile.route) {
                             popUpTo(AuthScreen.Login.route) { inclusive = true }
                         }
