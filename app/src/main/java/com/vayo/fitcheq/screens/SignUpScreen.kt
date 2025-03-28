@@ -52,7 +52,7 @@ fun SignUpScreen(navController: NavController, authViewModel: AuthViewModel = vi
         Spacer(modifier = Modifier.height(20.dp))
 
         Button(onClick = {
-            authViewModel.signUp(email, password)
+            authViewModel.signUp(email, password, navController)
         }) {
             Text("Sign Up")
         }
@@ -67,7 +67,9 @@ fun SignUpScreen(navController: NavController, authViewModel: AuthViewModel = vi
         authState?.let {
             if (it) {
                 Toast.makeText(context, "Registration Successful", Toast.LENGTH_SHORT).show()
-                navController.navigate(AuthScreen.Login.route)
+                navController.navigate(AuthScreen.UserProfile.route) {
+                    popUpTo(AuthScreen.SignUp.route) { inclusive = true }
+                }
             } else {
                 Toast.makeText(context, "Registration Failed", Toast.LENGTH_SHORT).show()
             }
