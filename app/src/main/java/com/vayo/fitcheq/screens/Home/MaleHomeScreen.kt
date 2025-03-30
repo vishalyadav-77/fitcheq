@@ -1,6 +1,7 @@
 package com.vayo.fitcheq.screens.Home
 
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,16 +15,81 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.vayo.fitcheq.AuthViewModel
+import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.tasks.await
 
 @Composable
 fun MaleHomeScreen(navController: NavController, authViewModel:  AuthViewModel= viewModel()) {
+
+    val firestore = remember { FirebaseFirestore.getInstance() }
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    var userName by remember { mutableStateOf("Loading...") }
+    var isLoading by remember { mutableStateOf(true) }
+    val context = LocalContext.current
+
+
+
+    val isLoggedIn by authViewModel.authState.collectAsStateWithLifecycle()
+    LaunchedEffect(isLoggedIn) {
+        if (!isLoggedIn) {
+            navController.navigate("login") {
+                popUpTo("male_home") { inclusive = true }
+            }
+        }
+    }
+    LaunchedEffect(authViewModel.toastMessage) {
+        authViewModel.toastMessage.collect { message ->
+            message?.let {
+                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                authViewModel.clearToastMessage()
+            }
+        }
+    }
+
+    // Fetch user data when screen loads
+    LaunchedEffect(Unit) {
+        try {
+            // 1. Check authentication status
+            val uid = currentUser?.uid ?: run {
+                Toast.makeText(context, "User not authenticated", Toast.LENGTH_SHORT).show()
+                navController.navigate("login") { popUpTo(0) }
+                return@LaunchedEffect
+            }
+
+            // 2. Fetch user data with coroutine
+            val document = firestore.collection("users")
+                .document(uid)
+                .get()
+                .await() // Use await() instead of callbacks
+
+            // 3. Handle document data
+            if (document.exists()) {
+                userName = document.getString("name") ?: "Name not set"
+            } else {
+                Toast.makeText(context, "Profile data missing", Toast.LENGTH_SHORT).show()
+                navController.navigate("profile") // Redirect to profile creation
+            }
+        } catch (e: Exception) {
+            // 4. Handle errors
+            Toast.makeText(context, "Error loading data: ${e.message}", Toast.LENGTH_SHORT).show()
+            userName = "Error loading name"
+        } finally {
+            // 5. Update loading state
+            isLoading = false
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center
     ) {
         // Top Bar with App Title
         Text(
@@ -98,6 +164,14 @@ fun MaleHomeScreen(navController: NavController, authViewModel:  AuthViewModel= 
             text = "More sections coming soon...",
             fontSize = 16.sp,
             color = Color.Gray
+        )
+
+        Spacer(modifier = Modifier. height(24.dp))
+
+        Text(
+            text = "Welcome, $userName! 👋",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold
         )
 
         Spacer(modifier = Modifier. height(24.dp))
