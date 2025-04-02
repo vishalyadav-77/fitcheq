@@ -34,13 +34,14 @@ import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.vayo.fitcheq.AuthScreen
+import com.vayo.fitcheq.AuthViewModel
 import com.vayo.fitcheq.data.model.AgeGroup
 import com.vayo.fitcheq.data.model.PreferPlatform
 import com.vayo.fitcheq.data.model.UserProfile
 
 //@Preview(showSystemUi = true)
 @Composable
-fun ProfileScreen(navController: NavController){
+fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel){
     val context = LocalContext.current
     val firestore = FirebaseFirestore.getInstance()
     val currentUser = FirebaseAuth.getInstance().currentUser

@@ -23,13 +23,13 @@ sealed class AuthScreen(val route: String) {
 }
 
 @Composable
-fun AuthNavGraph(navController: NavHostController) {
+fun AuthNavGraph(navController: NavHostController, authViewModel: AuthViewModel) {
     NavHost(navController = navController, startDestination = AuthScreen.Login.route) {
-        composable(AuthScreen.Login.route) { LoginScreen(navController) }
-        composable(AuthScreen.SignUp.route) { SignUpScreen(navController) }
-        composable(AuthScreen.Home.route) { HomeScreen(navController) }
-        composable(AuthScreen.UserProfile.route) { ProfileScreen(navController) }
-        composable(AuthScreen.MaleHome.route) { MaleHomeScreen(navController) }
-        composable(AuthScreen.FemaleHome.route) { FemaleHomeScreen(navController) }
+        composable(AuthScreen.Login.route) { LoginScreen(navController, authViewModel) }
+        composable(AuthScreen.SignUp.route) { SignUpScreen(navController, authViewModel) }
+        composable(AuthScreen.Home.route) { HomeScreen(navController, authViewModel) }
+        composable(AuthScreen.UserProfile.route) { ProfileScreen(navController, authViewModel) }
+        composable(AuthScreen.MaleHome.route) { MaleHomeScreen(navController, authViewModel) }
+        composable(AuthScreen.FemaleHome.route) { FemaleHomeScreen(navController, authViewModel) }
     }
 }
