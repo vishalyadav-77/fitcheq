@@ -40,6 +40,14 @@ class AuthViewModel: ViewModel() {
     private val _isCheckingProfile = MutableStateFlow(false)
     val isCheckingProfile: StateFlow<Boolean> = _isCheckingProfile.asStateFlow()
 
+    init {
+        Log.d("NavigationDebug", "AuthViewModel initialized with currentUser: ${auth.currentUser?.uid}")
+        // Check profile if user is logged in
+        if (auth.currentUser != null) {
+            checkUserProfile()
+        }
+    }
+
     fun showToast(message: String) {
         _toastMessage.value = message
     }
@@ -57,30 +65,53 @@ class AuthViewModel: ViewModel() {
     }
 
     fun login(email: String, password: String) {
+        Log.d("NavigationDebug", "=== Login Process Started ===")
+        Log.d("NavigationDebug", "Login attempt with email: $email")
+        
         if (email.isBlank() || password.isBlank()) {
             showToast("Email and password cannot be empty")
             return
         }
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    _authState.value = true
-                    showToast("Login Successful!")
-                } else {
-                    showToast(task.exception?.localizedMessage ?: "Login failed")
-                }
+        
+        viewModelScope.launch {
+            try {
+                Log.d("NavigationDebug", "Starting Firebase authentication...")
+                val result = auth.signInWithEmailAndPassword(email, password).await()
+                
+                Log.d("NavigationDebug", "Firebase auth successful, updating states...")
+                _authState.value = true
+                _isProfileCompleted.value = null
+                _userGender.value = null
+                
+                Log.d("NavigationDebug", """
+                    States after login:
+                    authState: ${_authState.value}
+                    isProfileCompleted: ${_isProfileCompleted.value}
+                    userGender: ${_userGender.value}
+                """.trimIndent())
+                
+                showToast("Login Successful!")
+                
+                // Immediately check user profile after successful login
+                checkUserProfile()
+                
+            } catch (e: Exception) {
+                Log.e("NavigationDebug", "Login process failed", e)
+                showToast(e.localizedMessage ?: "Login failed")
             }
+        }
     }
 
     fun logout() {
-        Log.d("AUTH_DEBUG", "Logout function called")
-        Log.d("AUTH_DEBUG", "Before logout - Current user: ${auth.currentUser?.uid}")
-        auth.signOut()
-        Log.d("AUTH_DEBUG", "After logout - Current user: ${auth.currentUser?.uid}")
-        _authState.value = false
-        _isProfileCompleted.value = null
-        _userGender.value = null
-        showToast("Logged out successfully!")
+        Log.d("NavigationDebug", "=== Logout Started ===")
+        viewModelScope.launch {
+            auth.signOut()
+            _authState.value = false
+            _isProfileCompleted.value = null
+            _userGender.value = null
+            Log.d("NavigationDebug", "Logout completed, all states reset")
+            showToast("Logged out successfully!")
+        }
     }
 
     fun isUserLoggedIn(): Boolean {
@@ -93,31 +124,55 @@ class AuthViewModel: ViewModel() {
 
     fun checkUserProfile() {
         val userId = auth.currentUser?.uid
-        _isProfileCompleted.value = null
-        _userGender.value = null
-
-        if (userId != null) {
-            viewModelScope.launch {
-                try {
-                    val document = firestore.collection("users")
-                        .document(userId)
-                        .get()
-                        .await()
-
-                    val exists = document.exists()
-                    val completed = document.getBoolean("profileCompleted") ?: false
-                    val gender = document.getString("gender")
-
-                    _isProfileCompleted.value = exists && completed
-                    _userGender.value = gender
-                } catch (e: Exception) {
-                    _isProfileCompleted.value = false
-                    _userGender.value = null
-                }
-            }
-        } else {
+        Log.d("NavigationDebug", "=== Profile Check Started ===")
+        Log.d("NavigationDebug", "Checking profile for userId: $userId")
+        
+        if (userId == null) {
+            Log.d("NavigationDebug", "No user ID found, setting profile states to false/null")
             _isProfileCompleted.value = false
             _userGender.value = null
+            return
+        }
+
+        viewModelScope.launch {
+            _isCheckingProfile.value = true
+            Log.d("NavigationDebug", "Profile check started, isCheckingProfile set to true")
+            
+            try {
+                Log.d("NavigationDebug", "Fetching user document from Firestore...")
+                val document = firestore.collection("users")
+                    .document(userId)
+                    .get()
+                    .await()
+
+                val exists = document.exists()
+                val completed = document.getBoolean("profileCompleted") ?: false
+                val gender = document.getString("gender")
+
+                Log.d("NavigationDebug", """
+                    Profile check results:
+                    Document exists: $exists
+                    Profile completed: $completed
+                    Gender: $gender
+                """.trimIndent())
+
+                _isProfileCompleted.value = exists && completed
+                _userGender.value = gender
+                
+                Log.d("NavigationDebug", """
+                    Updated profile states:
+                    isProfileCompleted: ${_isProfileCompleted.value}
+                    userGender: ${_userGender.value}
+                """.trimIndent())
+            } catch (e: Exception) {
+                Log.e("NavigationDebug", "Error checking profile", e)
+                _isProfileCompleted.value = false
+                _userGender.value = null
+                showToast("Error checking profile: ${e.localizedMessage}")
+            } finally {
+                _isCheckingProfile.value = false
+                Log.d("NavigationDebug", "Profile check completed, isCheckingProfile set to false")
+            }
         }
     }
 }
