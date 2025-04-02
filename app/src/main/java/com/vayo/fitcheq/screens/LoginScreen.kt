@@ -25,21 +25,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.vayo.fitcheq.AuthScreen
 import com.vayo.fitcheq.AuthViewModel
-import com.vayo.fitcheq.HomeActivity
+//import com.vayo.fitcheq.HomeActivity
 import com.vayo.fitcheq.MainActivity
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun LoginScreen(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
+fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val context = LocalContext.current
     val authState by authViewModel.authState.collectAsStateWithLifecycle()
-    val isProfileCompleted by authViewModel.isProfileCompleted.collectAsState()
     var loginAttempted by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxSize().padding(20.dp),
@@ -52,7 +50,7 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel = vie
         Spacer(modifier = Modifier.height(20.dp))
 
         Button(onClick = {
-            loginAttempted=true
+            loginAttempted = true
             authViewModel.login(email, password)
         }) {
             Text("Login")
@@ -65,33 +63,12 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel = vie
         }
     }
 
-    // Observe authState safely
+    // Only show toast messages
     LaunchedEffect(authState) {
-        if (loginAttempted) { // Show toast only if login was attempted
-            if (authState == true) {
+        if (loginAttempted) {
+            if (authState) {
                 Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
-
-                // Check if user profile exists
-                authViewModel.checkUserProfile()
-
-                // Wait for the first emitted profile completion status
-                authViewModel.isProfileCompleted.collectLatest { isProfileCompleted ->
-                    if (isProfileCompleted == true) {
-                        Toast.makeText(context, "Profile Exists", Toast.LENGTH_SHORT).show()
-                        navController.navigate(AuthScreen.MaleHome.route) {
-                            popUpTo(AuthScreen.Login.route) { inclusive = true }
-                        }
-//                    val intent = Intent(context, HomeActivity::class.java)
-//                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-//                    context.startActivity(intent)
-                     } else {
-                        Toast.makeText(context, "else part called", Toast.LENGTH_SHORT).show()
-                        navController.navigate(AuthScreen.UserProfile.route) {
-                            popUpTo(AuthScreen.Login.route) { inclusive = true }
-                        }
-                    }
-                }
-            } else{
+            } else {
                 Toast.makeText(context, "Login Failed", Toast.LENGTH_SHORT).show()
             }
         }
