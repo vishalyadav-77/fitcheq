@@ -1,28 +1,24 @@
 package com.vayo.fitcheq
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
-import android.widget.Toast
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.StateFlow
-
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 
 //Wil handle Authentication logic
 class AuthViewModel: ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firestore = FirebaseFirestore.getInstance()
+    private var sharedPreferences: SharedPreferences? = null
 
     private val _authState = MutableStateFlow(auth.currentUser != null)
     val authState: StateFlow<Boolean> = _authState.asStateFlow()
@@ -40,12 +36,39 @@ class AuthViewModel: ViewModel() {
     private val _isCheckingProfile = MutableStateFlow(false)
     val isCheckingProfile: StateFlow<Boolean> = _isCheckingProfile.asStateFlow()
 
+    fun initializeSharedPreferences(context: Context) {
+        Log.d("NavigationDebug", "Initializing SharedPreferences")
+        sharedPreferences = context.getSharedPreferences("user_profile", Context.MODE_PRIVATE)
+        Log.d("NavigationDebug", "SharedPreferences initialized successfully")
+        
+        // Check profile after SharedPreferences is initialized
+        if (auth.currentUser != null) {
+            Log.d("NavigationDebug", "User is logged in, checking profile...")
+            checkUserProfile()
+        } else {
+            Log.d("NavigationDebug", "No user logged in, skipping profile check")
+        }
+    }
+
+    private fun saveProfileToSharedPreferences(profileCompleted: Boolean, gender: String?) {
+        Log.d("NavigationDebug", "Saving to SharedPreferences - profileCompleted: $profileCompleted, gender: $gender")
+        sharedPreferences?.edit()?.apply {
+            putBoolean("profile_completed", profileCompleted)
+            putString("user_gender", gender)
+            apply()
+        }
+        Log.d("NavigationDebug", "SharedPreferences saved successfully")
+    }
+
+    private fun loadProfileFromSharedPreferences(): Pair<Boolean, String?> {
+        val profileCompleted = sharedPreferences?.getBoolean("profile_completed", false) ?: false
+        val gender = sharedPreferences?.getString("user_gender", null)
+        Log.d("NavigationDebug", "Loading from SharedPreferences - profileCompleted: $profileCompleted, gender: $gender")
+        return Pair(profileCompleted, gender)
+    }
+
     init {
         Log.d("NavigationDebug", "AuthViewModel initialized with currentUser: ${auth.currentUser?.uid}")
-        // Check profile if user is logged in
-        if (auth.currentUser != null) {
-            checkUserProfile()
-        }
     }
 
     fun showToast(message: String) {
@@ -92,7 +115,7 @@ class AuthViewModel: ViewModel() {
                 
                 showToast("Login Successful!")
                 
-                // Immediately check user profile after successful login
+                // Check user profile after successful login
                 checkUserProfile()
                 
             } catch (e: Exception) {
@@ -109,7 +132,9 @@ class AuthViewModel: ViewModel() {
             _authState.value = false
             _isProfileCompleted.value = null
             _userGender.value = null
-            Log.d("NavigationDebug", "Logout completed, all states reset")
+            // Clear SharedPreferences on logout
+            sharedPreferences?.edit()?.clear()?.apply()
+            Log.d("NavigationDebug", "Logout completed, all states reset and SharedPreferences cleared")
             showToast("Logged out successfully!")
         }
     }
@@ -134,11 +159,28 @@ class AuthViewModel: ViewModel() {
             return
         }
 
+        if (sharedPreferences == null) {
+            Log.e("NavigationDebug", "SharedPreferences not initialized!")
+            return
+        }
+
         viewModelScope.launch {
             _isCheckingProfile.value = true
             Log.d("NavigationDebug", "Profile check started, isCheckingProfile set to true")
             
             try {
+                // First check SharedPreferences
+                val (localProfileCompleted, localGender) = loadProfileFromSharedPreferences()
+                
+                if (localProfileCompleted && localGender != null) {
+                    Log.d("NavigationDebug", "Found valid profile data in SharedPreferences")
+                    _isProfileCompleted.value = true
+                    _userGender.value = localGender
+                    _isCheckingProfile.value = false
+                    return@launch
+                }
+
+                // If SharedPreferences data is incomplete or missing, fetch from Firestore
                 Log.d("NavigationDebug", "Fetching user document from Firestore...")
                 val document = firestore.collection("users")
                     .document(userId)
@@ -156,8 +198,17 @@ class AuthViewModel: ViewModel() {
                     Gender: $gender
                 """.trimIndent())
 
-                _isProfileCompleted.value = exists && completed
-                _userGender.value = gender
+                if (exists && completed && gender != null) {
+                    Log.d("NavigationDebug", "Found valid profile in Firestore, updating SharedPreferences")
+                    _isProfileCompleted.value = true
+                    _userGender.value = gender
+                    saveProfileToSharedPreferences(true, gender)
+                    Log.d("NavigationDebug", "Profile data saved to SharedPreferences")
+                } else {
+                    Log.d("NavigationDebug", "Profile incomplete or missing in Firestore")
+                    _isProfileCompleted.value = false
+                    _userGender.value = null
+                }
                 
                 Log.d("NavigationDebug", """
                     Updated profile states:
