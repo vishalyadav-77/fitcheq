@@ -40,6 +40,9 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val authViewModel: AuthViewModel = viewModel()
 
+                // Initialize SharedPreferences
+                authViewModel.initializeSharedPreferences(applicationContext)
+
                 val isLoggedIn by authViewModel.authState.collectAsStateWithLifecycle()
                 val isProfileCompleted by authViewModel.isProfileCompleted.collectAsStateWithLifecycle()
                 val userGender by authViewModel.userGender.collectAsStateWithLifecycle()
