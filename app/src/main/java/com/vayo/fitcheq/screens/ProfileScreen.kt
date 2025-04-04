@@ -1,5 +1,6 @@
 package com.vayo.fitcheq.screens
 
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -11,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.RadioButton
@@ -36,6 +39,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.vayo.fitcheq.AuthScreen
 import com.vayo.fitcheq.AuthViewModel
 import com.vayo.fitcheq.data.model.AgeGroup
+import com.vayo.fitcheq.data.model.BodyType
+import com.vayo.fitcheq.data.model.HeightGroup
 import com.vayo.fitcheq.data.model.PreferPlatform
 import com.vayo.fitcheq.data.model.UserProfile
 
@@ -51,8 +56,11 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel){
     var occupation by remember { mutableStateOf("") }
     var ageGroup by remember { mutableStateOf(AgeGroup.UNSPECIFIED) }
     var preferplatform by remember { mutableStateOf(PreferPlatform.moderate)}
+    var height by remember { mutableStateOf(HeightGroup.average)}
+    var bodyType by remember { mutableStateOf(BodyType.average)}
 
-    Column(modifier = Modifier.fillMaxSize().padding(8.dp),
+    Column(modifier = Modifier.fillMaxSize().padding(10.dp).verticalScroll(rememberScrollState()),
+
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -108,6 +116,35 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel){
 
         Spacer(modifier = Modifier.height(20.dp))
 
+        //Height SELECTION
+        Text("HEIGHT", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(selected = height == HeightGroup.short, onClick = { height= HeightGroup.short})
+                Text(text = HeightGroup.short.displayName, fontSize = 13.sp, modifier = Modifier.padding(start = 4.dp))
+            }
+            Spacer(modifier = Modifier.width(10.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(selected = height==HeightGroup.average, onClick = { height = HeightGroup.average})
+                Text(text = HeightGroup.average.displayName, fontSize = 13.sp, modifier = Modifier.padding(start = 4.dp))
+            }
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(selected = height == HeightGroup.tall, onClick = { height = HeightGroup.tall })
+                Text(text = HeightGroup.tall.displayName, fontSize = 13.sp, modifier = Modifier.padding(start = 4.dp))
+            }
+            Spacer(modifier = Modifier.width(10.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(selected = height== HeightGroup.very_tall, onClick = { height = HeightGroup.very_tall })
+                Text(text = HeightGroup.very_tall.displayName, fontSize = 13.sp, modifier = Modifier.padding(start = 4.dp))
+            }
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
         // Occupation Selection
         Text("WHAT DO YOU DO?", fontSize = 18.sp, fontWeight = FontWeight.Bold)
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -137,7 +174,7 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel){
 
         Spacer(modifier = Modifier.height(20.dp))
 
-
+//BRANDS KON KON SI
         Text("Which brands usually make up your wardrobe?:", fontSize = 16
             .sp, fontWeight = FontWeight.Bold)
 
@@ -151,16 +188,50 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel){
                 RadioButton(selected = preferplatform == PreferPlatform.moderate, onClick = { preferplatform = PreferPlatform.moderate })
                 Text(text = PreferPlatform.moderate.displayName, fontSize = 13.sp, modifier = Modifier.padding(start = 4.dp))
             }
+            Spacer(modifier = Modifier.height(10.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(selected = preferplatform == PreferPlatform.expensive, onClick = { preferplatform = PreferPlatform.expensive })
+                    Text(text = PreferPlatform.expensive.displayName, fontSize = 13.sp, modifier = Modifier.padding(start = 4.dp))
+                }
+
+            }
+        }
+
+        Spacer(modifier = Modifier.height(30.dp))
+//BODY TYPE
+        Text("BODY TYPE:", fontSize = 16
+            .sp, fontWeight = FontWeight.Bold)
+
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(selected = bodyType == BodyType.slim , onClick = { bodyType = BodyType.slim })
+                Text(text = BodyType.slim.displayName, fontSize = 13.sp, modifier = Modifier.padding(start = 0.dp))
+            }
+            Spacer(modifier = Modifier.width(10.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(selected = bodyType == BodyType.athletic, onClick = { bodyType = BodyType.athletic })
+                Text(text = BodyType.athletic.displayName, fontSize = 13.sp, modifier = Modifier.padding(start = 0.dp))
+            }
+            Spacer(modifier = Modifier.width(10.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(selected = bodyType== BodyType.average, onClick = { bodyType = BodyType.average })
+                Text(text = BodyType.average.displayName, fontSize = 13.sp, modifier = Modifier.padding(start = 0.dp))
+            }
         }
         Spacer(modifier = Modifier.height(8.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                RadioButton(selected = preferplatform == PreferPlatform.expensive, onClick = { preferplatform = PreferPlatform.expensive })
-                Text(text = PreferPlatform.expensive.displayName, fontSize = 13.sp, modifier = Modifier.padding(start = 4.dp))
-            }
 
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(selected = bodyType== BodyType.muscular, onClick = { bodyType = BodyType.muscular })
+                Text(text = BodyType.muscular.displayName, fontSize = 13.sp, modifier = Modifier.padding(start = 4.dp))
+            }
+            Spacer(modifier = Modifier.width(10.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(selected = bodyType== BodyType.plus_size, onClick = { bodyType = BodyType.plus_size })
+                Text(text = BodyType.plus_size.displayName, fontSize = 13.sp, modifier = Modifier.padding(start = 4.dp))
+            }
         }
-        Spacer(modifier = Modifier.height(30.dp))
 
         Button(onClick = {
             val userProfile = UserProfile(
@@ -170,15 +241,23 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel){
                 ageGroup = ageGroup,
                 occupation = occupation,
                 preferPlatform = preferplatform,
-                profileCompleted = true
+                profileCompleted = true,
+                height = height,
+                bodyType = bodyType
             )
             firestore.collection("users").document(currentUser?.uid ?: "").set(userProfile)
                 .addOnSuccessListener {
+                    // Save to SharedPreferences
+                    val sharedPreferences = context.getSharedPreferences("user_profile", Context.MODE_PRIVATE)
+                    sharedPreferences.edit()
+                        .putBoolean("profile_completed", true)
+                        .putString("user_gender", gender)
+                        .apply()
+
                     Toast.makeText(context, "Profile Saved!", Toast.LENGTH_SHORT).show()
                     navController.navigate(if (gender == "Male") AuthScreen.MaleHome.route else AuthScreen.FemaleHome.route){
                         popUpTo(AuthScreen.UserProfile.route) { inclusive = true }
                     }
-
                 }
         }) {
             Text(text =  "Save Profile", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
