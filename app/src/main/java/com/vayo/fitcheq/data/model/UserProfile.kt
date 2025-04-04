@@ -7,7 +7,9 @@ data class UserProfile(
     val occupation: String = "", // "College Student", working professional, school student , other
     val ageGroup: AgeGroup = AgeGroup.UNSPECIFIED, // Default value
     val preferPlatform: PreferPlatform = PreferPlatform.moderate, //default value
-    val profileCompleted: Boolean = false
+    val profileCompleted: Boolean = false,
+    val height: HeightGroup = HeightGroup.average,
+    val bodyType: BodyType = BodyType.average
 )
 
 enum class AgeGroup(val displayName: String) {
@@ -21,4 +23,18 @@ enum class PreferPlatform(val displayName: String) {
     cheap("meesho"),
     moderate("Myntra"),
     expensive("Zara")
+}
+
+enum class HeightGroup(val displayName: String){
+    short("Below 5'4\""),
+    average("5'4\" - 5'7\""),
+    tall("5'8\" - 5'11\""),
+    very_tall("6'0\" and above")
+}
+enum class BodyType(val displayName: String){
+    slim("Slim"),
+    athletic("Athletic"),
+    average("Average"),
+    muscular("Muscular"),
+    plus_size("Plus-Size")
 }
