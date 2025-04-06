@@ -1,6 +1,5 @@
 package com.vayo.fitcheq.screens.Home
 
-
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,19 +22,17 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.vayo.fitcheq.AuthViewModel
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.tasks.await
+import com.vayo.fitcheq.navigation.ScreenContainer
 
 @Composable
-fun MaleHomeScreen(navController: NavController, authViewModel:  AuthViewModel= viewModel()) {
-
+fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
     val firestore = remember { FirebaseFirestore.getInstance() }
     val currentUser = FirebaseAuth.getInstance().currentUser
     var userName by remember { mutableStateOf("Loading...") }
     var isLoading by remember { mutableStateOf(true) }
     val context = LocalContext.current
-
-
-
     val isLoggedIn by authViewModel.authState.collectAsStateWithLifecycle()
+
     LaunchedEffect(isLoggedIn) {
         if (!isLoggedIn) {
             navController.navigate("login") {
@@ -43,6 +40,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel:  AuthViewModel= 
             }
         }
     }
+
     LaunchedEffect(authViewModel.toastMessage) {
         authViewModel.toastMessage.collect { message ->
             message?.let {
@@ -85,103 +83,99 @@ fun MaleHomeScreen(navController: NavController, authViewModel:  AuthViewModel= 
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center
-    ) {
-        // Top Bar with App Title
-        Text(
-            text = "Fit Cheq",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Row for Profile and Weather Widget Buttons
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Button(
-                onClick = { /* TODO: Handle Weather Click */ },
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text("Weather Widget")
-            }
-
-            Button(
-                onClick = { /* TODO: Handle Profile Click */ },
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text(" Male Profile")
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Search Bar Placeholder
-        Box(
+    ScreenContainer(navController = navController) { paddingValues ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
-                .background(Color.LightGray, shape = RoundedCornerShape(8.dp))
-                .clickable { /* TODO: Handle Search Click */ },
-            contentAlignment = Alignment.Center
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Search for outfits...", color = Color.Gray)
+            // Top Bar with App Title
+            Text(
+                text = "Fit Cheq",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Welcome Message
+            Text(
+                text = "Welcome, $userName! 👋",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Row for Profile and Weather Widget Buttons
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Button(
+                    onClick = { /* TODO: Handle Weather Click */ },
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text("Weather Widget")
+                }
+
+                Button(
+                    onClick = { navController.navigate("my_profile") },
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text("Male Profile")
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Search Bar Placeholder
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .background(Color.LightGray, shape = RoundedCornerShape(8.dp))
+                    .clickable { /* TODO: Handle Search Click */ },
+                contentAlignment = Alignment.Center
+            ) {
+                Text("Search for outfits...", color = Color.Gray)
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Seasonal Fits Section
+            Text(
+                text = "Fits According to Season",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text("• Summer • Winter • Monsoon • Spring")
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Fashion Style Section
+            Text(
+                text = "Fits According to Fashion Style",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text("• Old Money • Starboy • Streetwear • Casual")
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Logout Button
+            Button(
+                onClick = { authViewModel.logout() },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Logout")
+            }
         }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Seasonal Fits Section
-        Text(
-            text = "Fits According to Season",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text("• Summer • Winter • Monsoon • Spring")
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Fashion Style Section
-        Text(
-            text = "Fits According to Fashion Style",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text("• Old Money • Starboy • Streetwear • Casual")
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Placeholder for More Sections if Needed
-        Text(
-            text = "More sections coming soon...",
-            fontSize = 16.sp,
-            color = Color.Gray
-        )
-
-        Spacer(modifier = Modifier. height(24.dp))
-
-        Text(
-            text = "Welcome, $userName! 👋",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(modifier = Modifier. height(24.dp))
-
-        Button(onClick = {
-            authViewModel.logout()
-        }) {
-            Text("Logout")
-        }
-        Spacer(modifier = Modifier.height(20.dp))
     }
 }
 
