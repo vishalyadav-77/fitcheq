@@ -24,9 +24,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
-import com.vayo.fitcheq.screens.HomeScreen
-import com.vayo.fitcheq.screens.ProfileScreen
+import com.vayo.fitcheq.screens.auth.ProfileScreen
 import com.vayo.fitcheq.ui.theme.FitCheqTheme
+import com.vayo.fitcheq.viewmodels.AuthViewModel
 import kotlinx.coroutines.flow.collectLatest
 
 class MainActivity : ComponentActivity() {

@@ -19,7 +19,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.vayo.fitcheq.AuthViewModel
+import com.vayo.fitcheq.viewmodels.AuthViewModel
 import com.vayo.fitcheq.navigation.BottomNavigation
 import com.vayo.fitcheq.navigation.ScreenContainer
 

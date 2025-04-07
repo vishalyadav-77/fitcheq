@@ -19,7 +19,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.vayo.fitcheq.AuthViewModel
+import com.vayo.fitcheq.viewmodels.AuthViewModel
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.tasks.await
 import com.vayo.fitcheq.navigation.ScreenContainer

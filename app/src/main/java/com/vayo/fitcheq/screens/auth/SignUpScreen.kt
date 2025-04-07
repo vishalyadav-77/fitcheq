@@ -24,7 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.vayo.fitcheq.AuthScreen
-import com.vayo.fitcheq.AuthViewModel
+import com.vayo.fitcheq.viewmodels.AuthViewModel
 
 @Composable
 fun SignUpScreen(navController: NavController, authViewModel: AuthViewModel) {

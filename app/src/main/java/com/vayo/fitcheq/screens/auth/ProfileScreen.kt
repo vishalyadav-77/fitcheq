@@ -33,7 +33,7 @@ import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.vayo.fitcheq.AuthScreen
-import com.vayo.fitcheq.AuthViewModel
+import com.vayo.fitcheq.viewmodels.AuthViewModel
 import com.vayo.fitcheq.data.model.AgeGroup
 import com.vayo.fitcheq.data.model.BodyType
 import com.vayo.fitcheq.data.model.HeightGroup

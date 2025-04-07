@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.vayo.fitcheq.AuthViewModel
+import com.vayo.fitcheq.viewmodels.AuthViewModel
 import com.vayo.fitcheq.navigation.ScreenContainer
 
 @Composable
