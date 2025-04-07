@@ -36,23 +36,42 @@ fun BottomNavigation(navController: NavController) {
                 onClick = {
                     when (item) {
                         BottomNavItem.Home -> {
-                            // Don't navigate if already on home screen
-                            if (currentRoute != AuthScreen.MaleHome.route && currentRoute != AuthScreen.FemaleHome.route) {
-                                // Navigate back to the last home screen
-                                navController.popBackStack(
-                                    route = if (currentRoute?.contains("male") == true) AuthScreen.MaleHome.route else AuthScreen.FemaleHome.route,
-                                    inclusive = false
-                                )
+                            // Get the appropriate home route based on current route
+                            val homeRoute = if (currentRoute?.contains("female") == true || 
+                                (currentRoute != AuthScreen.MaleHome.route && navController.previousBackStackEntry?.destination?.route?.contains("female") == true)) {
+                                AuthScreen.FemaleHome.route
+                            } else {
+                                AuthScreen.MaleHome.route
+                            }
+                            
+                            if (currentRoute != homeRoute) {
+                                navController.navigate(homeRoute) {
+                                    popUpTo(homeRoute) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
                             }
                         }
                         else -> {
-                            navController.navigate(item.route) {
-                                // Preserve the home screen in back stack
-                                popUpTo(if (currentRoute?.contains("male") == true) AuthScreen.MaleHome.route else AuthScreen.FemaleHome.route) {
-                                    saveState = true
+                            if (currentRoute != item.route) {
+                                navController.navigate(item.route) {
+                                    // Keep the home screen as the parent
+                                    val homeRoute = if (currentRoute?.contains("female") == true || 
+                                        (currentRoute != AuthScreen.MaleHome.route && navController.previousBackStackEntry?.destination?.route?.contains("female") == true)) {
+                                        AuthScreen.FemaleHome.route
+                                    } else {
+                                        AuthScreen.MaleHome.route
+                                    }
+                                    
+                                    // Pop up to home screen but don't remove it
+                                    popUpTo(homeRoute) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
-                                launchSingleTop = true
-                                restoreState = true
                             }
                         }
                     }
