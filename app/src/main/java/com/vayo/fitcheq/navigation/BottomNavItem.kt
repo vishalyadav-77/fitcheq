@@ -19,12 +19,12 @@ sealed class BottomNavItem(
     )
     object Community : BottomNavItem(
         route = "community",
-        title = "Community",
+        title = "Explore",
         icon = Icons.Default.Person
     )
     object SavedOutfit : BottomNavItem(
         route = "saved_outfit",
-        title = "Saved",
+        title = "Wishlist",
         icon = Icons.Default.Favorite
     )
     object MyProfile : BottomNavItem(
