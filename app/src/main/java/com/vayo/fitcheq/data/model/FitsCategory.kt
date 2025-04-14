@@ -5,7 +5,7 @@ data class FitsCategory(val emoji: String, val title: String)
 val maleoccasionList = listOf(
     FitsCategory("📚", "College"),
     FitsCategory("❤️", "Date"),
-    FitsCategory("🌃", "Nightout"),
+    FitsCategory("🤵", "Wedding"),
     FitsCategory("💼", "Office"),
     FitsCategory("🏋️", "Gym")
 )
@@ -13,7 +13,7 @@ val maleoccasionList = listOf(
 val femaleoccasionList = listOf(
     FitsCategory("📚", "FemaleCollege"),
     FitsCategory("❤️", "Date"),
-    FitsCategory("🌃", "Nightout"),
+    FitsCategory("🌃", "Wedding"),
     FitsCategory("💼", "Office"),
     FitsCategory("🏋️", "Gym")
 )
