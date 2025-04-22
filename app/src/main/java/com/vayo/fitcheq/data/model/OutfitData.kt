@@ -1,6 +1,7 @@
 package com.vayo.fitcheq.data.model
 
 data class OutfitData(
+    val id: String = "",
     val imageUrl: String = "",
     val title: String = "",
     val price: String = "",
