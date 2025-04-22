@@ -68,6 +68,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
     implementation ("com.google.firebase:firebase-firestore:24.10.0")
     implementation ("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("io.coil-kt:coil-compose:2.0.0")
 
 
 
