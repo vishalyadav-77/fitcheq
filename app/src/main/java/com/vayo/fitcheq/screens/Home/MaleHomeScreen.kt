@@ -1,5 +1,6 @@
 package com.vayo.fitcheq.screens.Home
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,80 +28,82 @@ import kotlinx.coroutines.tasks.await
 import com.vayo.fitcheq.navigation.ScreenContainer
 import androidx.compose.foundation.lazy.items
 import androidx.navigation.compose.rememberNavController
+import com.vayo.fitcheq.AuthScreen
 import com.vayo.fitcheq.data.model.malefashionList
+import com.vayo.fitcheq.navigation.MainNavGraph
 
 
-@Preview(showBackground = true)
-@Composable
-fun MaleHomePreview() {
-    // Provide a fake NavController (won't actually navigate in preview)
-    val navController = rememberNavController()
-
-    MaleHomeScreen(navController)
-}
-
-@Composable
-//fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
-fun MaleHomeScreen(navController: NavController) {
-//    val firestore = remember { FirebaseFirestore.getInstance() }
-//    val currentUser = FirebaseAuth.getInstance().currentUser
-//    var userName by remember { mutableStateOf("Loading...") }
-//    var isLoading by remember { mutableStateOf(true) }
-//    val context = LocalContext.current
-//    val isLoggedIn by authViewModel.authState.collectAsStateWithLifecycle()
-
-//    LaunchedEffect(isLoggedIn) {
-//        if (!isLoggedIn) {
-//            navController.navigate("login") {
-//                popUpTo("male_home") { inclusive = true }
-//            }
-//        }
-//    }
+//@Preview(showBackground = true)
+//@Composable
+//fun MaleHomePreview() {
+//    // Provide a fake NavController (won't actually navigate in preview)
+//    val navController = rememberNavController()
 //
-//    LaunchedEffect(authViewModel.toastMessage) {
-//        authViewModel.toastMessage.collect { message ->
-//            message?.let {
-//                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-//                authViewModel.clearToastMessage()
-//            }
-//        }
-//    }
+//    MaleHomeScreen(navController)
+//}
+
+@Composable
+fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
+//fun MaleHomeScreen(navController: NavController) {
+    val firestore = remember { FirebaseFirestore.getInstance() }
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    var userName by remember { mutableStateOf("Loading...") }
+    var isLoading by remember { mutableStateOf(true) }
+    val context = LocalContext.current
+    val isLoggedIn by authViewModel.authState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(isLoggedIn) {
+        if (!isLoggedIn) {
+            navController.navigate("login") {
+                popUpTo("male_home") { inclusive = true }
+            }
+        }
+    }
+
+    LaunchedEffect(authViewModel.toastMessage) {
+        authViewModel.toastMessage.collect { message ->
+            message?.let {
+                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                authViewModel.clearToastMessage()
+            }
+        }
+    }
 
     // Fetch user data when screen loads
-//    LaunchedEffect(Unit) {
-//        try {
-//            // 1. Check authentication status
-//            val uid = currentUser?.uid ?: run {
-//                Toast.makeText(context, "User not authenticated", Toast.LENGTH_SHORT).show()
-////                navController.navigate("login") { popUpTo(0) }
-//                return@LaunchedEffect
-//            }
-//
-//            // 2. Fetch user data with coroutine
-//            val document = firestore.collection("users")
-//                .document(uid)
-//                .get()
-//                .await() // Use await() instead of callbacks
-//
-//            // 3. Handle document data
-//            if (document.exists()) {
-//                userName = document.getString("name") ?: "Name not set"
-//            } else {
-//                Toast.makeText(context, "Profile data missing", Toast.LENGTH_SHORT).show()
-////                navController.navigate("profile") // Redirect to profile creation
-//            }
-//        } catch (e: Exception) {
-//            // 4. Handle errors
-//            Toast.makeText(context, "Error loading data: ${e.message}", Toast.LENGTH_SHORT).show()
-//            userName = "Error loading name"
-//        } finally {
-//            // 5. Update loading state
-//            isLoading = false
-//        }
-//    }
+    LaunchedEffect(Unit) {
+        try {
+            // 1. Check authentication status
+            val uid = currentUser?.uid ?: run {
+                Toast.makeText(context, "User not authenticated", Toast.LENGTH_SHORT).show()
+//                navController.navigate("login") { popUpTo(0) }
+                return@LaunchedEffect
+            }
 
-//    ScreenContainer(navController = navController) { paddingValues ->
+            // 2. Fetch user data with coroutine
+            val document = firestore.collection("users")
+                .document(uid)
+                .get()
+                .await() // Use await() instead of callbacks
+
+            // 3. Handle document data
+            if (document.exists()) {
+                userName = document.getString("name") ?: "Name not set"
+            } else {
+                Toast.makeText(context, "Profile data missing", Toast.LENGTH_SHORT).show()
+//                navController.navigate("profile") // Redirect to profile creation
+            }
+        } catch (e: Exception) {
+            // 4. Handle errors
+            Toast.makeText(context, "Error loading data: ${e.message}", Toast.LENGTH_SHORT).show()
+            userName = "Error loading name"
+        } finally {
+            // 5. Update loading state
+            isLoading = false
+        }
+    }
+
     ScreenContainer(navController = navController) { paddingValues ->
+//    ScreenContainer(navController = navController) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -119,11 +122,11 @@ fun MaleHomeScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             // Welcome Message
-//            Text(
-//                text = "Welcome, $userName! 👋",
-//                fontSize = 24.sp,
-//                fontWeight = FontWeight.Bold
-//            )
+            Text(
+                text = "Welcome, $userName! 👋",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -175,10 +178,26 @@ fun MaleHomeScreen(navController: NavController) {
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(maleoccasionList) { occasion ->
+                    val onCardClick = {
+                        when (occasion.title) {
+                            "College" -> {
+                                navController.navigate(AuthScreen.OutfitDetails.createRoute("male", "college"))
+                                {
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
+                        }
+
+                    }
                     Card(
                         modifier = Modifier
                             .width(100.dp)
-                            .height(120.dp),
+                            .height(120.dp)
+                            .clickable(onClick = onCardClick),
                         shape = RoundedCornerShape(12.dp),
                         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                     ) {
@@ -229,10 +248,27 @@ fun MaleHomeScreen(navController: NavController) {
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(malefashionList) { occasion ->
+                    val onCardClick = {
+                        when (occasion.title) {
+                            "Starboy" -> {
+                                navController.navigate(AuthScreen.OutfitDetails.createRoute("male", "starboy"))
+                                {
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
+                        }
+
+                    }
+                    
                     Card(
                         modifier = Modifier
                             .width(100.dp)
-                            .height(120.dp),
+                            .height(120.dp)
+                            .clickable(onClick = onCardClick),
                         shape = RoundedCornerShape(12.dp),
                         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                     ) {
@@ -263,7 +299,7 @@ fun MaleHomeScreen(navController: NavController) {
             // Logout Button
             Button(
                 onClick = {
-//                    authViewModel.logout()
+                    authViewModel.logout()
                           },
                 modifier = Modifier.fillMaxWidth()
             ) {

@@ -3,6 +3,8 @@ package com.vayo.fitcheq.screens.Home
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -19,6 +21,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.vayo.fitcheq.AuthScreen
+import com.vayo.fitcheq.data.model.femaleoccasionList
+import com.vayo.fitcheq.data.model.maleoccasionList
 import com.vayo.fitcheq.viewmodels.AuthViewModel
 import com.vayo.fitcheq.navigation.BottomNavigation
 import com.vayo.fitcheq.navigation.ScreenContainer
@@ -95,14 +100,62 @@ fun FemaleHomeScreen(navController: NavController, authViewModel: AuthViewModel)
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Seasonal Fits Section
+            /// Occasion Fits Section
             Text(
-                text = "Fits According to Season",
+                text = "Fits According to Occasion",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Text("• Summer • Winter • Monsoon • Spring")
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(femaleoccasionList) { occasion ->
+                    val onCardClick = {
+                        when (occasion.title) {
+                            "College" -> {
+                                navController.navigate(AuthScreen.OutfitDetails.createRoute("female", "college"))
+                                {
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
+                        }
+
+                    }
+                    Card(
+                        modifier = Modifier
+                            .width(100.dp)
+                            .height(120.dp)
+                            .clickable(onClick = onCardClick),
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(8.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = occasion.emoji,
+                                fontSize = 28.sp
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = occasion.title,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 
