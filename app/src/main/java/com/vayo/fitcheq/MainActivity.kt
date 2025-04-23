@@ -18,6 +18,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.vayo.fitcheq.ui.theme.FitCheqTheme
 import com.vayo.fitcheq.viewmodels.AuthViewModel
+import com.vayo.fitcheq.viewmodels.MaleHomeViewModel
 import kotlinx.coroutines.flow.collectLatest
 
 class MainActivity : ComponentActivity() {
@@ -30,6 +31,7 @@ class MainActivity : ComponentActivity() {
                 Log.d("NavigationDebug", "MainActivity setContent called")
                 val navController = rememberNavController()
                 val authViewModel: AuthViewModel = viewModel()
+                val maleViewModel: MaleHomeViewModel = viewModel()
 
                 // Initialize SharedPreferences
                 authViewModel.initializeSharedPreferences(applicationContext)
@@ -86,7 +88,7 @@ class MainActivity : ComponentActivity() {
                     }
                 } else {
                     // Base navigation with shared ViewModel
-                    AuthNavGraph(navController = navController, authViewModel = authViewModel)
+                    AuthNavGraph(navController = navController, authViewModel = authViewModel, maleViewModel = maleViewModel)
 
                     // Navigation logic
                     LaunchedEffect(isLoggedIn, isProfileCompleted, userGender) {
