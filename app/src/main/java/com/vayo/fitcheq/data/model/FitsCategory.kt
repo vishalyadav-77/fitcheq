@@ -11,7 +11,7 @@ val maleoccasionList = listOf(
 )
 
 val femaleoccasionList = listOf(
-    FitsCategory("📚", "FemaleCollege"),
+    FitsCategory("📚", "College"),
     FitsCategory("❤️", "Date"),
     FitsCategory("🌃", "Wedding"),
     FitsCategory("💼", "Office"),
