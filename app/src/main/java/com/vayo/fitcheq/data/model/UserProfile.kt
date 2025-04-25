@@ -13,16 +13,16 @@ data class UserProfile(
 )
 
 enum class AgeGroup(val displayName: String) {
-    BELOW_18("Below 18"),
+    BELOW_18("<18"),
     AGE_18_25("18-25"),
     AGE_25_30("25-30"),
     AGE_30_PLUS("30+"),
     UNSPECIFIED("Unspecified") // For cases where the user hasn't selected an age
 }
 enum class PreferPlatform(val displayName: String) {
-    cheap("meesho"),
-    moderate("Myntra"),
-    expensive("Zara")
+    cheap("Meesho Flipkart Amazon "),
+    moderate("Myntra AJIO FREAKINS Shein"),
+    expensive("Zara H&M ONLY Snitch ")
 }
 
 enum class HeightGroup(val displayName: String){
