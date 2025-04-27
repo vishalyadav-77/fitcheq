@@ -14,12 +14,6 @@ import kotlinx.coroutines.tasks.await
 
 class MaleHomeViewModel: ViewModel() {
     private val firestore = FirebaseFirestore.getInstance()
-
-//    fetch star boy outfits
-//    Firebase.firestore.collection("outfits")
-//    .whereEqualTo("gender", "male")
-//    .whereArrayContains("tags", "starboy")
-//    .get()
     private val _outfits = MutableStateFlow<List<OutfitData>>(emptyList())
     val outfits: StateFlow<List<OutfitData>> = _outfits
     
