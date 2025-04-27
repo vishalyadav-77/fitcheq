@@ -373,12 +373,12 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
                     uId = currentUser?.uid ?: "",
                     name = name,
                     gender = gender,
-                    ageGroup = ageGroup,
+                    ageGroup = AgeGroup.valueOf(ageGroup.name),
                     occupation = occupation,
-                    preferPlatform = preferplatform,
+                    preferPlatform = PreferPlatform.valueOf(preferplatform.name),
                     profileCompleted = true,
-                    height = height,
-                    bodyType = bodyType
+                    height = HeightGroup.valueOf(height.name),
+                    bodyType = BodyType.valueOf(bodyType.name)
                 )
                 firestore.collection("users").document(currentUser?.uid ?: "").set(userProfile)
                     .addOnSuccessListener {
@@ -388,6 +388,12 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
                         sharedPreferences.edit()
                             .putBoolean("profile_completed", true)
                             .putString("user_gender", gender)
+                            .putString("user_name", name)
+                            .putString("user_ageGroup", ageGroup.name)
+                            .putString("user_occupation", occupation)
+                            .putString("user_preferPlatform", preferplatform.name)
+                            .putString("user_height", height.name)
+                            .putString("user_bodyType", bodyType.name)
                             .apply()
 
                         Toast.makeText(context, "Profile Saved!", Toast.LENGTH_SHORT).show()
