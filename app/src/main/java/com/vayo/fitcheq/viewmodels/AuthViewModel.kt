@@ -8,6 +8,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.vayo.fitcheq.data.model.AgeGroup
+import com.vayo.fitcheq.data.model.BodyType
+import com.vayo.fitcheq.data.model.HeightGroup
+import com.vayo.fitcheq.data.model.PreferPlatform
+import com.vayo.fitcheq.data.model.UserProfile
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -55,21 +60,59 @@ class AuthViewModel: ViewModel() {
         }
     }
 
-    private fun saveProfileToSharedPreferences(profileCompleted: Boolean, gender: String?) {
+    private fun saveProfileToSharedPreferences(profileCompleted: Boolean,
+                                               gender: String?,
+                                               name: String?,
+                                               ageGroup: AgeGroup?,
+                                               occupation: String?,
+                                               preferPlatform: PreferPlatform?,
+                                               height: HeightGroup?,
+                                               bodyType: BodyType?,
+                                               uid: String?) {
         Log.d("NavigationDebug", "Saving to SharedPreferences - profileCompleted: $profileCompleted, gender: $gender")
+        Log.d("NavigationDebug", "Saving to SharedPreferences - age Group: $ageGroup")
         sharedPreferences?.edit()?.apply {
             putBoolean("profile_completed", profileCompleted)
             putString("user_gender", gender)
+            putString("user_name", name)
+            putString("user_ageGroup", ageGroup?.name)
+            putString("user_occupation", occupation)
+            putString("user_preferPlatform", preferPlatform?.name)
+            putString("user_heightGroup", height?.name)
+            putString("user_bodyType", bodyType?.name)
             apply()
         }
         Log.d("NavigationDebug", "SharedPreferences saved successfully")
     }
 
-    private fun loadProfileFromSharedPreferences(): Pair<Boolean, String?> {
-        val profileCompleted = sharedPreferences?.getBoolean("profile_completed", false) ?: false
-        val gender = sharedPreferences?.getString("user_gender", null)
-        Log.d("NavigationDebug", "Loading from SharedPreferences - profileCompleted: $profileCompleted, gender: $gender")
-        return Pair(profileCompleted, gender)
+
+
+    private fun loadProfileFromSharedPreferences(): UserProfile {
+        return UserProfile(
+            uId = sharedPreferences?.getString("user_uId", "") ?: "",
+            name = sharedPreferences?.getString("user_name", "") ?: "",
+            gender = sharedPreferences?.getString("user_gender", "") ?: "",
+            occupation = sharedPreferences?.getString("user_occupation", "") ?: "",
+            ageGroup = sharedPreferences?.getString("user_ageGroup", null)
+                ?.let { stringValue ->
+                    runCatching { AgeGroup.valueOf(stringValue) }.getOrNull()
+                } ?: AgeGroup.UNSPECIFIED,
+            preferPlatform = sharedPreferences?.getString("user_preferPlatform", null)
+                ?.let { stringValue ->
+                    runCatching { PreferPlatform.valueOf(stringValue) }.getOrNull()
+                } ?: PreferPlatform.moderate,
+            profileCompleted = sharedPreferences?.getBoolean("profile_completed", false) ?: false,
+            height = sharedPreferences?.getString("user_heightGroup", null)
+                ?.let { stringValue ->
+                    runCatching { HeightGroup.valueOf(stringValue) }.getOrNull()
+                } ?: HeightGroup.average,
+            bodyType = sharedPreferences?.getString("user_bodyType", null)
+                ?.let { stringValue ->
+                    runCatching { BodyType.valueOf(stringValue) }.getOrNull()
+                } ?: BodyType.average
+        ).also {
+            Log.d("ProfileLoad", "Loaded profile: $it")
+        }
     }
 
     init {
@@ -203,9 +246,12 @@ class AuthViewModel: ViewModel() {
 
             try {
                 // First check SharedPreferences
-                val (localProfileCompleted, localGender) = loadProfileFromSharedPreferences()
+                val userprofile = loadProfileFromSharedPreferences()
+                val localProfileCompleted = userprofile.profileCompleted
+                val localGender = userprofile.gender
+//                val (localProfileCompleted, localGender) = loadProfileFromSharedPreferences()
 
-                if (localProfileCompleted && localGender != null) {
+                if (localProfileCompleted && localGender.isNotEmpty()) {
                     Log.d("NavigationDebug", "Found valid profile data in SharedPreferences")
                     _isProfileCompleted.value = true
                     _userGender.value = localGender
@@ -223,6 +269,19 @@ class AuthViewModel: ViewModel() {
                 val exists = document.exists()
                 val completed = document.getBoolean("profileCompleted") ?: false
                 val gender = document.getString("gender")
+                val uid = document.getString("uid")
+                val name = document.getString("name")
+                val occupation = document.getString("occupation")
+                val ageGroupName = document.getString("ageGroup") ?: AgeGroup.UNSPECIFIED.name
+                val preferPlatformName = document.getString("preferPlatform") ?: PreferPlatform.moderate.name
+                val heightName = document.getString("height") ?: HeightGroup.average.name
+                val bodyTypeName = document.getString("bodyType") ?: BodyType.average.name
+
+                // Convert the string back to the enum instance
+                val ageGroup = AgeGroup.valueOf(ageGroupName)
+                val preferPlatform = PreferPlatform.valueOf(preferPlatformName)
+                val height = HeightGroup.valueOf(heightName)
+                val bodyType = BodyType.valueOf(bodyTypeName)
 
                 Log.d("NavigationDebug", """
                     Profile check results:
@@ -235,7 +294,7 @@ class AuthViewModel: ViewModel() {
                     Log.d("NavigationDebug", "Found valid profile in Firestore, updating SharedPreferences")
                     _isProfileCompleted.value = true
                     _userGender.value = gender
-                    saveProfileToSharedPreferences(true, gender)
+                    saveProfileToSharedPreferences(true, gender,name,ageGroup,occupation,preferPlatform,height,bodyType,uid)
                     Log.d("NavigationDebug", "Profile data saved to SharedPreferences")
                 } else {
                     Log.d("NavigationDebug", "Profile incomplete or missing in Firestore")
