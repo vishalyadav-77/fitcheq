@@ -392,7 +392,7 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
                             .putString("user_ageGroup", ageGroup.name)
                             .putString("user_occupation", occupation)
                             .putString("user_preferPlatform", preferplatform.name)
-                            .putString("user_height", height.name)
+                            .putString("user_heightGroup", height.name)
                             .putString("user_bodyType", bodyType.name)
                             .apply()
 
