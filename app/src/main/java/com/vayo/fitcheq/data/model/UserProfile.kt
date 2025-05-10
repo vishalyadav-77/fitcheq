@@ -3,10 +3,10 @@ package com.vayo.fitcheq.data.model
 data class UserProfile(
     val uId: String = "",
     val name: String = "",
-    val gender: String = "", // "Male" or "Female"
-    val occupation: String = "", // "College Student", working professional, school student , other
+    val gender: String = "",
+    val occupation: String = "",
     val ageGroup: AgeGroup = AgeGroup.UNSPECIFIED, // Default value
-    val preferPlatform: PreferPlatform = PreferPlatform.moderate, //default value
+    val preferPlatform: PreferPlatform = PreferPlatform.moderate,
     val profileCompleted: Boolean = false,
     val height: HeightGroup = HeightGroup.average,
     val bodyType: BodyType = BodyType.average
