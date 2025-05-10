@@ -34,6 +34,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,15 +55,27 @@ import coil.compose.AsyncImage
 import com.vayo.fitcheq.data.model.OutfitData
 import com.vayo.fitcheq.navigation.ScreenContainer
 import com.vayo.fitcheq.viewmodels.MaleHomeViewModel
-
-
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material3.Icon
+import com.google.firebase.auth.FirebaseAuth
 
 //@Preview
 @Composable
 fun OutfitDetailsScreen(gender: String,tag: String,viewModel: MaleHomeViewModel){
 
     val context = LocalContext.current
-    // Fetch only once when screen loads
+    val currentUser = FirebaseAuth.getInstance().currentUser
+
+    // Load favorites when screen loads
+    LaunchedEffect(Unit) {
+        currentUser?.uid?.let { userId ->
+            viewModel.loadFavorites(userId)
+        }
+    }
+
+    // Fetch outfits
     LaunchedEffect(gender, tag) {
         viewModel.fetchOutfitsByTagAndGender(tag, gender)
     }
@@ -140,6 +156,7 @@ fun OutfitDetailsScreen(gender: String,tag: String,viewModel: MaleHomeViewModel)
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(outfits) { outfit ->
+                        val isFavorite = viewModel.favoriteMap[outfit.id] ?: false
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -156,15 +173,33 @@ fun OutfitDetailsScreen(gender: String,tag: String,viewModel: MaleHomeViewModel)
                                 modifier = Modifier.padding(8.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                AsyncImage(
-                                    model = outfit.imageUrl,
-                                    contentDescription = outfit.title,
-                                    contentScale = ContentScale.Crop,
+                                Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(250.dp)
-                                        .clip(RoundedCornerShape(8.dp))
-                                )
+                                ) {
+                                    AsyncImage(
+                                        model = outfit.imageUrl,
+                                        contentDescription = outfit.title,
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(250.dp)
+                                            .clip(RoundedCornerShape(8.dp))
+                                    )
+                                    Icon(
+                                        imageVector = if (isFavorite)  Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                                        contentDescription = "Favorite",
+                                        tint = if (isFavorite) Color.Red else Color.White,
+                                        modifier = Modifier
+                                            .align(Alignment.TopEnd)
+                                            .padding(8.dp)
+                                            .size(24.dp)
+                                            .clickable {
+                                                viewModel.toggleFavorite(outfit)
+                                            }
+                                    )
+                                }
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Column(
                                     modifier = Modifier.fillMaxWidth()

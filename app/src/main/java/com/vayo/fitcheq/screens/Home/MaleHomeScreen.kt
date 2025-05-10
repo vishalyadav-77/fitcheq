@@ -30,27 +30,30 @@ import androidx.compose.foundation.lazy.items
 import androidx.navigation.compose.rememberNavController
 import com.vayo.fitcheq.AuthScreen
 import com.vayo.fitcheq.data.model.malefashionList
-import com.vayo.fitcheq.navigation.MainNavGraph
+import com.vayo.fitcheq.viewmodels.MaleHomeViewModel
 
-
-//@Preview(showBackground = true)
-//@Composable
-//fun MaleHomePreview() {
-//    // Provide a fake NavController (won't actually navigate in preview)
-//    val navController = rememberNavController()
-//
-//    MaleHomeScreen(navController)
-//}
 
 @Composable
 fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
-//fun MaleHomeScreen(navController: NavController) {
     val firestore = remember { FirebaseFirestore.getInstance() }
     val currentUser = FirebaseAuth.getInstance().currentUser
     var userName by remember { mutableStateOf("Loading...") }
     var isLoading by remember { mutableStateOf(true) }
     val context = LocalContext.current
     val isLoggedIn by authViewModel.authState.collectAsStateWithLifecycle()
+    val homeViewModel: MaleHomeViewModel = viewModel()
+    val userId by authViewModel.currentUserId.collectAsState()
+
+
+    // Observe the userId changes to load or clear favorites
+    LaunchedEffect(userId) {
+        userId?.let {
+            homeViewModel.observeUser(authViewModel.currentUserId)  // Load favorites when user is logged in
+        } ?: run {
+            homeViewModel.clearFavorites()
+        }
+    }
+
 
     LaunchedEffect(isLoggedIn) {
         if (!isLoggedIn) {

@@ -8,5 +8,6 @@ data class OutfitData(
     val price: String = "",
     val website: String = "",
     val gender: String = "",
-    val tags: List<String> = emptyList()
+    val tags: List<String> = emptyList(),
+    var isFavorite: Boolean = false
 )
