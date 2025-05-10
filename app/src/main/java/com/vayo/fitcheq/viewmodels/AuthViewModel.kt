@@ -3,6 +3,7 @@ package com.vayo.fitcheq.viewmodels
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
@@ -44,6 +45,13 @@ class AuthViewModel: ViewModel() {
     private var lastProfileCheckTime = 0L
     private val PROFILE_CHECK_DEBOUNCE = 1000L // 1 second
 
+    private val _currentUserId = MutableStateFlow(auth.currentUser?.uid)
+    val currentUserId: StateFlow<String?> = _currentUserId.asStateFlow()
+
+
+    val userProfile = mutableStateOf<UserProfile?>(null)
+
+
     fun initializeSharedPreferences(context: Context) {
         if (sharedPreferences == null) {
             Log.d("NavigationDebug", "Initializing SharedPreferences")
@@ -84,10 +92,12 @@ class AuthViewModel: ViewModel() {
         }
         Log.d("NavigationDebug", "SharedPreferences saved successfully")
     }
+    fun loadProfile(): UserProfile { // Renamed for clarity
+        return loadProfileFromSharedPreferences()
+    }
 
 
-
-    private fun loadProfileFromSharedPreferences(): UserProfile {
+     fun loadProfileFromSharedPreferences(): UserProfile {
         return UserProfile(
             uId = sharedPreferences?.getString("user_uId", "") ?: "",
             name = sharedPreferences?.getString("user_name", "") ?: "",
@@ -178,6 +188,8 @@ class AuthViewModel: ViewModel() {
                 _isProfileCompleted.value = null
                 _userGender.value = null
 
+                _currentUserId.value = auth.currentUser?.uid
+
                 Log.d("NavigationDebug", """
                     States after login:
                     authState: ${_authState.value}
@@ -205,8 +217,13 @@ class AuthViewModel: ViewModel() {
             _authState.value = false
             _isProfileCompleted.value = null
             _userGender.value = null
-            // Clear SharedPreferences on logout
+            _currentUserId.value = null
             sharedPreferences?.edit()?.clear()?.apply()
+            
+            // Clear favorites when logging out
+            val maleHomeViewModel = MaleHomeViewModel()
+            maleHomeViewModel.clearFavorites()
+            
             Log.d("NavigationDebug", "Logout completed, all states reset and SharedPreferences cleared")
             showToast("Logged out successfully!")
         }
