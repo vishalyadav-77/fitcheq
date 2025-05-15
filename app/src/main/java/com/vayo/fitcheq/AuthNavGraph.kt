@@ -46,7 +46,7 @@ fun AuthNavGraph(
         composable(AuthScreen.MaleHome.route) { MaleHomeScreen(navController, authViewModel) }
         composable(AuthScreen.FemaleHome.route) { FemaleHomeScreen(navController, authViewModel) }
         composable(AuthScreen.Community.route) { CommunityScreen(navController, authViewModel) }
-        composable(AuthScreen.SavedOutfit.route) { SavedOutfitScreen(navController, authViewModel) }
+        composable(AuthScreen.SavedOutfit.route) { SavedOutfitScreen(navController, maleViewModel) }
         composable(AuthScreen.MyProfile.route) { MyProfileScreen(navController, authViewModel) }
         composable(
             route = AuthScreen.OutfitDetails.route,

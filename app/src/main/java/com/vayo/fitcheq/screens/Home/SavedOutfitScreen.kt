@@ -1,88 +1,179 @@
 package com.vayo.fitcheq.screens.Home
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.vayo.fitcheq.viewmodels.AuthViewModel
+import coil.compose.AsyncImage
 import com.vayo.fitcheq.navigation.ScreenContainer
 import com.vayo.fitcheq.R
+import com.vayo.fitcheq.viewmodels.MaleHomeViewModel
 
-//@Preview(showBackground = true)
-//@Composable
-//fun SavedOutfitScreenPreview() {
-//    // Provide a fake NavController (won't actually navigate in preview)
-//    val navController = rememberNavController()
-//
-//    SavedOutfitScreen(navController)
-//}
 
 @Composable
-fun SavedOutfitScreen(navController: NavController, authViewModel: AuthViewModel) {
-//fun SavedOutfitScreen(navController: NavController) {
+fun SavedOutfitScreen(navController: NavController, viewModel: MaleHomeViewModel) {
+    val context = LocalContext.current
+    val outfits by viewModel.outfits.collectAsState() // auto-observe flow
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchSavedOutfits()
+    }
+
     ScreenContainer(navController = navController) { paddingValues ->
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(paddingValues)
-                .padding(vertical = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxSize()
+                .padding(paddingValues) // Important to respect system bars
         ) {
-            Text(
-                text = "Wishlist",
-                fontSize = 22.sp,
-                fontWeight = FontWeight.SemiBold
-            )
-            Divider(
+            //TITLE
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp, bottom = 16.dp),
-                color = Color.LightGray,
-                thickness = 1.dp
-            )
-        }
-        LazyColumn( modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            item {
-                //IF CONDITION FOR INVISIBLE AND VISIBLE VARIABLE STATE
-                Box(
+                    .fillMaxWidth(),
+                //                .padding(paddingValues)
+                //                .padding(vertical = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Wishlist",
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Divider(
                     modifier = Modifier
-                        .fillParentMaxSize(), // fills entire LazyColumn height
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        .fillMaxWidth()
+                        .padding(top = 8.dp, bottom = 16.dp),
+                    color = Color.LightGray,
+                    thickness = 1.dp
+                )
+            }
+            // BODY OF THE SCREEN
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 0.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(outfits) { outfit ->
+                    val isFavorite = viewModel.favoriteMap[outfit.id] ?: false
+
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(350.dp)
+                            .padding(2.dp)
+                            .clickable {
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(outfit.link))
+                                context.startActivity(intent)
+                            },
+                        elevation = CardDefaults.cardElevation(4.dp),
+                        shape = RoundedCornerShape(12.dp)
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.drobe_image),
-                            contentDescription = "Wardrobe",
-                            modifier = Modifier
-                                .size(320.dp)
-                        )
+                        Column(
+                            modifier = Modifier.padding(8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(250.dp)
+                            ) {
+                                AsyncImage(
+                                    model = outfit.imageUrl,
+                                    contentDescription = outfit.title,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(250.dp)
+                                        .clip(RoundedCornerShape(8.dp))
+                                )
+                                Icon(
+                                    imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                                    contentDescription = "Favorite",
+                                    tint = if (isFavorite) Color.Red else Color.White,
+                                    modifier = Modifier
+                                        .align(Alignment.TopEnd)
+                                        .padding(8.dp)
+                                        .size(24.dp)
+                                        .clickable {
+                                            viewModel.toggleFavorite(outfit)
+                                        }
+                                )
+                            }
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                            Spacer(modifier = Modifier.height(8.dp))
 
-                        Text(
-                            text = "You haven’t saved anything\nStart building your wardrobe",
-                            fontSize = 16.sp,
-                            color = Color.Gray,
-                            textAlign = TextAlign.Center
-                        )
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 4.dp),
+                                verticalArrangement = Arrangement.spacedBy(2.dp)
+                            ) {
+                                Text(
+                                    text = outfit.title,
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 14.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .basicMarquee()
+                                        .focusable()
+                                )
+
+                                Text(
+                                    text = "₹${outfit.price}",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 14.sp,
+                                )
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.End
+                                ) {
+                                    Text(
+                                        text = outfit.website,
+                                        fontSize = 12.sp,
+                                        fontStyle = FontStyle.Italic,
+                                        color = Color.DarkGray
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
