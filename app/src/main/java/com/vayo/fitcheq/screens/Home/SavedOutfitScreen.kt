@@ -46,7 +46,7 @@ import com.vayo.fitcheq.viewmodels.MaleHomeViewModel
 @Composable
 fun SavedOutfitScreen(navController: NavController, viewModel: MaleHomeViewModel) {
     val context = LocalContext.current
-    val outfits by viewModel.outfits.collectAsState() // auto-observe flow
+    val savedOutfits by viewModel.savedOutfits.collectAsState() // Changed from outfits to savedOutfits
 
     LaunchedEffect(Unit) {
         viewModel.fetchSavedOutfits()
@@ -62,8 +62,6 @@ fun SavedOutfitScreen(navController: NavController, viewModel: MaleHomeViewModel
             Column(
                 modifier = Modifier
                     .fillMaxWidth(),
-                //                .padding(paddingValues)
-                //                .padding(vertical = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
@@ -80,97 +78,126 @@ fun SavedOutfitScreen(navController: NavController, viewModel: MaleHomeViewModel
                 )
             }
             // BODY OF THE SCREEN
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 0.dp),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(outfits) { outfit ->
-                    val isFavorite = viewModel.favoriteMap[outfit.id] ?: false
-
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(350.dp)
-                            .padding(2.dp)
-                            .clickable {
-                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(outfit.link))
-                                context.startActivity(intent)
-                            },
-                        elevation = CardDefaults.cardElevation(4.dp),
-                        shape = RoundedCornerShape(12.dp)
+            if (savedOutfits.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
                     ) {
-                        Column(
-                            modifier = Modifier.padding(8.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                        Image(
+                            painter = painterResource(id = R.drawable.drobe_image),
+                            contentDescription = "Empty Wishlist",
+                            modifier = Modifier
+                                .size(300.dp)
+                                .padding(bottom = 16.dp)
+                        )
+                        Text(
+                            text = "Your wishlist is empty",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color.Gray
+                        )
+                    }
+                }
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 0.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(savedOutfits) { outfit ->  // Changed from outfits to savedOutfits
+                        val favoriteMap by viewModel.favoriteMap.collectAsState()
+                        val isFavorite = favoriteMap[outfit.id] ?: false
+
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(350.dp)
+                                .padding(2.dp)
+                                .clickable {
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(outfit.link))
+                                    context.startActivity(intent)
+                                },
+                            elevation = CardDefaults.cardElevation(4.dp),
+                            shape = RoundedCornerShape(12.dp)
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(250.dp)
+                            Column(
+                                modifier = Modifier.padding(8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                AsyncImage(
-                                    model = outfit.imageUrl,
-                                    contentDescription = outfit.title,
-                                    contentScale = ContentScale.Crop,
+                                Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(250.dp)
-                                        .clip(RoundedCornerShape(8.dp))
-                                )
-                                Icon(
-                                    imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                                    contentDescription = "Favorite",
-                                    tint = if (isFavorite) Color.Red else Color.White,
+                                ) {
+                                    AsyncImage(
+                                        model = outfit.imageUrl,
+                                        contentDescription = outfit.title,
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(250.dp)
+                                            .clip(RoundedCornerShape(8.dp))
+                                    )
+                                    Icon(
+                                        imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                                        contentDescription = "Favorite",
+                                        tint = if (isFavorite) Color.Red else Color.White,
+                                        modifier = Modifier
+                                            .align(Alignment.TopEnd)
+                                            .padding(8.dp)
+                                            .size(24.dp)
+                                            .clickable {
+                                                viewModel.toggleFavorite(outfit)
+                                            }
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                Column(
                                     modifier = Modifier
-                                        .align(Alignment.TopEnd)
-                                        .padding(8.dp)
-                                        .size(24.dp)
-                                        .clickable {
-                                            viewModel.toggleFavorite(outfit)
-                                        }
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 4.dp),
-                                verticalArrangement = Arrangement.spacedBy(2.dp)
-                            ) {
-                                Text(
-                                    text = outfit.title,
-                                    fontWeight = FontWeight.SemiBold,
-                                    fontSize = 14.sp,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .basicMarquee()
-                                        .focusable()
-                                )
-
-                                Text(
-                                    text = "₹${outfit.price}",
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 14.sp,
-                                )
-
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.End
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 4.dp),
+                                    verticalArrangement = Arrangement.spacedBy(2.dp)
                                 ) {
                                     Text(
-                                        text = outfit.website,
-                                        fontSize = 12.sp,
-                                        fontStyle = FontStyle.Italic,
-                                        color = Color.DarkGray
+                                        text = outfit.title,
+                                        fontWeight = FontWeight.SemiBold,
+                                        fontSize = 14.sp,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .basicMarquee()
+                                            .focusable()
                                     )
+
+                                    Text(
+                                        text = "₹${outfit.price}",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 14.sp,
+                                    )
+
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.End
+                                    ) {
+                                        Text(
+                                            text = outfit.website,
+                                            fontSize = 12.sp,
+                                            fontStyle = FontStyle.Italic,
+                                            color = Color.DarkGray
+                                        )
+                                    }
                                 }
                             }
                         }

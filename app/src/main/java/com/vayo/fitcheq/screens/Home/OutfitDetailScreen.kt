@@ -156,7 +156,8 @@ fun OutfitDetailsScreen(gender: String,tag: String,viewModel: MaleHomeViewModel)
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(outfits) { outfit ->
-                        val isFavorite = viewModel.favoriteMap[outfit.id] ?: false
+                        val favoriteMap by viewModel.favoriteMap.collectAsState()
+                        val isFavorite = favoriteMap[outfit.id] ?: false
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
