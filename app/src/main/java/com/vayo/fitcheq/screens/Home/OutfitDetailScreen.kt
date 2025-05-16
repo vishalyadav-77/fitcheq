@@ -60,6 +60,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
 import com.google.firebase.auth.FirebaseAuth
+import android.widget.Toast
 
 //@Preview
 @Composable
@@ -198,6 +199,11 @@ fun OutfitDetailsScreen(gender: String,tag: String,viewModel: MaleHomeViewModel)
                                             .size(24.dp)
                                             .clickable {
                                                 viewModel.toggleFavorite(outfit)
+                                                Toast.makeText(
+                                                    context,
+                                                    if (isFavorite) "Removed from wishlist" else "Added to wishlist",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
                                             }
                                     )
                                 }

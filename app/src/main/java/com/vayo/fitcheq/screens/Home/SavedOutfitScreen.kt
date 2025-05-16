@@ -41,6 +41,7 @@ import coil.compose.AsyncImage
 import com.vayo.fitcheq.navigation.ScreenContainer
 import com.vayo.fitcheq.R
 import com.vayo.fitcheq.viewmodels.MaleHomeViewModel
+import android.widget.Toast
 
 
 @Composable
@@ -157,6 +158,11 @@ fun SavedOutfitScreen(navController: NavController, viewModel: MaleHomeViewModel
                                             .size(24.dp)
                                             .clickable {
                                                 viewModel.toggleFavorite(outfit)
+                                                Toast.makeText(
+                                                    context,
+                                                    if (isFavorite) "Removed from wishlist" else "Added to wishlist",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
                                             }
                                     )
                                 }
