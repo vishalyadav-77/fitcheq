@@ -123,16 +123,6 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
             )
 
             Spacer(modifier = Modifier.height(16.dp))
-
-            // Welcome Message
-            Text(
-                text = "Welcome, $userName! 👋",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
             // Row for Profile and Weather Widget Buttons
             Row(
                 modifier = Modifier.fillMaxWidth(),
