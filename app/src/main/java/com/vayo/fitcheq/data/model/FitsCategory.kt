@@ -7,7 +7,17 @@ val maleoccasionList = listOf(
     FitsCategory("❤️", "Date"),
     FitsCategory("🤵", "Wedding"),
     FitsCategory("💼", "Office"),
+    FitsCategory("⛱️", "Beach"),
     FitsCategory("🏋️", "Gym")
+)
+val malecategoryList = listOf(
+    FitsCategory("👕", "Tshirt"),
+    FitsCategory("👕", "Shirt"),
+    FitsCategory("👖", "Jeans"),
+    FitsCategory("💼", "TrackPants"),
+    FitsCategory("🧥", "Jacket"),
+    FitsCategory("🧥", "TankTops"),
+    FitsCategory("💍️", "Accessories")
 )
 
 val femaleoccasionList = listOf(
