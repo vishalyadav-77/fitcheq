@@ -6,6 +6,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -29,7 +31,12 @@ import com.vayo.fitcheq.navigation.ScreenContainer
 import androidx.compose.foundation.lazy.items
 import androidx.navigation.compose.rememberNavController
 import com.vayo.fitcheq.AuthScreen
+import com.vayo.fitcheq.data.model.FitsCategory
+import com.vayo.fitcheq.data.model.malecategoryList
 import com.vayo.fitcheq.data.model.malefashionList
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import com.vayo.fitcheq.viewmodels.MaleHomeViewModel
 
 
@@ -44,7 +51,6 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
     val homeViewModel: MaleHomeViewModel = viewModel()
     val userId by authViewModel.currentUserId.collectAsState()
 
-
     // Observe the userId changes to load or clear favorites
     LaunchedEffect(userId) {
         userId?.let {
@@ -53,7 +59,6 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
             homeViewModel.clearFavorites()
         }
     }
-
 
     LaunchedEffect(isLoggedIn) {
         if (!isLoggedIn) {
@@ -106,10 +111,10 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
     }
 
     ScreenContainer(navController = navController) { paddingValues ->
-//    ScreenContainer(navController = navController) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(paddingValues)
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -159,6 +164,88 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
+
+            // shop by category Section
+            Text(
+                text = "Shop by Category",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            // Horizontal scrollable 2-row layout
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp), // adjust as needed
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                val chunkedCategories = malecategoryList.chunked(2) // two rows per column
+                items(chunkedCategories.size) { index ->
+                    val itemsInColumn = chunkedCategories[index]
+
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier
+                            .width(100.dp) // ensures 4 max visible at once if LazyRow width ~ 400dp
+                    ) {
+                        itemsInColumn.forEach { category ->
+                            val onCardClick = {
+                                val route = when (category.title) {
+                                    "TShirt" -> "tshirt"
+                                    "Shirt" -> "shirt"
+                                    "Jeans" -> "jeans"
+                                    "Trackpants" -> "trackpants"
+                                    "Jacket" -> "jacket"
+                                    "TankTop" -> "tanktop"
+                                    "Accessories" -> "accessories"
+                                    else -> ""
+                                }
+                                if (route.isNotEmpty()) {
+                                    navController.navigate(
+                                        AuthScreen.OutfitDetails.createRoute("male", route)
+                                    ) {
+                                        popUpTo(navController.graph.startDestinationId) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
+                                }
+                            }
+
+                            Card(
+                                modifier = Modifier
+                                    .height(80.dp)
+                                    .fillMaxWidth()
+                                    .clickable(onClick = onCardClick),
+                                shape = RoundedCornerShape(12.dp),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        text = category.emoji,
+                                        fontSize = 28.sp
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(
+                                        text = category.title,
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+             Spacer(modifier = Modifier.height(24.dp))
+
             // Occasion Fits Section
             Text(
                 text = "Fits According to Occasion",
@@ -170,21 +257,23 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(maleoccasionList) { occasion ->
+                items(maleoccasionList, key = { it.title }) { occasion ->
                     val onCardClick = {
-                        when (occasion.title) {
-                            "College" -> {
-                                navController.navigate(AuthScreen.OutfitDetails.createRoute("male", "college"))
-                                {
-                                    popUpTo(navController.graph.startDestinationId) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
+                        val route = when (occasion.title) {
+                            "College" -> "college"
+                            "Date" -> "date"
+                            "Wedding" -> "wedding"
+                            "Office" -> "office"
+                            "Gym" -> "gym"
+                            else -> ""
+                        }
+                        if (route.isNotEmpty()) {
+                            navController.navigate(AuthScreen.OutfitDetails.createRoute("male", route)) {
+                                popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
                             }
                         }
-
                     }
                     Card(
                         modifier = Modifier
@@ -215,17 +304,6 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                     }
                 }
             }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Seasonal Fits Section
-            Text(
-                text = "Fits According to Season",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text("• Summer • Winter • Monsoon • Spring")
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -240,23 +318,27 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(malefashionList) { occasion ->
+                items(malefashionList, key = { it.title }) { fashion ->
                     val onCardClick = {
-                        when (occasion.title) {
-                            "Starboy" -> {
-                                navController.navigate(AuthScreen.OutfitDetails.createRoute("male", "starboy"))
-                                {
-                                    popUpTo(navController.graph.startDestinationId) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
+                        val route = when (fashion.title) {
+                            "Starboy" -> "starboy"
+                            "Soft Boy" -> "softboy"
+                            "Y2K" -> "y2k"
+                            "Old Money" -> "oldmoney"
+                            "Streetwear" -> "streetwear"
+                            "Minimalist" -> "minimalist"
+                            "Dark Academia" -> "dark"
+                            else -> ""
+                        }
+                        if (route.isNotEmpty()) {
+                            navController.navigate(AuthScreen.OutfitDetails.createRoute("male", route)) {
+                                popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
                             }
                         }
-
                     }
-                    
+
                     Card(
                         modifier = Modifier
                             .width(100.dp)
@@ -273,12 +355,12 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = occasion.emoji,
+                                text = fashion.emoji,
                                 fontSize = 28.sp
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = occasion.title,
+                                text = fashion.title,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -288,16 +370,30 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
             }
 
             Spacer(modifier = Modifier.height(24.dp))
+            // Seasonal Fits Section
+            Text(
+                text = "Fits According to Season",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text("• Summer • Winter • Monsoon • Spring")
+
+            Spacer(modifier = Modifier.height(24.dp))
+
 
             // Logout Button
-            Button(
-                onClick = {
-                    authViewModel.logout()
-                          },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Logout")
-            }
+                    Button(
+                        onClick = {
+                            authViewModel.logout()
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Logout")
+                    }
+
+
+
         }
     }
 }
