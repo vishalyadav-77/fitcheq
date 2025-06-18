@@ -68,14 +68,25 @@ fun MyProfileScreen(navController: NavController, authViewModel: AuthViewModel) 
             } ?: run {
                 Text("Loading...", modifier = Modifier.align(Alignment.CenterHorizontally))
             }
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Logout Button
+            Button(
+                onClick = {
+                    authViewModel.logout()
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Logout")
+            }
         }
     }
 }
 @Composable
 fun ProfileRow(label: String, value: String) {
     Column(modifier = Modifier.padding(vertical = 8.dp,horizontal = 12.dp)) {
-        Text(text = label, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-        Text(text = value, fontSize = 15.sp, color = Color.DarkGray)
+        Text(text = label, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        Text(text = value, fontSize = 12.sp, color = Color.DarkGray)
     }
 }
 
