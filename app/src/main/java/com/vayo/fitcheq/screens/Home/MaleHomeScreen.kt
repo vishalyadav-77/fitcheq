@@ -37,6 +37,9 @@ import com.vayo.fitcheq.data.model.malefashionList
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
 import com.vayo.fitcheq.viewmodels.MaleHomeViewModel
 
 
@@ -176,7 +179,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
             LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp), // adjust as needed
+                    .height(250.dp), // adjust as needed
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 val chunkedCategories = malecategoryList.chunked(2) // two rows per column
@@ -215,28 +218,33 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
 
                             Card(
                                 modifier = Modifier
-                                    .height(80.dp)
+                                    .height(120.dp)
                                     .fillMaxWidth()
                                     .clickable(onClick = onCardClick),
                                 shape = RoundedCornerShape(12.dp),
                                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                             ) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                    verticalArrangement = Arrangement.Center,
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Text(
-                                        text = category.emoji,
-                                        fontSize = 28.sp
+                                Box(modifier = Modifier.fillMaxSize()) {
+                                    AsyncImage(
+                                        model = category.imageUrl,
+                                        contentDescription = category.title,
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop
                                     )
-                                    Spacer(modifier = Modifier.height(8.dp))
+
                                     Text(
                                         text = category.title,
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.SemiBold
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = Color.White,
+                                        modifier = Modifier
+                                            .align(Alignment.BottomStart)
+                                            .padding(8.dp)
+                                            .background(
+                                                color = Color.Black.copy(alpha = 0.6f),
+                                                shape = RoundedCornerShape(6.dp)
+                                            )
+                                            .padding(horizontal = 8.dp, vertical = 4.dp) // internal padding inside bg
                                     )
                                 }
                             }
@@ -283,22 +291,27 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                         shape = RoundedCornerShape(12.dp),
                         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                     ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(8.dp),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = occasion.emoji,
-                                fontSize = 28.sp
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            AsyncImage(
+                                model = occasion.imageUrl,
+                                contentDescription = occasion.title,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
+
                             Text(
                                 text = occasion.title,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.SemiBold
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color.White,
+                                modifier = Modifier
+                                    .align(Alignment.BottomStart)
+                                    .padding(8.dp)
+                                    .background(
+                                        color = Color.Black.copy(alpha = 0.6f),
+                                        shape = RoundedCornerShape(6.dp)
+                                    )
+                                    .padding(horizontal = 8.dp, vertical = 4.dp) // internal padding inside bg
                             )
                         }
                     }
@@ -355,7 +368,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = fashion.emoji,
+                                text = fashion.emoji?: "",
                                 fontSize = 28.sp
                             )
                             Spacer(modifier = Modifier.height(8.dp))
