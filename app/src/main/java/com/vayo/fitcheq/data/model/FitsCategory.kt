@@ -16,7 +16,7 @@ val malecategoryList = listOf(
     FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/jeans2male.webp", title = "Jeans"),
     FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/trackpants.webp", title = "TrackPants"),
     FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/jacket_male.webp", title = "Jacket"),
-    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/tanktop_male.webp", title = "TankTops"),
+    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/tanktop_male.webp", title = "TankTop"),
     FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/male_accessories.webp", title = "Accessories")
 )
 
@@ -30,11 +30,11 @@ val femaleoccasionList = listOf(
 )
 
 val malefashionList = listOf(
-    FitsCategory(emoji = "🕊️", title = "Minimalist"),
-    FitsCategory(emoji = "💸", title = "Old Money"),
-    FitsCategory(emoji = "🌟", title = "Starboy"),
-    FitsCategory(emoji = "🧢", title = "Streetwear"),
-    FitsCategory(emoji = "🧛", title = "Dark Academia"),
-    FitsCategory(emoji = "💿", title = "Y2K"),
-    FitsCategory(emoji = "🌻", title = "Soft Boy"),
+    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/minimalist_final.webp", title = "Minimalist"),
+    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/oldmoney_final.webp", title = "Old Money"),
+    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/streetwear_final.webp", title = "Streetwear"),
+    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/starboy_final.webp", title = "Starboy"),
+    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/softboy_final.webp", title = "Soft Boy"),
+    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/y2k_final.webp", title = "Y2K"),
+    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/dark2_final.webp", title = "Dark Academia")
 )
