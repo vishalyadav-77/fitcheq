@@ -10,6 +10,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,9 +41,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontStyle
+import com.vayo.fitcheq.R
 import coil.compose.AsyncImage
+import com.vayo.fitcheq.data.model.maleSeasonList
 import com.vayo.fitcheq.viewmodels.MaleHomeViewModel
-
 
 @Composable
 fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
@@ -53,6 +59,12 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
     val isLoggedIn by authViewModel.authState.collectAsStateWithLifecycle()
     val homeViewModel: MaleHomeViewModel = viewModel()
     val userId by authViewModel.currentUserId.collectAsState()
+    val myTitleFont = FontFamily(
+        Font(R.font.title_syarifa)
+    )
+    val myHeadingFont = FontFamily(
+        Font(R.font.headings_kugile)
+    )
 
     // Observe the userId changes to load or clear favorites
     LaunchedEffect(userId) {
@@ -118,60 +130,141 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(paddingValues)
-                .padding(16.dp),
+                .padding(vertical = 18.dp)
+                .padding(paddingValues),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Top Bar with App Title
             Text(
                 text = "Fit Cheq",
+                fontFamily = myTitleFont,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-            // Row for Profile and Weather Widget Buttons
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Button(
-                    onClick = { /* TODO: Handle Weather Click */ },
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text("Weather Widget")
-                }
+            Spacer(modifier = Modifier.height(30.dp))
 
-                Button(
-                    onClick = { navController.navigate("my_profile") },
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text("Male Profile")
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Search Bar Placeholder
+            // Search Bar
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp)
-                    .background(Color.LightGray, shape = RoundedCornerShape(8.dp))
-                    .clickable { /* TODO: Handle Search Click */ },
-                contentAlignment = Alignment.Center
+                    .padding(horizontal = 16.dp)//outer margin
+                    .height(46.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color(0xFFF1F1F1)) // Light gray modern tone
+                    .clickable { /* Handle click later */ }
+                    .padding(horizontal = 16.dp),//inner padding
+                contentAlignment = Alignment.CenterStart
             ) {
-                Text("Search for outfits...", color = Color.Gray)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search",
+                        tint = Color.Gray
+                    )
+
+                    Text(
+                        text = "Search outfits, styles...",
+                        color = Color.Gray,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
 
+            Spacer(modifier = Modifier.height(30.dp))
+
+            Text(
+                text= "Time for today’s fit cheq?",
+                fontSize = 20.sp,
+                fontStyle = FontStyle.Italic,
+            )
+            Spacer(modifier = Modifier.height(30.dp))
+
+        //  ESSENTIALS CATEGORY
+            Card(
+                modifier = Modifier
+                .height(200.dp)
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth(),
+//                .clickable(),
+                shape = RoundedCornerShape(12.dp),
+                elevation = CardDefaults.cardElevation(4.dp)
+            ) {
+                AsyncImage(
+                    model = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/banners/ess_banner2.webp",
+                    contentDescription = "ESS Banner",
+                    contentScale = ContentScale.Crop
+                )
+            }
+            Spacer(modifier = Modifier.height(30.dp))
+
+            // Seasonal Fits Section
+            Text(
+                text = "Fits By Season",
+                fontFamily = myHeadingFont,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Box(modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    maleSeasonList.forEach { season ->
+                        val onCardClick = {
+                            val route = when (season.title) {
+                                "Summer" -> "summer"
+                                "Winter" -> "winter"
+                                else -> ""
+                            }
+                            if (route.isNotEmpty()) {
+                                navController.navigate(
+                                    AuthScreen.OutfitDetails.createRoute(
+                                        "male",
+                                        route
+                                    )
+                                ) {
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
+                        }
+                        Card(
+                            modifier = Modifier
+                                .width(190.dp)
+                                .height(260.dp)
+                                .clickable(onClick = onCardClick),
+                            shape = RoundedCornerShape(12.dp),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                        ) {
+                            Box(modifier = Modifier.fillMaxSize()) {
+                                AsyncImage(
+                                    model = season.imageUrl,
+                                    contentDescription = season.title,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(28.dp))
 
             // shop by category Section
             Text(
-                text = "Shop by Category",
-                fontSize = 20.sp,
+                text = "Shop By Category",
+                fontFamily = myHeadingFont,
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -179,8 +272,9 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
             LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(250.dp), // adjust as needed
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    .height(250.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp)
             ) {
                 val chunkedCategories = malecategoryList.chunked(2) // two rows per column
                 items(chunkedCategories.size) { index ->
@@ -194,12 +288,12 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                         itemsInColumn.forEach { category ->
                             val onCardClick = {
                                 val route = when (category.title) {
-                                    "TShirt" -> "tshirt"
+                                    "Tshirt" -> "tshirt"
                                     "Shirt" -> "shirt"
                                     "Jeans" -> "jeans"
-                                    "Trackpants" -> "trackpants"
+                                    "TrackPants" -> "trackpants"
                                     "Jacket" -> "jacket"
-                                    "TankTop" -> "tanktop"
+                                    "TankTops" -> "tanktops"
                                     "Accessories" -> "accessories"
                                     else -> ""
                                 }
@@ -222,7 +316,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                                     .fillMaxWidth()
                                     .clickable(onClick = onCardClick),
                                 shape = RoundedCornerShape(12.dp),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
                             ) {
                                 Box(modifier = Modifier.fillMaxSize()) {
                                     AsyncImage(
@@ -252,24 +346,27 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                     }
                 }
             }
-             Spacer(modifier = Modifier.height(24.dp))
+             Spacer(modifier = Modifier.height(28.dp))
 
             // Occasion Fits Section
             Text(
-                text = "Fits According to Occasion",
-                fontSize = 20.sp,
+                text = "Fits By Occasion",
+                fontFamily = myHeadingFont,
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(8.dp))
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp)
             ) {
                 items(maleoccasionList, key = { it.title }) { occasion ->
                     val onCardClick = {
                         val route = when (occasion.title) {
                             "College" -> "college"
                             "Date" -> "date"
+                            "Beach" -> "beach"
                             "Wedding" -> "wedding"
                             "Office" -> "office"
                             "Gym" -> "gym"
@@ -285,8 +382,8 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                     }
                     Card(
                         modifier = Modifier
-                            .width(100.dp)
-                            .height(120.dp)
+                            .width(120.dp)
+                            .height(140.dp)
                             .clickable(onClick = onCardClick),
                         shape = RoundedCornerShape(12.dp),
                         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -318,18 +415,20 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
             // Fashion Style Section
             Text(
-                text = "Fits According to Fashion Style",
-                fontSize = 20.sp,
+                text = "Fits By Fashion Style",
+                fontFamily = myHeadingFont,
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(8.dp))
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp)
             ) {
                 items(malefashionList, key = { it.title }) { fashion ->
                     val onCardClick = {
@@ -354,59 +453,25 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
 
                     Card(
                         modifier = Modifier
-                            .width(100.dp)
-                            .height(120.dp)
+                            .width(140.dp)
+                            .height(160.dp)
                             .clickable(onClick = onCardClick),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
                         shape = RoundedCornerShape(12.dp),
                         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                     ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(8.dp),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = fashion.emoji?: "",
-                                fontSize = 28.sp
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = fashion.title,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.SemiBold
+                        Box(modifier = Modifier.fillMaxSize().padding(4.dp)) {
+                            AsyncImage(
+                                model = fashion.imageUrl,
+                                contentDescription = fashion.title,
+                                modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp)),
+                                contentScale = ContentScale.Crop
                             )
                         }
                     }
                 }
             }
-
-            Spacer(modifier = Modifier.height(24.dp))
-            // Seasonal Fits Section
-            Text(
-                text = "Fits According to Season",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text("• Summer • Winter • Monsoon • Spring")
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-
-            // Logout Button
-                    Button(
-                        onClick = {
-                            authViewModel.logout()
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Logout")
-                    }
-
-
-
+            Spacer(modifier = Modifier.height(20.dp))
         }
     }
 }
