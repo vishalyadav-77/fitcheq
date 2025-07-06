@@ -118,7 +118,7 @@ fun SavedOutfitScreen(navController: NavController, viewModel: MaleHomeViewModel
                         val favoriteMap by viewModel.favoriteMap.collectAsState()
                         val isFavorite = favoriteMap[outfit.id] ?: false
 
-                        Card(
+                        Card(colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F8F8)),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(350.dp)
