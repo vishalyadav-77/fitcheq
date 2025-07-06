@@ -62,6 +62,12 @@ class MaleHomeViewModel: ViewModel() {
         }
     }
 
+    // Clear outfits to prevent showing previous screen content
+    fun clearOutfits() {
+        _outfits.value = emptyList()
+        _error.value = null
+    }
+
     // Load the user's favorite outfits from Firestore
     fun loadFavorites(userId: String) {
         viewModelScope.launch {

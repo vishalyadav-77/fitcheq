@@ -19,12 +19,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -47,13 +44,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.vayo.fitcheq.data.model.OutfitData
-import com.vayo.fitcheq.navigation.ScreenContainer
 import com.vayo.fitcheq.viewmodels.MaleHomeViewModel
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -61,13 +54,28 @@ import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
 import com.google.firebase.auth.FirebaseAuth
 import android.widget.Toast
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import java.text.NumberFormat
+import java.util.Locale
 
 //@Preview
 @Composable
-fun OutfitDetailsScreen(gender: String,tag: String,viewModel: MaleHomeViewModel){
-
+fun OutfitDetailsScreen(gender: String, tag: String, viewModel: MaleHomeViewModel) {
     val context = LocalContext.current
     val currentUser = FirebaseAuth.getInstance().currentUser
+    
+    // Local loading state to show immediately
+    var isInitialLoading by remember { mutableStateOf(true) }
+
+    // Clear previous data and start loading immediately
+    LaunchedEffect(gender, tag) {
+        isInitialLoading = true
+        // Clear previous outfits to prevent showing old content
+        viewModel.clearOutfits()
+        // Fetch new outfits
+        viewModel.fetchOutfitsByTagAndGender(tag, gender)
+        isInitialLoading = false
+    }
 
     // Load favorites when screen loads
     LaunchedEffect(Unit) {
@@ -76,10 +84,6 @@ fun OutfitDetailsScreen(gender: String,tag: String,viewModel: MaleHomeViewModel)
         }
     }
 
-    // Fetch outfits
-    LaunchedEffect(gender, tag) {
-        viewModel.fetchOutfitsByTagAndGender(tag, gender)
-    }
     val outfits = viewModel.outfits.collectAsState().value
     val isLoading = viewModel.isLoading.collectAsState().value
     val error = viewModel.error.collectAsState().value
@@ -87,16 +91,12 @@ fun OutfitDetailsScreen(gender: String,tag: String,viewModel: MaleHomeViewModel)
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(
-                top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 16.dp,
-                start = 6.dp,
-                end = 6.dp
-            )
+            .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 16.dp)
+            .padding(horizontal = 6.dp)
     ) {
         // Title section
         Column(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(), 
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
@@ -115,7 +115,7 @@ fun OutfitDetailsScreen(gender: String,tag: String,viewModel: MaleHomeViewModel)
 
         // Content section
         when {
-            isLoading -> {
+            isInitialLoading || isLoading -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -159,7 +159,10 @@ fun OutfitDetailsScreen(gender: String,tag: String,viewModel: MaleHomeViewModel)
                     items(outfits) { outfit ->
                         val favoriteMap by viewModel.favoriteMap.collectAsState()
                         val isFavorite = favoriteMap[outfit.id] ?: false
+                        val priceNumber = outfit.price.toLongOrNull() ?: 0L
+                        val formattedPrice = NumberFormat.getNumberInstance(Locale("en", "IN")).format(priceNumber)
                         Card(
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F8F8)),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(350.dp)
@@ -169,9 +172,9 @@ fun OutfitDetailsScreen(gender: String,tag: String,viewModel: MaleHomeViewModel)
                                     context.startActivity(intent)
                                 },
                             elevation = CardDefaults.cardElevation(4.dp),
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(12.dp),
                         ) {
-                            Column(                                      //two card in a same row
+                            Column(
                                 modifier = Modifier.padding(8.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
@@ -190,7 +193,7 @@ fun OutfitDetailsScreen(gender: String,tag: String,viewModel: MaleHomeViewModel)
                                             .clip(RoundedCornerShape(8.dp))
                                     )
                                     Icon(
-                                        imageVector = if (isFavorite)  Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                                        imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                                         contentDescription = "Favorite",
                                         tint = if (isFavorite) Color.Red else Color.White,
                                         modifier = Modifier
@@ -209,7 +212,8 @@ fun OutfitDetailsScreen(gender: String,tag: String,viewModel: MaleHomeViewModel)
                                 }
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Column(
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier
+                                        .fillMaxWidth()
                                         .padding(horizontal = 4.dp),
                                     verticalArrangement = Arrangement.spacedBy(2.dp)
                                 ) {
@@ -218,17 +222,17 @@ fun OutfitDetailsScreen(gender: String,tag: String,viewModel: MaleHomeViewModel)
                                         fontWeight = FontWeight.SemiBold,
                                         fontSize = 14.sp,
                                         maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis, // fallback
+                                        overflow = TextOverflow.Ellipsis,
                                         modifier = Modifier
                                             .weight(1f)
                                             .basicMarquee()
-                                            .focusable() // required for marquee to work
+                                            .focusable()
                                     )
 
                                     Spacer(modifier = Modifier.width(4.dp))
 
                                     Text(
-                                        text = "₹${outfit.price}",
+                                        text = "₹${formattedPrice}",
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 14.sp,
                                     )
@@ -246,6 +250,9 @@ fun OutfitDetailsScreen(gender: String,tag: String,viewModel: MaleHomeViewModel)
                                 }
                             }
                         }
+                    }
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        Spacer(modifier = Modifier.height(12.dp))
                     }
                 }
             }

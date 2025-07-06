@@ -7,6 +7,11 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.core.tween
 import com.vayo.fitcheq.screens.auth.LoginScreen
 import com.vayo.fitcheq.screens.auth.SignUpScreen
 import com.vayo.fitcheq.screens.Home.FemaleHomeScreen
@@ -40,20 +45,62 @@ fun AuthNavGraph(
     maleViewModel: MaleHomeViewModel
 ) {
     NavHost(navController = navController, startDestination = AuthScreen.Login.route) {
-        composable(AuthScreen.Login.route) { LoginScreen(navController, authViewModel) }
-        composable(AuthScreen.SignUp.route) { SignUpScreen(navController, authViewModel) }
-        composable(AuthScreen.UserProfile.route) { ProfileScreen(navController, authViewModel) }
-        composable(AuthScreen.MaleHome.route) { MaleHomeScreen(navController, authViewModel) }
-        composable(AuthScreen.FemaleHome.route) { FemaleHomeScreen(navController, authViewModel) }
-        composable(AuthScreen.Community.route) { CommunityScreen(navController, authViewModel) }
-        composable(AuthScreen.SavedOutfit.route) { SavedOutfitScreen(navController, maleViewModel) }
-        composable(AuthScreen.MyProfile.route) { MyProfileScreen(navController, authViewModel) }
+        composable(
+            route = AuthScreen.Login.route,
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None }
+        ) { LoginScreen(navController, authViewModel) }
+        
+        composable(
+            route = AuthScreen.SignUp.route,
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None }
+        ) { SignUpScreen(navController, authViewModel) }
+        
+        composable(
+            route = AuthScreen.UserProfile.route,
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None }
+        ) { ProfileScreen(navController, authViewModel) }
+        
+        composable(
+            route = AuthScreen.MaleHome.route,
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None }
+        ) { MaleHomeScreen(navController, authViewModel) }
+        
+        composable(
+            route = AuthScreen.FemaleHome.route,
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None }
+        ) { FemaleHomeScreen(navController, authViewModel) }
+        
+        composable(
+            route = AuthScreen.Community.route,
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None }
+        ) { CommunityScreen(navController, authViewModel) }
+        
+        composable(
+            route = AuthScreen.SavedOutfit.route,
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None }
+        ) { SavedOutfitScreen(navController, maleViewModel) }
+        
+        composable(
+            route = AuthScreen.MyProfile.route,
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None }
+        ) { MyProfileScreen(navController, authViewModel) }
+        
         composable(
             route = AuthScreen.OutfitDetails.route,
             arguments = listOf(
                 navArgument("gender") { type = NavType.StringType },
                 navArgument("tag") { type = NavType.StringType }
-            )
+            ),
+            enterTransition = { fadeIn(animationSpec = tween(150)) },
+            exitTransition = { fadeOut(animationSpec = tween(150)) }
         ) { backStackEntry ->
             val gender = backStackEntry.arguments?.getString("gender") ?: "Male"
             val tag = backStackEntry.arguments?.getString("tag") ?: "default"
