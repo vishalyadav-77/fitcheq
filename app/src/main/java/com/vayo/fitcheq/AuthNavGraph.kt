@@ -12,6 +12,8 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import com.vayo.fitcheq.screens.auth.LoginScreen
 import com.vayo.fitcheq.screens.auth.SignUpScreen
 import com.vayo.fitcheq.screens.Home.FemaleHomeScreen
@@ -21,6 +23,7 @@ import com.vayo.fitcheq.screens.Home.CommunityScreen
 import com.vayo.fitcheq.screens.Home.MyProfileScreen
 import com.vayo.fitcheq.screens.Home.SavedOutfitScreen
 import com.vayo.fitcheq.screens.Home.OutfitDetailsScreen
+import com.vayo.fitcheq.screens.Home.SettingsPage
 import com.vayo.fitcheq.viewmodels.AuthViewModel
 import com.vayo.fitcheq.viewmodels.MaleHomeViewModel
 
@@ -36,6 +39,7 @@ sealed class AuthScreen(val route: String) {
     object OutfitDetails : AuthScreen("outfit_details/{gender}/{tag}") {
         fun createRoute(gender: String, tag: String): String = "outfit_details/$gender/$tag"
     }
+    object SettingsPage : AuthScreen("settings_page")
 }
 
 @Composable
@@ -109,7 +113,36 @@ fun AuthNavGraph(
                 gender = gender,
                 tag = tag,
                 viewModel = maleViewModel
-            )
+            ) }
+        composable(
+            route = AuthScreen.SettingsPage.route,
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { it }, // Slide from right
+                    animationSpec = tween(durationMillis = 300)
+                )
+            },
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { -it }, // Slide to left
+                    animationSpec = tween(durationMillis = 300)
+                )
+            },
+            popEnterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { -it }, // Reverse when coming back
+                    animationSpec = tween(durationMillis = 300)
+                )
+            },
+            popExitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { it }, // Reverse when going back
+                    animationSpec = tween(durationMillis = 300)
+                )
+            }
+        ) {
+            SettingsPage(navController)
         }
+
     }
 }
