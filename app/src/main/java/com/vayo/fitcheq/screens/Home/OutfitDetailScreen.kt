@@ -1,7 +1,6 @@
 package com.vayo.fitcheq.screens.Home
 
-import android.content.Intent
-import android.net.Uri
+
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
@@ -55,12 +54,14 @@ import androidx.compose.material3.Icon
 import com.google.firebase.auth.FirebaseAuth
 import android.widget.Toast
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.navigation.NavController
+import com.vayo.fitcheq.AuthScreen
 import java.text.NumberFormat
 import java.util.Locale
 
 //@Preview
 @Composable
-fun OutfitDetailsScreen(gender: String, tag: String, viewModel: MaleHomeViewModel) {
+fun OutfitDetailsScreen(gender: String, tag: String, viewModel: MaleHomeViewModel,navController: NavController) {
     val context = LocalContext.current
     val currentUser = FirebaseAuth.getInstance().currentUser
     
@@ -168,8 +169,7 @@ fun OutfitDetailsScreen(gender: String, tag: String, viewModel: MaleHomeViewMode
                                 .height(350.dp)
                                 .padding(2.dp)
                                 .clickable {
-                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(outfit.link))
-                                    context.startActivity(intent)
+                                    navController.navigate(AuthScreen.ItemInfo.passOutfit(outfit))
                                 },
                             elevation = CardDefaults.cardElevation(4.dp),
                             shape = RoundedCornerShape(12.dp),
