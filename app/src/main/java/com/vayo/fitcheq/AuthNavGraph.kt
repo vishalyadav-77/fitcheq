@@ -1,6 +1,7 @@
 package com.vayo.fitcheq
 
-//This will define the navigation routes
+
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -14,6 +15,9 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import com.vayo.fitcheq.data.model.OutfitData
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.encodeToString
 import com.vayo.fitcheq.screens.auth.LoginScreen
 import com.vayo.fitcheq.screens.auth.SignUpScreen
 import com.vayo.fitcheq.screens.Home.FemaleHomeScreen
@@ -21,12 +25,14 @@ import com.vayo.fitcheq.screens.Home.MaleHomeScreen
 import com.vayo.fitcheq.screens.auth.ProfileScreen
 import com.vayo.fitcheq.screens.Home.CommunityScreen
 import com.vayo.fitcheq.screens.Home.MyProfileScreen
+import com.vayo.fitcheq.screens.Home.ItemInfoScreen
 import com.vayo.fitcheq.screens.Home.SavedOutfitScreen
 import com.vayo.fitcheq.screens.Home.OutfitDetailsScreen
 import com.vayo.fitcheq.screens.Home.SettingsPage
 import com.vayo.fitcheq.viewmodels.AuthViewModel
 import com.vayo.fitcheq.viewmodels.MaleHomeViewModel
 
+//This will define the navigation routes
 sealed class AuthScreen(val route: String) {
     object Login : AuthScreen("login")
     object SignUp : AuthScreen("signup")
@@ -40,6 +46,12 @@ sealed class AuthScreen(val route: String) {
         fun createRoute(gender: String, tag: String): String = "outfit_details/$gender/$tag"
     }
     object SettingsPage : AuthScreen("settings_page")
+    object ItemInfo : AuthScreen("itemInfo/{outfit}") {
+        fun passOutfit(outfit: OutfitData): String {
+            val encoded = Uri.encode(Json.encodeToString(outfit))
+            return "itemInfo/$encoded"
+        }
+    }
 }
 
 @Composable
@@ -109,11 +121,7 @@ fun AuthNavGraph(
             val gender = backStackEntry.arguments?.getString("gender") ?: "Male"
             val tag = backStackEntry.arguments?.getString("tag") ?: "default"
 
-            OutfitDetailsScreen(
-                gender = gender,
-                tag = tag,
-                viewModel = maleViewModel
-            ) }
+            OutfitDetailsScreen(gender = gender, tag = tag, viewModel = maleViewModel, navController) }
         composable(
             route = AuthScreen.SettingsPage.route,
             enterTransition = {
@@ -140,9 +148,19 @@ fun AuthNavGraph(
                     animationSpec = tween(durationMillis = 300)
                 )
             }
-        ) {
-            SettingsPage(navController)
+        ) { SettingsPage(navController) }
+
+        composable(
+            route = "itemInfo/{outfit}",
+            arguments = listOf(navArgument("outfit") { type = NavType.StringType }),
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None }
+        ) { backStackEntry ->
+            val json = backStackEntry.arguments?.getString("outfit")!!
+            val outfit = Json.decodeFromString<OutfitData>(json)
+            ItemInfoScreen(outfit)
         }
+
 
     }
 }
