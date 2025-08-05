@@ -2,8 +2,13 @@ package com.vayo.fitcheq.screens.Home
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import com.vayo.fitcheq.R
@@ -50,6 +55,7 @@ import kotlinx.serialization.json.Json
 import java.net.URLEncoder
 import androidx.compose.ui.res.colorResource
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -57,6 +63,8 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.Button
@@ -66,9 +74,12 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.Font
+import com.vayo.fitcheq.data.model.brandMap
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -86,6 +97,14 @@ fun ItemInfoScreen(outfit: OutfitData){
     val imagesToUse = if (outfit.imageUrls.isNotEmpty()) outfit.imageUrls else listOf(outfit.imageUrl)
     val priceNumber = outfit.price.toLongOrNull() ?: 0L
     val formattedPrice = NumberFormat.getNumberInstance(Locale("en", "IN")).format(priceNumber)
+    val fallbackText = "Please visit site for this info"
+    val brandInfo = brandMap[outfit.website]
+    val combinedPolicy = listOfNotNull(
+        brandInfo?.returnPolicy?.takeIf { it.isNotBlank() },
+        brandInfo?.exchangePolicy?.takeIf { it.isNotBlank() }
+    ).joinToString("\n\n") // two line breaks between sections
+    var isShippingExpanded by remember { mutableStateOf(false) }
+    var isReturnsExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
         bottomBar = {
@@ -152,9 +171,75 @@ fun ItemInfoScreen(outfit: OutfitData){
                         Spacer(modifier = Modifier.height(18.dp))
                         Text(text = "SIZE", fontWeight = FontWeight.Bold, fontSize = 20.sp )
                         Spacer(modifier = Modifier.height(18.dp))
-                        Text(text = "SHIPPING", fontWeight = FontWeight.Bold, fontSize = 20.sp )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { isShippingExpanded = !isShippingExpanded },
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "SHIPPING",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Icon(
+                                imageVector = if (isShippingExpanded) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowRight,
+                                contentDescription = if (isShippingExpanded) "Collapse" else "Expand",
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+
+                        AnimatedVisibility(
+                            visible = isShippingExpanded,
+                            enter = expandVertically(animationSpec = tween(durationMillis = 300)),
+                            exit = shrinkVertically(animationSpec = tween(durationMillis = 300))
+                        ) {
+                            Column {
+                                Spacer(modifier = Modifier.height(6.dp))
+                                Text(
+                                    text = brandInfo?.shippingPolicy?.takeIf { it.isNotBlank() } ?: fallbackText,
+                                    fontSize = 13.sp,
+                                    lineHeight = 18.sp
+                                )
+                            }
+                        }
                         Spacer(modifier = Modifier.height(18.dp))
-                        Text(text = "RETURN EXCHANGE", fontWeight = FontWeight.Bold, fontSize = 20.sp )
+
+                        // RETURN & EXCHANGE SECTION
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { isReturnsExpanded = !isReturnsExpanded },
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "RETURN & EXCHANGE",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Icon(
+                                imageVector = if (isReturnsExpanded) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowRight,
+                                contentDescription = if (isReturnsExpanded) "Collapse" else "Expand",
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+
+                        AnimatedVisibility(
+                            visible = isReturnsExpanded,
+                            enter = expandVertically(animationSpec = tween(durationMillis = 300)),
+                            exit = shrinkVertically(animationSpec = tween(durationMillis = 300))
+                        ) {
+                            Column {
+                                Spacer(modifier = Modifier.height(6.dp))
+                                Text(
+                                    text = if (combinedPolicy.isNotBlank()) combinedPolicy else fallbackText,
+                                    fontSize = 13.sp,
+                                    lineHeight = 18.sp
+                                )
+                            }
+                        }
                         Spacer(modifier = Modifier.height(18.dp))
                         Text(text = "PRODUCT DESCRIPTION", fontWeight = FontWeight.Bold, fontSize = 20.sp )
                         Spacer(modifier = Modifier.height(24.dp))
