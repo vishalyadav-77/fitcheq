@@ -42,6 +42,8 @@ import com.vayo.fitcheq.navigation.ScreenContainer
 import com.vayo.fitcheq.R
 import com.vayo.fitcheq.viewmodels.MaleHomeViewModel
 import android.widget.Toast
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import com.vayo.fitcheq.AuthScreen
 
 
 @Composable
@@ -57,7 +59,7 @@ fun SavedOutfitScreen(navController: NavController, viewModel: MaleHomeViewModel
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues) // Important to respect system bars
+                .padding(paddingValues)
         ) {
             //TITLE
             Column(
@@ -65,6 +67,7 @@ fun SavedOutfitScreen(navController: NavController, viewModel: MaleHomeViewModel
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Spacer(modifier = Modifier.height(10.dp))
                 Text(
                     text = "Wishlist",
                     fontSize = 22.sp,
@@ -73,7 +76,7 @@ fun SavedOutfitScreen(navController: NavController, viewModel: MaleHomeViewModel
                 Divider(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp, bottom = 16.dp),
+                        .padding(top = 8.dp),
                     color = Color.LightGray,
                     thickness = 1.dp
                 )
@@ -114,6 +117,7 @@ fun SavedOutfitScreen(navController: NavController, viewModel: MaleHomeViewModel
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    item(span = { GridItemSpan(2) }) {Spacer(modifier = Modifier.height(12.dp))}
                     items(savedOutfits) { outfit ->  // Changed from outfits to savedOutfits
                         val favoriteMap by viewModel.favoriteMap.collectAsState()
                         val isFavorite = favoriteMap[outfit.id] ?: false
@@ -121,11 +125,10 @@ fun SavedOutfitScreen(navController: NavController, viewModel: MaleHomeViewModel
                         Card(colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F8F8)),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(350.dp)
-                                .padding(2.dp)
+                                .height(340.dp)
+                                .padding(horizontal = 4.dp, vertical = 4.dp)
                                 .clickable {
-                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(outfit.link))
-                                    context.startActivity(intent)
+                                    navController.navigate(AuthScreen.ItemInfo.passOutfit(outfit))
                                 },
                             elevation = CardDefaults.cardElevation(4.dp),
                             shape = RoundedCornerShape(12.dp)
@@ -137,7 +140,7 @@ fun SavedOutfitScreen(navController: NavController, viewModel: MaleHomeViewModel
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(250.dp)
+                                        .height(240.dp)
                                 ) {
                                     AsyncImage(
                                         model = outfit.imageUrl,
@@ -145,7 +148,7 @@ fun SavedOutfitScreen(navController: NavController, viewModel: MaleHomeViewModel
                                         contentScale = ContentScale.Crop,
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .height(250.dp)
+                                            .height(240.dp)
                                             .clip(RoundedCornerShape(8.dp))
                                     )
                                     Icon(
@@ -208,6 +211,7 @@ fun SavedOutfitScreen(navController: NavController, viewModel: MaleHomeViewModel
                             }
                         }
                     }
+                    item(span = { GridItemSpan(2) }) {Spacer(modifier = Modifier.height(12.dp))}
                 }
             }
         }
