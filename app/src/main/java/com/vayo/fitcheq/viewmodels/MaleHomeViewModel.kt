@@ -32,6 +32,9 @@ class MaleHomeViewModel: ViewModel() {
     private val _favoriteMap = MutableStateFlow<Map<String, Boolean>>(emptyMap())
     val favoriteMap: StateFlow<Map<String, Boolean>> = _favoriteMap
 
+    private val _relatedOutfits = MutableStateFlow<List<OutfitData>>(emptyList())
+    val relatedOutfits: StateFlow<List<OutfitData>> = _relatedOutfits
+
 
     fun fetchOutfitsByTagAndGender(tag: String, gender: String) {
         viewModelScope.launch {
@@ -162,5 +165,16 @@ class MaleHomeViewModel: ViewModel() {
                 saved.forEach { newFavoriteMap[it.id] = true }
                 _favoriteMap.value = newFavoriteMap
             }
+    }
+
+    fun fetchRelatedOutfits(currentOutfit: OutfitData) {
+        viewModelScope.launch {
+            // Assuming 'outfits' is already loaded in memory (from repository)
+            val allOutfits = outfits.value // StateFlow/LiveData of all outfits
+            val filtered = allOutfits.filter {
+                it.category == currentOutfit.category && it.id != currentOutfit.id
+            }
+            _relatedOutfits.value = filtered
+        }
     }
 }
