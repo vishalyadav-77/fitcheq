@@ -158,7 +158,7 @@ fun AuthNavGraph(
         ) { backStackEntry ->
             val json = backStackEntry.arguments?.getString("outfit")!!
             val outfit = Json.decodeFromString<OutfitData>(json)
-            ItemInfoScreen(outfit)
+            ItemInfoScreen(outfit,maleViewModel,navController)
         }
 
 
