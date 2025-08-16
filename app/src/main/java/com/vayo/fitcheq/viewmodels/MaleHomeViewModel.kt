@@ -36,25 +36,32 @@ class MaleHomeViewModel: ViewModel() {
     val relatedOutfits: StateFlow<List<OutfitData>> = _relatedOutfits
 
 
-    fun fetchOutfitsByTagAndGender(tag: String, gender: String) {
+    fun fetchOutfitsByFieldAndGender(fieldName: String, fieldValue: String, gender: String) {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
                 _error.value = null
-                
-                Log.d("OutfitFetch", "Fetching outfits with tag: $tag and gender: $gender")
-                
-                val result = Firebase.firestore.collection("outfits")
+
+                Log.d("OutfitFetch", "Fetching outfits where $fieldName=$fieldValue and gender=$gender")
+
+                val query = Firebase.firestore.collection("outfits")
                     .whereEqualTo("gender", gender)
-                    .whereArrayContains("tags", tag)
-                    .get()
-                    .await()
-                
+
+                // 👇 Decide based on whether the field is an array
+                val arrayFields = setOf("tags", "style", "occasion","season")
+
+                val finalQuery = if (fieldName in arrayFields) {
+                    query.whereArrayContains(fieldName, fieldValue)
+                } else {
+                    query.whereEqualTo(fieldName, fieldValue)
+                }
+
+                val result = finalQuery.get().await()
+
                 val outfitList = result.documents.mapNotNull { doc ->
                     doc.toObject(OutfitData::class.java)?.copy(id = doc.id)
                 }
-                
-                Log.d("OutfitFetch", "Fetched ${outfitList.size} outfits")
+
                 _outfits.value = outfitList
             } catch (e: Exception) {
                 Log.e("OutfitFetch", "Error fetching outfits", e)
@@ -64,6 +71,9 @@ class MaleHomeViewModel: ViewModel() {
             }
         }
     }
+
+
+
 
     // Clear outfits to prevent showing previous screen content
     fun clearOutfits() {

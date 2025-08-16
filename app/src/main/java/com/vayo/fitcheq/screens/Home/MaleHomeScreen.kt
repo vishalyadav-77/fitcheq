@@ -129,9 +129,9 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
-                .padding(vertical = 18.dp)
-                .padding(paddingValues),
+                .padding(vertical = 18.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Top Bar with App Title
@@ -142,7 +142,6 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
-
             Spacer(modifier = Modifier.height(30.dp))
 
             // Search Bar
@@ -154,7 +153,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                     .clip(RoundedCornerShape(12.dp))
                     .background(Color(0xFFF1F1F1)) // Light gray modern tone
                     .clickable { /* Handle click later */ }
-                    .padding(horizontal = 16.dp),//inner padding
+                    .padding(horizontal = 16.dp),
                 contentAlignment = Alignment.CenterStart
             ) {
                 Row(
@@ -174,29 +173,42 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                     )
                 }
             }
+            Spacer(modifier = Modifier.height(40.dp))
 
-
-            Spacer(modifier = Modifier.height(30.dp))
-
+        // TIME FOR TODAY FIT CHEQ
             Text(
                 text= "Time for today’s fit cheq?",
-                fontSize = 20.sp,
+                fontSize = 18.sp,
                 fontStyle = FontStyle.Italic,
             )
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(40.dp))
 
         //  ESSENTIALS CATEGORY
             Card(
                 modifier = Modifier
                 .height(200.dp)
                 .padding(horizontal = 16.dp)
-                .fillMaxWidth(),
-//                .clickable(),
-                shape = RoundedCornerShape(12.dp),
-                elevation = CardDefaults.cardElevation(4.dp)
+                .fillMaxWidth()
+                .clickable {
+                    navController.navigate(
+                        AuthScreen.OutfitDetails.createRoute(
+                            "male",
+                            "tags",
+                            "essentials"
+                        )
+                    ) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                           },
+                shape = RoundedCornerShape(8.dp),
+                elevation = CardDefaults.cardElevation(0.dp)
             ) {
                 AsyncImage(
-                    model = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/banners/ess_banner2.webp",
+                    model = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/banners/ess_banner3.webp",
                     contentDescription = "ESS Banner",
                     contentScale = ContentScale.Crop
                 )
@@ -227,6 +239,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                                 navController.navigate(
                                     AuthScreen.OutfitDetails.createRoute(
                                         "male",
+                                        "season",
                                         route
                                     )
                                 ) {
@@ -299,7 +312,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                                 }
                                 if (route.isNotEmpty()) {
                                     navController.navigate(
-                                        AuthScreen.OutfitDetails.createRoute("male", route)
+                                        AuthScreen.OutfitDetails.createRoute("male", "category" ,route)
                                     ) {
                                         popUpTo(navController.graph.startDestinationId) {
                                             saveState = true
@@ -328,7 +341,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
 
                                     Text(
                                         text = category.title,
-                                        fontSize = 12.sp,
+                                        fontSize = 11.sp,
                                         fontWeight = FontWeight.SemiBold,
                                         color = Color.White,
                                         modifier = Modifier
@@ -338,7 +351,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                                                 color = Color.Black.copy(alpha = 0.6f),
                                                 shape = RoundedCornerShape(6.dp)
                                             )
-                                            .padding(horizontal = 8.dp, vertical = 4.dp) // internal padding inside bg
+                                            .padding(horizontal = 6.dp, vertical = 2.dp) // internal padding inside bg
                                     )
                                 }
                             }
@@ -373,7 +386,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                             else -> ""
                         }
                         if (route.isNotEmpty()) {
-                            navController.navigate(AuthScreen.OutfitDetails.createRoute("male", route)) {
+                            navController.navigate(AuthScreen.OutfitDetails.createRoute("male","occasion", route)) {
                                 popUpTo(navController.graph.startDestinationId) { saveState = true }
                                 launchSingleTop = true
                                 restoreState = true
@@ -382,8 +395,8 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                     }
                     Card(
                         modifier = Modifier
-                            .width(120.dp)
-                            .height(140.dp)
+                            .width(130.dp)
+                            .height(150.dp)
                             .clickable(onClick = onCardClick),
                         shape = RoundedCornerShape(12.dp),
                         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -427,7 +440,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
             Spacer(modifier = Modifier.height(8.dp))
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
                 contentPadding = PaddingValues(start = 16.dp, end = 16.dp)
             ) {
                 items(malefashionList, key = { it.title }) { fashion ->
@@ -443,7 +456,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                             else -> ""
                         }
                         if (route.isNotEmpty()) {
-                            navController.navigate(AuthScreen.OutfitDetails.createRoute("male", route)) {
+                            navController.navigate(AuthScreen.OutfitDetails.createRoute("male","style", route)) {
                                 popUpTo(navController.graph.startDestinationId) { saveState = true }
                                 launchSingleTop = true
                                 restoreState = true
@@ -453,8 +466,8 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
 
                     Card(
                         modifier = Modifier
-                            .width(140.dp)
-                            .height(160.dp)
+                            .width(180.dp)
+                            .height(210.dp)
                             .clickable(onClick = onCardClick),
                         colors = CardDefaults.cardColors(containerColor = Color.White),
                         shape = RoundedCornerShape(12.dp),
@@ -471,7 +484,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(28.dp))
         }
     }
 }

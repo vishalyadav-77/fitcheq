@@ -42,8 +42,9 @@ sealed class AuthScreen(val route: String) {
     object Community : AuthScreen("community")
     object SavedOutfit : AuthScreen("saved_outfit")
     object MyProfile : AuthScreen("my_profile")
-    object OutfitDetails : AuthScreen("outfit_details/{gender}/{tag}") {
-        fun createRoute(gender: String, tag: String): String = "outfit_details/$gender/$tag"
+    object OutfitDetails : AuthScreen("outfit_details/{gender}/{fieldName}/{fieldValue}") {
+        fun createRoute(gender: String, fieldName: String, fieldValue: String): String =
+            "outfit_details/$gender/$fieldName/$fieldValue"
     }
     object SettingsPage : AuthScreen("settings_page")
     object ItemInfo : AuthScreen("itemInfo/{outfit}") {
@@ -108,20 +109,32 @@ fun AuthNavGraph(
             enterTransition = { EnterTransition.None },
             exitTransition = { ExitTransition.None }
         ) { MyProfileScreen(navController, authViewModel) }
-        
+
         composable(
             route = AuthScreen.OutfitDetails.route,
             arguments = listOf(
                 navArgument("gender") { type = NavType.StringType },
-                navArgument("tag") { type = NavType.StringType }
+                navArgument("fieldName") { type = NavType.StringType },
+                navArgument("fieldValue") { type = NavType.StringType }
             ),
-            enterTransition = { fadeIn(animationSpec = tween(150)) },
-            exitTransition = { fadeOut(animationSpec = tween(150)) }
+//            enterTransition = { fadeIn(animationSpec = tween(150)) },
+            enterTransition = { EnterTransition.None},
+//            exitTransition = { fadeOut(animationSpec = tween(150)) }
+            exitTransition = { ExitTransition.None }
         ) { backStackEntry ->
             val gender = backStackEntry.arguments?.getString("gender") ?: "Male"
-            val tag = backStackEntry.arguments?.getString("tag") ?: "default"
+            val fieldName = backStackEntry.arguments?.getString("fieldName") ?: "tags"
+            val fieldValue = backStackEntry.arguments?.getString("fieldValue") ?: "default"
 
-            OutfitDetailsScreen(gender = gender, tag = tag, viewModel = maleViewModel, navController) }
+            OutfitDetailsScreen(
+                gender = gender,
+                fieldName = fieldName,
+                fieldValue = fieldValue,
+                viewModel = maleViewModel,
+                navController = navController
+            )
+        }
+
         composable(
             route = AuthScreen.SettingsPage.route,
             enterTransition = {

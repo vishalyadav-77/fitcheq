@@ -61,7 +61,7 @@ import java.util.Locale
 
 //@Preview
 @Composable
-fun OutfitDetailsScreen(gender: String, tag: String, viewModel: MaleHomeViewModel,navController: NavController) {
+fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, viewModel: MaleHomeViewModel,navController: NavController) {
     val context = LocalContext.current
     val currentUser = FirebaseAuth.getInstance().currentUser
     
@@ -69,12 +69,11 @@ fun OutfitDetailsScreen(gender: String, tag: String, viewModel: MaleHomeViewMode
     var isInitialLoading by remember { mutableStateOf(true) }
 
     // Clear previous data and start loading immediately
-    LaunchedEffect(gender, tag) {
+    LaunchedEffect(gender, fieldName, fieldValue) {
         isInitialLoading = true
         // Clear previous outfits to prevent showing old content
         viewModel.clearOutfits()
-        // Fetch new outfits
-        viewModel.fetchOutfitsByTagAndGender(tag, gender)
+        viewModel.fetchOutfitsByFieldAndGender(fieldName, fieldValue, gender)
         isInitialLoading = false
     }
 
@@ -92,23 +91,24 @@ fun OutfitDetailsScreen(gender: String, tag: String, viewModel: MaleHomeViewMode
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 16.dp)
+            .padding(WindowInsets.statusBars.asPaddingValues())
             .padding(horizontal = 6.dp)
     ) {
         // Title section
         Column(
-            modifier = Modifier.fillMaxWidth(), 
+            modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(modifier = Modifier.height(10.dp))
             Text(
-                text = "${tag.replaceFirstChar { it.uppercaseChar() }} Collection",
+                text = "${fieldValue.replaceFirstChar { it.uppercaseChar() }} Collection",
                 fontSize = 22.sp,
                 fontWeight = FontWeight.SemiBold
             )
             Divider(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp, bottom = 16.dp),
+                    .padding(top = 8.dp),
                 color = Color.LightGray,
                 thickness = 1.dp
             )
@@ -157,6 +157,7 @@ fun OutfitDetailsScreen(gender: String, tag: String, viewModel: MaleHomeViewMode
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    item(span = { GridItemSpan(2) }) {Spacer(modifier = Modifier.height(8.dp))}
                     items(outfits) { outfit ->
                         val favoriteMap by viewModel.favoriteMap.collectAsState()
                         val isFavorite = favoriteMap[outfit.id] ?: false
