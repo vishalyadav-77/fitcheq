@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
@@ -25,13 +26,14 @@ fun BottomNavigation(navController: NavController) {
         BottomNavItem.SavedOutfit,
         BottomNavItem.MyProfile
     )
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(78.dp) // or 64.dp if you want slightly taller
+    Surface(
+        shadowElevation = 6.dp,
+        color = Color.White
     ) {
         NavigationBar(containerColor = Color.White,
-            tonalElevation = 6.dp) {
+            tonalElevation = 0.dp,
+            modifier = Modifier.height(78.dp)
+        ) {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route
 
