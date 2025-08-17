@@ -53,7 +53,9 @@ import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
 import com.google.firebase.auth.FirebaseAuth
 import android.widget.Toast
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.navigation.NavController
 import com.vayo.fitcheq.AuthScreen
 import java.text.NumberFormat
@@ -87,6 +89,7 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
     val outfits = viewModel.outfits.collectAsState().value
     val isLoading = viewModel.isLoading.collectAsState().value
     val error = viewModel.error.collectAsState().value
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
     Column(
         modifier = Modifier
@@ -167,7 +170,6 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                             colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F8F8)),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(350.dp)
                                 .padding(2.dp)
                                 .clickable {
                                     navController.navigate(AuthScreen.ItemInfo.passOutfit(outfit))
@@ -182,15 +184,14 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(250.dp)
+                                        .aspectRatio(4f / 5f)
                                 ) {
                                     AsyncImage(
                                         model = outfit.imageUrl,
                                         contentDescription = outfit.title,
                                         contentScale = ContentScale.Crop,
                                         modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(250.dp)
+                                            .fillMaxSize()
                                             .clip(RoundedCornerShape(8.dp))
                                     )
                                     Icon(
@@ -225,7 +226,7 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
                                         modifier = Modifier
-                                            .weight(1f)
+                                            .fillMaxWidth()
                                             .basicMarquee()
                                             .focusable()
                                     )
