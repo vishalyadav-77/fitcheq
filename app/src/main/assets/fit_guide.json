@@ -1,0 +1,35 @@
+{
+  "guides": [
+    {
+      "gender": "male",
+      "height": "tall",
+      "bodyType": "slim",
+      "categories": [
+        {
+          "id": "shirts",
+          "title": "Shirts & Tops",
+          "summary": "Go for slim-fit shirts to avoid looking smaller",
+          "image": "ic_shirt",
+          "details": [
+            "Vertical stripes help elongate your torso",
+            "Avoid oversized clothing",
+            "Layer lightly, don’t drown in fabric"
+          ],
+          "proTip": "Half-sleeve fitted shirts can make you look broader"
+        },
+        {
+          "id": "pants",
+          "title": "Pants & Jeans",
+          "summary": "Straight/slim pants balance proportions",
+          "image": "ic_pants",
+          "details": [
+            "Avoid baggy jeans that emphasize skinniness",
+            "Go for mid-rise pants",
+            "Dark shades add bulk to legs"
+          ],
+          "proTip": "Cropped pants with no break make legs look longer"
+        }
+      ]
+    }
+  ]
+}
