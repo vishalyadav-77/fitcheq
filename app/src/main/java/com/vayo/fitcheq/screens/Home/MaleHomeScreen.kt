@@ -185,9 +185,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
 
         //  ESSENTIALS CATEGORY
             Card(
-                modifier = Modifier
-                .height(200.dp)
-                .padding(horizontal = 16.dp)
+                modifier = Modifier.aspectRatio(16f / 9f).padding(horizontal = 16.dp)
                 .fillMaxWidth()
                 .clickable {
                     navController.navigate(
@@ -223,10 +221,11 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Box(modifier = Modifier.fillMaxWidth(),
+            Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 contentAlignment = Alignment.Center) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     maleSeasonList.forEach { season ->
                         val onCardClick = {
@@ -253,8 +252,8 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                         }
                         Card(
                             modifier = Modifier
-                                .width(190.dp)
-                                .height(260.dp)
+                                .weight(1f)
+                                .aspectRatio(3f / 4f)
                                 .clickable(onClick = onCardClick),
                             shape = RoundedCornerShape(12.dp),
                             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
