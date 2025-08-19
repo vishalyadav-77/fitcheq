@@ -72,9 +72,6 @@ class MaleHomeViewModel: ViewModel() {
         }
     }
 
-
-
-
     // Clear outfits to prevent showing previous screen content
     fun clearOutfits() {
         _outfits.value = emptyList()
