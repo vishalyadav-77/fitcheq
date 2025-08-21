@@ -1,5 +1,8 @@
 package com.vayo.fitcheq.data.model
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
 data class UserProfile(
     val uId: String = "",
     val name: String = "",
@@ -25,16 +28,36 @@ enum class PreferPlatform(val displayName: String) {
     expensive("Zara H&M ONLY Snitch ")
 }
 
-enum class HeightGroup(val displayName: String){
+@Serializable
+enum class HeightGroup(val displayName: String) {
+    @SerialName("short")
     short("Below 5'4\""),
+
+    @SerialName("average")
     average("5'4\" - 5'7\""),
+
+    @SerialName("tall")
     tall("5'8\" - 5'11\""),
+
+    @SerialName("very_tall")
     very_tall("6'0\" and above")
 }
-enum class BodyType(val displayName: String){
+
+@Serializable
+enum class BodyType(val displayName: String) {
+    @SerialName("slim")
     slim("Slim"),
+
+    @SerialName("athletic")
     athletic("Athletic"),
+
+    @SerialName("average")
     average("Average"),
+
+    @SerialName("muscular")
     muscular("Muscular"),
+
+    @SerialName("plus_size")
     plus_size("Plus-Size")
 }
+
