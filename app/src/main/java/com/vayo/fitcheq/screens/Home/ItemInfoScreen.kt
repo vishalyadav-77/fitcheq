@@ -210,6 +210,7 @@ fun ItemInfoScreen(outfit: OutfitData, viewModel: MaleHomeViewModel,navControlle
                             .padding(horizontal = 18.dp)
                     ) {
                         Spacer(modifier = Modifier.height(18.dp))
+
                         Text(text = "SIZE", fontWeight = FontWeight.Bold, fontSize = 20.sp)
                         Spacer(modifier = Modifier.height(6.dp))
                         Row(
@@ -241,6 +242,12 @@ fun ItemInfoScreen(outfit: OutfitData, viewModel: MaleHomeViewModel,navControlle
                                 .clickable { isShippingExpanded = !isShippingExpanded },
                             verticalAlignment = Alignment.CenterVertically
                         ) {
+                            Icon(
+                                painter = painterResource(R.drawable.shipping_truck),
+                                contentDescription = "Shipping icon",
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = "SHIPPING",
                                 fontWeight = FontWeight.Bold,
@@ -276,6 +283,12 @@ fun ItemInfoScreen(outfit: OutfitData, viewModel: MaleHomeViewModel,navControlle
                                 .clickable { isReturnsExpanded = !isReturnsExpanded },
                             verticalAlignment = Alignment.CenterVertically
                         ) {
+                            Icon(
+                                painter = painterResource(R.drawable.returnbox),
+                                contentDescription = "return icon",
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = "RETURN & EXCHANGE",
                                 fontWeight = FontWeight.Bold,
