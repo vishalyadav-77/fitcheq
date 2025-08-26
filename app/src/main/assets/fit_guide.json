@@ -4,12 +4,13 @@
       "gender": "male",
       "height": "tall",
       "bodyType": "slim",
+      "chips": ["Layering Adds Volume", "Baggy Outfits Work Well", "Go for Horizontal Patterns", "Wide-Leg Pants Balance Frame"],
       "categories": [
         {
           "id": "shirts",
-          "title": "Shirts & Tops",
+          "title": "Shirts & T-Shirts",
           "summary": "Go for slim-fit shirts to avoid looking smaller",
-          "image": "ic_shirt",
+          "image": "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/shirt_male.webp",
           "details": [
             "Vertical stripes help elongate your torso",
             "Avoid oversized clothing",
@@ -21,7 +22,7 @@
           "id": "pants",
           "title": "Pants & Jeans",
           "summary": "Straight/slim pants balance proportions",
-          "image": "ic_pants",
+          "image": "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/jeans2male.webp",
           "details": [
             "Avoid baggy jeans that emphasize skinniness",
             "Go for mid-rise pants",
