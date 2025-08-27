@@ -1,6 +1,8 @@
 package com.vayo.fitcheq.screens.Home
 
 import android.content.Context
+import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -33,15 +35,18 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.vayo.fitcheq.AuthScreen
 import com.vayo.fitcheq.R
+import com.vayo.fitcheq.data.model.BodyType
 import com.vayo.fitcheq.data.model.FitGuide
 import com.vayo.fitcheq.data.model.FitGuideCategory
 import com.vayo.fitcheq.data.model.FitGuideWrapper
+import com.vayo.fitcheq.data.model.HeightGroup
 import com.vayo.fitcheq.data.model.UserProfile
 import com.vayo.fitcheq.data.model.maleoccasionList
 import com.vayo.fitcheq.viewmodels.AuthViewModel
 import com.vayo.fitcheq.navigation.ScreenContainer
 import com.vayo.fitcheq.viewmodels.MaleHomeViewModel
 import kotlinx.serialization.json.Json
+import com.vayo.fitcheq.data.model.utils.orDefault
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -52,6 +57,9 @@ fun CommunityScreen(navController: NavController, authViewModel: AuthViewModel) 
     var selectedCategory by remember { mutableStateOf<FitGuideCategory?>(null) }
 
     LaunchedEffect(Unit) { userProfile = authViewModel.loadUserProfileFromSharedPreferences(context) }
+    val userHeight = userProfile?.height?.orDefault(HeightGroup.average)
+    val userBodyType = userProfile?.bodyType?.orDefault(BodyType.average)
+
 
     LaunchedEffect(userProfile) {
         if (userProfile != null) {
@@ -64,9 +72,17 @@ fun CommunityScreen(navController: NavController, authViewModel: AuthViewModel) 
         }
     }
 
-    val gender = userProfile?.gender
-    val height = userProfile?.height
-    val bodyType = userProfile?.bodyType
+
+
+
+    val iconRes = when (userProfile?.bodyType) {
+        BodyType.slim -> R.drawable.male_skinny
+        BodyType.athletic -> R.drawable.male_athletic
+        BodyType.average -> R.drawable.male_normal
+        BodyType.muscular -> R.drawable.male_athletic
+        BodyType.plus_size -> R.drawable.male_plus_size
+        null -> null //DEFAULT
+    }
 
 
     ScreenContainer(navController = navController) { paddingValues ->
@@ -93,7 +109,7 @@ fun CommunityScreen(navController: NavController, authViewModel: AuthViewModel) 
                         .fillMaxWidth()
                         .padding(top = 8.dp),
                     color = Color.LightGray,
-                    thickness = 1.dp
+                    thickness = 0.5.dp
                 )
             }
             Spacer(modifier = Modifier.height(18.dp))
@@ -101,27 +117,76 @@ fun CommunityScreen(navController: NavController, authViewModel: AuthViewModel) 
             Text(
                 text = "YOUR PERSONAL FIT GUIDE",
                 fontStyle = FontStyle.Italic,
-                fontSize = 20.sp
+                fontSize = 18.sp
             )
             Spacer(modifier = Modifier.height(18.dp))
+            //CHARACTER BODY
+            Box(
+                modifier = Modifier.size(270.dp), // reserve space so layout doesn’t shift
+                contentAlignment = Alignment.Center
+            ) {
+                Crossfade(targetState = iconRes) { res ->
+                    if (res != null) {
+                        Icon(
+                            painter = painterResource(res),
+                            contentDescription = userProfile?.bodyType?.displayName ?: "Body type",
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                }
 
-            Text(
-                text = "GENERAL GUIDE",
-                fontWeight = FontWeight.Bold,
-                fontSize = 22.sp
-            )
+                // Height chip
+                userHeight?.let { height ->
+                    Surface(
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .padding(start = 16.dp, top = 8.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                        color = Color.Transparent
+                    ) {
+                        Text(
+                            text = height.displayName,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        )
+                    }
+                }
+                // Body type chip
+                userBodyType?.let { bodyType ->
+                    Surface(
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(end = 40.dp, bottom = 8.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                        color = Color.Transparent
+                    ) {
+                        Text(
+                            text = bodyType.displayName,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(18.dp))
 
             // Content
             when {
                 fitGuide == null -> {
                     Text("Loading your fit guide…")
                 }
-
                 fitGuide!!.categories.isEmpty() -> {
                     Text("No categories available for your profile")
                 }
 
                 else -> {
+                    //CHIPS
                     FlowRow(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -148,6 +213,8 @@ fun CommunityScreen(navController: NavController, authViewModel: AuthViewModel) 
                         }
                     }
                     Spacer(modifier = Modifier.height(18.dp))
+
+                    //CARDS
                     LazyRow(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -159,14 +226,13 @@ fun CommunityScreen(navController: NavController, authViewModel: AuthViewModel) 
                             }
                             Card(
                                 modifier = Modifier
-                                    .width(130.dp)
-                                    .height(150.dp)
+                                    .width(180.dp)
+                                    .height(180.dp)
                                     .clickable(onClick = onCardClick),
-                                shape = RoundedCornerShape(12.dp),
+                                shape = RoundedCornerShape(0.dp),
                                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                             ) {
                                 Box(modifier = Modifier.fillMaxSize()) {
-                                    // If it's a URL use AsyncImage, else fallback to drawable
                                     if (category.image.startsWith("http")) {
                                         AsyncImage(
                                             model = category.image,
@@ -177,21 +243,20 @@ fun CommunityScreen(navController: NavController, authViewModel: AuthViewModel) 
                                     } else {
                                         // do nothing for now
                                     }
-
-                                    Text(
-                                        text = category.title,
-                                        fontSize = 12.sp,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = Color.White,
-                                        modifier = Modifier
-                                            .align(Alignment.BottomStart)
-                                            .padding(8.dp)
-                                            .background(
-                                                color = Color.Black.copy(alpha = 0.6f),
-                                                shape = RoundedCornerShape(6.dp)
-                                            )
-                                            .padding(horizontal = 8.dp, vertical = 4.dp)
-                                    )
+//                                    Text(
+//                                        text = category.title,
+//                                        fontSize = 12.sp,
+//                                        fontWeight = FontWeight.SemiBold,
+//                                        color = Color.White,
+//                                        modifier = Modifier
+//                                            .align(Alignment.BottomStart)
+//                                            .padding(8.dp)
+//                                            .background(
+//                                                color = Color.Black.copy(alpha = 0.6f),
+//                                                shape = RoundedCornerShape(6.dp)
+//                                            )
+//                                            .padding(horizontal = 8.dp, vertical = 4.dp)
+//                                    )
                                 }
                             }
                         }
@@ -203,9 +268,11 @@ fun CommunityScreen(navController: NavController, authViewModel: AuthViewModel) 
                                 shape = RoundedCornerShape(16.dp),
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .background(color = Color.White)
                                     .padding(16.dp),
-                                elevation = CardDefaults.cardElevation(8.dp)
+                                elevation = CardDefaults.cardElevation(8.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = Color.White
+                                )
                             ) {
                                 Column(
                                     modifier = Modifier
@@ -260,6 +327,7 @@ fun CommunityScreen(navController: NavController, authViewModel: AuthViewModel) 
         }
     }
 }
+
 fun loadFitGuide(context: Context): FitGuideWrapper {
     val jsonString = context.assets.open("fit_guide.json")
         .bufferedReader().use { it.readText() }
