@@ -15,7 +15,7 @@ data class FitGuideCategory(
     val summary: String,
     val image: String,
     val details: List<String>,
-    val proTip: String
+    val proTip: String,
 )
 
 @Serializable
@@ -23,5 +23,6 @@ data class FitGuide(
     val gender: String,
     val height: HeightGroup,
     val bodyType: BodyType,
+    val chips: List<String>,
     val categories: List<FitGuideCategory>
 )
