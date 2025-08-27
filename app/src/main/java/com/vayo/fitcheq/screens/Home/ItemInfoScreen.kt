@@ -236,6 +236,7 @@ fun ItemInfoScreen(outfit: OutfitData, viewModel: MaleHomeViewModel,navControlle
                         }
                         Spacer(modifier = Modifier.height(18.dp))
 
+                        //SHIPPING
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -260,7 +261,6 @@ fun ItemInfoScreen(outfit: OutfitData, viewModel: MaleHomeViewModel,navControlle
                                 modifier = Modifier.size(20.dp)
                             )
                         }
-
                         AnimatedVisibility(
                             visible = !isShippingExpanded,
                             enter = expandVertically(animationSpec = tween(durationMillis = 300)),
@@ -277,6 +277,7 @@ fun ItemInfoScreen(outfit: OutfitData, viewModel: MaleHomeViewModel,navControlle
                         }
                         Spacer(modifier = Modifier.height(18.dp))
 
+                        //RETURNS
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -301,7 +302,6 @@ fun ItemInfoScreen(outfit: OutfitData, viewModel: MaleHomeViewModel,navControlle
                                 modifier = Modifier.size(20.dp)
                             )
                         }
-
                         AnimatedVisibility(
                             visible = !isReturnsExpanded,
                             enter = expandVertically(animationSpec = tween(durationMillis = 300)),
