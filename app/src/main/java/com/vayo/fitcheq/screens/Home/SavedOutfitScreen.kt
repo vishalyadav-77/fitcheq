@@ -78,7 +78,7 @@ fun SavedOutfitScreen(navController: NavController, viewModel: MaleHomeViewModel
                         .fillMaxWidth()
                         .padding(top = 8.dp),
                     color = Color.LightGray,
-                    thickness = 1.dp
+                    thickness = 0.5.dp
                 )
             }
             // BODY OF THE SCREEN

@@ -95,7 +95,6 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
         modifier = Modifier
             .fillMaxSize()
             .padding(WindowInsets.statusBars.asPaddingValues())
-            .padding(horizontal = 6.dp)
     ) {
         // Title section
         Column(
@@ -113,148 +112,157 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                     .fillMaxWidth()
                     .padding(top = 8.dp),
                 color = Color.LightGray,
-                thickness = 1.dp
+                thickness = 0.5.dp
             )
         }
 
-        // Content section
-        when {
-            isInitialLoading || isLoading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 6.dp))
+        {
+            // Content section
+            when {
+                isInitialLoading || isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
-            }
-            error != null -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = error,
-                        color = Color.Red,
-                        modifier = Modifier.padding(16.dp)
-                    )
+
+                error != null -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = error,
+                            color = Color.Red,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
                 }
-            }
-            outfits.isEmpty() -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "No outfits found",
-                        color = Color.Gray,
-                        modifier = Modifier.padding(16.dp)
-                    )
+
+                outfits.isEmpty() -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "No outfits found",
+                            color = Color.Gray,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
                 }
-            }
-            else -> {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 0.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    item(span = { GridItemSpan(2) }) {Spacer(modifier = Modifier.height(8.dp))}
-                    items(outfits) { outfit ->
-                        val favoriteMap by viewModel.favoriteMap.collectAsState()
-                        val isFavorite = favoriteMap[outfit.id] ?: false
-                        val priceNumber = outfit.price.toLongOrNull() ?: 0L
-                        val formattedPrice = NumberFormat.getNumberInstance(Locale("en", "IN")).format(priceNumber)
-                        Card(
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F8F8)),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(2.dp)
-                                .clickable {
-                                    navController.navigate(AuthScreen.ItemInfo.passOutfit(outfit))
-                                },
-                            elevation = CardDefaults.cardElevation(4.dp),
-                            shape = RoundedCornerShape(12.dp),
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(8.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
+
+                else -> {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 0.dp),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        item(span = { GridItemSpan(2) }) { Spacer(modifier = Modifier.height(8.dp)) }
+                        items(outfits) { outfit ->
+                            val favoriteMap by viewModel.favoriteMap.collectAsState()
+                            val isFavorite = favoriteMap[outfit.id] ?: false
+                            val priceNumber = outfit.price.toLongOrNull() ?: 0L
+                            val formattedPrice = NumberFormat.getNumberInstance(Locale("en", "IN"))
+                                .format(priceNumber)
+                            Card(
+                                colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F8F8)),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(2.dp)
+                                    .clickable {
+                                        navController.navigate(AuthScreen.ItemInfo.passOutfit(outfit))
+                                    },
+                                elevation = CardDefaults.cardElevation(4.dp),
+                                shape = RoundedCornerShape(12.dp),
                             ) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .aspectRatio(4f / 5f)
-                                ) {
-                                    AsyncImage(
-                                        model = outfit.imageUrl,
-                                        contentDescription = outfit.title,
-                                        contentScale = ContentScale.Crop,
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .clip(RoundedCornerShape(8.dp))
-                                    )
-                                    Icon(
-                                        imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                                        contentDescription = "Favorite",
-                                        tint = if (isFavorite) Color.Red else Color.White,
-                                        modifier = Modifier
-                                            .align(Alignment.TopEnd)
-                                            .padding(8.dp)
-                                            .size(24.dp)
-                                            .clickable {
-                                                viewModel.toggleFavorite(outfit)
-                                                Toast.makeText(
-                                                    context,
-                                                    if (isFavorite) "Removed from wishlist" else "Added to wishlist",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-                                            }
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(8.dp))
                                 Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 4.dp),
-                                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                                    modifier = Modifier.padding(8.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    Text(
-                                        text = outfit.title,
-                                        fontWeight = FontWeight.SemiBold,
-                                        fontSize = 14.sp,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
+                                    Box(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .basicMarquee()
-                                            .focusable()
-                                    )
-
-                                    Spacer(modifier = Modifier.width(4.dp))
-
-                                    Text(
-                                        text = "₹${formattedPrice}",
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 14.sp,
-                                    )
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.End
+                                            .aspectRatio(4f / 5f)
+                                    ) {
+                                        AsyncImage(
+                                            model = outfit.imageUrl,
+                                            contentDescription = outfit.title,
+                                            contentScale = ContentScale.Crop,
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .clip(RoundedCornerShape(8.dp))
+                                        )
+                                        Icon(
+                                            imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                                            contentDescription = "Favorite",
+                                            tint = if (isFavorite) Color.Red else Color.White,
+                                            modifier = Modifier
+                                                .align(Alignment.TopEnd)
+                                                .padding(8.dp)
+                                                .size(24.dp)
+                                                .clickable {
+                                                    viewModel.toggleFavorite(outfit)
+                                                    Toast.makeText(
+                                                        context,
+                                                        if (isFavorite) "Removed from wishlist" else "Added to wishlist",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                }
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 4.dp),
+                                        verticalArrangement = Arrangement.spacedBy(2.dp)
                                     ) {
                                         Text(
-                                            text = outfit.website,
-                                            fontSize = 12.sp,
-                                            fontStyle = FontStyle.Italic,
-                                            color = Color.DarkGray
+                                            text = outfit.title,
+                                            fontWeight = FontWeight.SemiBold,
+                                            fontSize = 14.sp,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .basicMarquee()
+                                                .focusable()
                                         )
+
+                                        Spacer(modifier = Modifier.width(4.dp))
+
+                                        Text(
+                                            text = "₹${formattedPrice}",
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 14.sp,
+                                        )
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.End
+                                        ) {
+                                            Text(
+                                                text = outfit.website,
+                                                fontSize = 12.sp,
+                                                fontStyle = FontStyle.Italic,
+                                                color = Color.DarkGray
+                                            )
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                    item(span = { GridItemSpan(maxLineSpan) }) {
-                        Spacer(modifier = Modifier.height(12.dp))
+                        item(span = { GridItemSpan(maxLineSpan) }) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                        }
                     }
                 }
             }
