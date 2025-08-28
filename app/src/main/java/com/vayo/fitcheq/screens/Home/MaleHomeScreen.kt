@@ -63,7 +63,10 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
         Font(R.font.title_syarifa)
     )
     val myHeadingFont = FontFamily(
-        Font(R.font.headings_kugile)
+        Font(R.font.headings_russo_sans)
+    )
+    val commentFont = FontFamily(
+        Font(R.font.comment_badscript_regular)
     )
 
     // Observe the userId changes to load or clear favorites
@@ -142,51 +145,22 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
-            Spacer(modifier = Modifier.height(30.dp))
-
-            // Search Bar
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)//outer margin
-                    .height(46.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFFF1F1F1)) // Light gray modern tone
-                    .clickable { /* Handle click later */ }
-                    .padding(horizontal = 16.dp),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search",
-                        tint = Color.Gray
-                    )
-
-                    Text(
-                        text = "Search outfits, styles...",
-                        color = Color.Gray,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
             Spacer(modifier = Modifier.height(40.dp))
 
         // TIME FOR TODAY FIT CHEQ
             Text(
-                text= "Time for today’s fit cheq?",
-                fontSize = 18.sp,
+                text= "Ready for today’s fit cheq?",
+                fontSize = 20.sp,
+                fontFamily = commentFont,
                 fontStyle = FontStyle.Italic,
             )
             Spacer(modifier = Modifier.height(40.dp))
 
         //  ESSENTIALS CATEGORY
-            Card(
-                modifier = Modifier.aspectRatio(16f / 9f).padding(horizontal = 16.dp)
+            Card(modifier = Modifier
                 .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .height(180.dp)
                 .clickable {
                     navController.navigate(
                         AuthScreen.OutfitDetails.createRoute(
@@ -202,11 +176,11 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                         restoreState = true
                     }
                            },
-                shape = RoundedCornerShape(8.dp),
+                shape = RoundedCornerShape(0.dp),
                 elevation = CardDefaults.cardElevation(0.dp)
             ) {
                 AsyncImage(
-                    model = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/banners/ess_banner3.webp",
+                    model = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/banners/ess_banner_beta.webp",
                     contentDescription = "ESS Banner",
                     contentScale = ContentScale.Crop
                 )
@@ -217,10 +191,10 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
             Text(
                 text = "Fits By Season",
                 fontFamily = myHeadingFont,
-                fontSize = 20.sp,
+                fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(34.dp))
             Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 contentAlignment = Alignment.Center) {
                 Row(
@@ -270,16 +244,16 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(34.dp))
 
             // shop by category Section
             Text(
                 text = "Shop By Category",
                 fontFamily = myHeadingFont,
-                fontSize = 18.sp,
+                fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(34.dp))
             // Horizontal scrollable 2-row layout
             LazyRow(
                 modifier = Modifier
@@ -358,16 +332,16 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                     }
                 }
             }
-             Spacer(modifier = Modifier.height(28.dp))
+             Spacer(modifier = Modifier.height(34.dp))
 
             // Occasion Fits Section
             Text(
                 text = "Fits By Occasion",
                 fontFamily = myHeadingFont,
-                fontSize = 18.sp,
+                fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(34.dp))
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -427,16 +401,16 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                 }
             }
 
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(34.dp))
 
             // Fashion Style Section
             Text(
                 text = "Fits By Fashion Style",
                 fontFamily = myHeadingFont,
-                fontSize = 18.sp,
+                fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(34.dp))
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -483,7 +457,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(34.dp))
         }
     }
 }
