@@ -129,6 +129,9 @@ fun ItemInfoScreen(outfit: OutfitData, viewModel: MaleHomeViewModel,navControlle
     val myHeadingFont = FontFamily(
         Font(R.font.headings_kugile)
     )
+    val mytextFont = FontFamily(
+        Font(R.font.mini_text_chivo)
+    )
 
     LaunchedEffect(outfit) {
         viewModel.fetchRelatedOutfits(outfit)
@@ -150,6 +153,7 @@ fun ItemInfoScreen(outfit: OutfitData, viewModel: MaleHomeViewModel,navControlle
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Color.White)
                 .padding(innerPadding)
         ) {
             LazyVerticalGrid(
@@ -262,7 +266,7 @@ fun ItemInfoScreen(outfit: OutfitData, viewModel: MaleHomeViewModel,navControlle
                             )
                         }
                         AnimatedVisibility(
-                            visible = !isShippingExpanded,
+                            visible = isShippingExpanded,
                             enter = expandVertically(animationSpec = tween(durationMillis = 300)),
                             exit = shrinkVertically(animationSpec = tween(durationMillis = 300))
                         ) {
@@ -270,6 +274,7 @@ fun ItemInfoScreen(outfit: OutfitData, viewModel: MaleHomeViewModel,navControlle
                                 Spacer(modifier = Modifier.height(6.dp))
                                 Text(
                                     text = brandInfo?.shippingPolicy?.takeIf { it.isNotBlank() } ?: fallbackText,
+                                    fontFamily =  mytextFont,
                                     fontSize = 13.sp,
                                     lineHeight = 18.sp
                                 )
@@ -303,7 +308,7 @@ fun ItemInfoScreen(outfit: OutfitData, viewModel: MaleHomeViewModel,navControlle
                             )
                         }
                         AnimatedVisibility(
-                            visible = !isReturnsExpanded,
+                            visible = isReturnsExpanded,
                             enter = expandVertically(animationSpec = tween(durationMillis = 300)),
                             exit = shrinkVertically(animationSpec = tween(durationMillis = 300))
                         ) {
@@ -312,11 +317,11 @@ fun ItemInfoScreen(outfit: OutfitData, viewModel: MaleHomeViewModel,navControlle
                                 Text(
                                     text = if (combinedPolicy.isNotBlank()) combinedPolicy else fallbackText,
                                     fontSize = 13.sp,
+                                    fontFamily =  mytextFont,
                                     lineHeight = 18.sp
                                 )
                             }
                         }
-
                         Spacer(modifier = Modifier.height(35.dp))
                     }
                 }
@@ -340,7 +345,7 @@ fun ItemInfoScreen(outfit: OutfitData, viewModel: MaleHomeViewModel,navControlle
                     val formattedPrice = NumberFormat.getNumberInstance(Locale("en", "IN")).format(priceNumber)
 
                     Card(
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F8F8)),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(350.dp)
@@ -350,7 +355,7 @@ fun ItemInfoScreen(outfit: OutfitData, viewModel: MaleHomeViewModel,navControlle
                                     popUpTo(AuthScreen.ItemInfo.route) { inclusive = true }
                                 }
                             },
-                        elevation = CardDefaults.cardElevation(4.dp),
+                        elevation = CardDefaults.cardElevation(1.dp),
                         shape = RoundedCornerShape(12.dp),
                     ) {
                         Column(
@@ -537,6 +542,11 @@ fun BottomActionBar(
             .height(80.dp)
             .background(color = Color.White)
     ) {
+        Divider(
+            modifier = Modifier.fillMaxWidth(),
+            color = Color.LightGray,
+            thickness = 0.3.dp
+        )
         Row(
             modifier = Modifier
                 .fillMaxSize()
