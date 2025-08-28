@@ -53,15 +53,21 @@ import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
 import com.google.firebase.auth.FirebaseAuth
 import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.material3.FilterChip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.navigation.NavController
 import com.vayo.fitcheq.AuthScreen
 import java.text.NumberFormat
 import java.util.Locale
+import androidx.compose.foundation.lazy.items   // For LazyRow
+import androidx.compose.material3.FilterChipDefaults
 
-//@Preview
+
 @Composable
 fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, viewModel: MaleHomeViewModel,navController: NavController) {
     val context = LocalContext.current
@@ -89,11 +95,27 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
     val outfits = viewModel.outfits.collectAsState().value
     val isLoading = viewModel.isLoading.collectAsState().value
     val error = viewModel.error.collectAsState().value
-    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+
+    // 🔹 Extract unique categories from outfits
+    val categories = remember(outfits) {
+        outfits.mapNotNull { it.category } // adjust field name if different
+            .distinct()
+    }
+
+    // 🔹 State for selected category
+    var selectedCategory by remember { mutableStateOf<String?>(null) }
+
+    // 🔹 Filter outfits if a category is selected
+    val filteredOutfits = remember(outfits, selectedCategory) {
+        if (selectedCategory == null) outfits
+        else outfits.filter { it.category == selectedCategory }
+    }
+
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color.White)
             .padding(WindowInsets.statusBars.asPaddingValues())
     ) {
         // Title section
@@ -102,25 +124,61 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(10.dp))
+
             Text(
+                modifier = Modifier.padding(bottom = 8.dp),
                 text = "${fieldValue.replaceFirstChar { it.uppercaseChar() }} Collection",
                 fontSize = 22.sp,
                 fontWeight = FontWeight.SemiBold
             )
+            // 🔹 Category chips
+            if (categories.isNotEmpty() && categories.size > 1) {
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(start = 10.dp, end = 10.dp)
+                ) {
+                    items(categories) { category ->
+                        val chipTitle = category.replaceFirstChar { it.uppercase() }
+                        FilterChip(
+                            selected = selectedCategory == category,
+                            onClick = {
+                                selectedCategory = if (selectedCategory == category) null else category
+                            },
+                            label = {
+                                Text(text = if (selectedCategory == category) chipTitle+ "  ✕" else chipTitle, color = if (selectedCategory == category) Color.White else Color.Black)
+                            },
+                            border = FilterChipDefaults.filterChipBorder(
+                                enabled = true,
+                                selected = selectedCategory == category,
+                                borderWidth = 0.3.dp,
+                                selectedBorderWidth = 0.3.dp
+                            ),
+                            colors = FilterChipDefaults.filterChipColors(
+                                containerColor = Color.Transparent,
+                                selectedContainerColor = Color.Black
+                            )
+                        )
+
+                    }
+                }
+            }
+
             Divider(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp),
+                    .padding(top = 4.dp),
                 color = Color.LightGray,
                 thickness = 0.5.dp
             )
+
         }
 
+        // Content section
         Column(modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 6.dp))
         {
-            // Content section
             when {
                 isInitialLoading || isLoading -> {
                     Box(
@@ -130,7 +188,6 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                         CircularProgressIndicator()
                     }
                 }
-
                 error != null -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -143,7 +200,6 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                         )
                     }
                 }
-
                 outfits.isEmpty() -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -167,21 +223,21 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         item(span = { GridItemSpan(2) }) { Spacer(modifier = Modifier.height(8.dp)) }
-                        items(outfits) { outfit ->
+                        items(filteredOutfits) { outfit ->
                             val favoriteMap by viewModel.favoriteMap.collectAsState()
                             val isFavorite = favoriteMap[outfit.id] ?: false
                             val priceNumber = outfit.price.toLongOrNull() ?: 0L
                             val formattedPrice = NumberFormat.getNumberInstance(Locale("en", "IN"))
                                 .format(priceNumber)
                             Card(
-                                colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F8F8)),
+                                colors = CardDefaults.cardColors(containerColor = Color.White),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(2.dp)
                                     .clickable {
                                         navController.navigate(AuthScreen.ItemInfo.passOutfit(outfit))
                                     },
-                                elevation = CardDefaults.cardElevation(4.dp),
+                                elevation = CardDefaults.cardElevation(1.dp),
                                 shape = RoundedCornerShape(12.dp),
                             ) {
                                 Column(
