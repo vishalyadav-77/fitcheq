@@ -87,6 +87,7 @@ fun CommunityScreen(navController: NavController, authViewModel: AuthViewModel) 
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Color.White)
                 .padding(paddingValues),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {

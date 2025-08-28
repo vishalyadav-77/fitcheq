@@ -132,6 +132,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Color.White)
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
                 .padding(vertical = 18.dp),

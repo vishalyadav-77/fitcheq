@@ -42,6 +42,7 @@ import com.vayo.fitcheq.navigation.ScreenContainer
 import com.vayo.fitcheq.R
 import com.vayo.fitcheq.viewmodels.MaleHomeViewModel
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import com.vayo.fitcheq.AuthScreen
 
@@ -59,6 +60,7 @@ fun SavedOutfitScreen(navController: NavController, viewModel: MaleHomeViewModel
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Color.White)
                 .padding(paddingValues)
         ) {
             //TITLE
@@ -122,7 +124,7 @@ fun SavedOutfitScreen(navController: NavController, viewModel: MaleHomeViewModel
                         val favoriteMap by viewModel.favoriteMap.collectAsState()
                         val isFavorite = favoriteMap[outfit.id] ?: false
 
-                        Card(colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F8F8)),
+                        Card(colors = CardDefaults.cardColors(containerColor = Color.White),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(340.dp)
@@ -130,7 +132,7 @@ fun SavedOutfitScreen(navController: NavController, viewModel: MaleHomeViewModel
                                 .clickable {
                                     navController.navigate(AuthScreen.ItemInfo.passOutfit(outfit))
                                 },
-                            elevation = CardDefaults.cardElevation(4.dp),
+                            elevation = CardDefaults.cardElevation(1.dp),
                             shape = RoundedCornerShape(12.dp)
                         ) {
                             Column(
