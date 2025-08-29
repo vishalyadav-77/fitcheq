@@ -24,6 +24,16 @@ data class OutfitData(
     val sizes: List<String> = emptyList()
 )
 
+data class Filters(
+    val categories: Set<String> = emptySet(),
+    val websites: Set<String> = emptySet(),
+    val colors: Set<String> = emptySet(),
+    val type: String? = null,
+    val fit: String? = null,
+    val price: String? = null,
+)
+
+
 val outfitSizeMap = mapOf(
     "tshirt" to listOf("S", "M", "L", "XL"),
     "shirt" to listOf("S", "M", "L", "XL"),

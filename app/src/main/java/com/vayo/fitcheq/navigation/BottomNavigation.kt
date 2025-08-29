@@ -27,7 +27,7 @@ fun BottomNavigation(navController: NavController) {
         BottomNavItem.MyProfile
     )
     Surface(
-        shadowElevation = 6.dp,
+        shadowElevation = 2.dp,
         color = Color.White
     ) {
         NavigationBar(containerColor = Color.White,
