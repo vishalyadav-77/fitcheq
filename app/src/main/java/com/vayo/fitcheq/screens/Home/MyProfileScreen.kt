@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
@@ -25,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -44,23 +46,26 @@ fun MyProfileScreen(navController: NavController, authViewModel: AuthViewModel) 
     var userProfile by remember { mutableStateOf<UserProfile?>(null) }
     val firestore = remember { FirebaseFirestore.getInstance() }
     var userName by remember { mutableStateOf("Loading...") }
+    val context = LocalContext.current
+    
 
     LaunchedEffect(Unit) {
-       userProfile = authViewModel.loadProfileFromSharedPreferences()
+       userProfile = authViewModel.loadUserProfileFromSharedPreferences(context)
     }
+
+    val username = userProfile?.name ?: "..."
+
     ScreenContainer(navController = navController) { paddingValues ->
-        // Title section
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(
-                    top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 16.dp,
-                )
+                .background(Color.White)
+                .padding(paddingValues)
         ) {
+            // Title
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp)
             ) {
                 Text(
                     text = "Profile",
@@ -71,7 +76,7 @@ fun MyProfileScreen(navController: NavController, authViewModel: AuthViewModel) 
 
                 IconButton(
                     onClick = { navController.navigate(AuthScreen.SettingsPage.route) },
-                    modifier = Modifier.align(Alignment.CenterEnd).padding(end = 12.dp)
+                    modifier = Modifier.align(Alignment.CenterEnd).padding(end = 12.dp),
                 ) {
                     Icon(
                         imageVector = Icons.Default.Settings,
@@ -82,32 +87,42 @@ fun MyProfileScreen(navController: NavController, authViewModel: AuthViewModel) 
             Divider(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp, bottom = 26.dp),
+                    .padding(top = 6.dp, bottom = 26.dp),
                 color = Color.LightGray,
-                thickness = 1.dp
+                thickness = 0.5.dp
             )
+
+            // CONTENT
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Icon(
-                    imageVector = Icons.Default.AccountCircle,
-                    contentDescription = "Profile",
-                    modifier = Modifier
-                        .size(78.dp)
-                        .clip(CircleShape)
-                        .background(Color.Black)
-                        .padding(8.dp),
-                    tint = Color.White
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = userProfile?.name.toString(),
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 36.dp)
-                )
-            }
+
+                //USER pfp and Name
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AccountCircle,
+                        contentDescription = "Profile",
+                        modifier = Modifier
+                            .size(78.dp)
+                            .clip(CircleShape)
+                            .background(Color.Black)
+                            .padding(8.dp),
+                        tint = Color.White
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = username,
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                            .padding(bottom = 36.dp)
+                    )
+                }
+
                 Row(
                     modifier = Modifier.fillMaxWidth()
                         .padding(horizontal = 12.dp),
@@ -126,18 +141,27 @@ fun MyProfileScreen(navController: NavController, authViewModel: AuthViewModel) 
                     )
                 }
                 Spacer(modifier = Modifier.height(12.dp))
-                userProfile?.let { profile ->
-                    ProfileRow(label = "Gender", value = profile.gender)
-                    ProfileRow(label = "Height Group", value = profile.height.displayName)
-                    ProfileRow(label = "Age Group", value = profile.ageGroup.displayName)
-                    ProfileRow(label = "Occupation", value = profile.occupation)
-                    ProfileRow(label = "Body Type", value = profile.bodyType.displayName)
-                    ProfileRow(
-                        label = "Preferred Platform",
-                        value = profile.preferPlatform.displayName
-                    )
-                } ?: run {
-                    Text("Loading...", modifier = Modifier.align(Alignment.CenterHorizontally))
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(400.dp)
+                ) {
+                    Column {
+                        userProfile?.let { profile ->
+                            ProfileRow(label = "Gender", value = profile.gender)
+                            ProfileRow(label = "Height Group", value = profile.height.displayName)
+                            ProfileRow(label = "Age Group", value = profile.ageGroup.displayName)
+                            ProfileRow(label = "Occupation", value = profile.occupation)
+                            ProfileRow(label = "Body Type", value = profile.bodyType.displayName)
+                            ProfileRow(
+                                label = "Preferred Platform",
+                                value = profile.preferPlatform.displayName
+                            )
+                        } ?: run {
+                            Text("Loading...")
+                        }
+                    }
                 }
                 Spacer(modifier = Modifier.height(24.dp))
                 // Logout Button
@@ -145,10 +169,17 @@ fun MyProfileScreen(navController: NavController, authViewModel: AuthViewModel) 
                     onClick = {
                         authViewModel.logout()
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.width(250.dp),
+                    shape = RoundedCornerShape(0.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Black,
+                        contentColor = Color.White
+                    )
                 ) {
-                    Text("Logout")
+                    Text("LOGOUT",)
                 }
+
+            }
 
         }
     }
