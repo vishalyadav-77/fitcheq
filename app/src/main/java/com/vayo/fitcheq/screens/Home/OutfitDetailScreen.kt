@@ -53,9 +53,13 @@ import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
 import com.google.firebase.auth.FirebaseAuth
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.material3.FilterChip
@@ -65,11 +69,27 @@ import com.vayo.fitcheq.AuthScreen
 import java.text.NumberFormat
 import java.util.Locale
 import androidx.compose.foundation.lazy.items   // For LazyRow
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.ui.res.painterResource
+import com.vayo.fitcheq.R
+import com.vayo.fitcheq.data.model.Filters
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, viewModel: MaleHomeViewModel,navController: NavController) {
+    val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val currentUser = FirebaseAuth.getInstance().currentUser
     
@@ -98,18 +118,50 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
 
     // 🔹 Extract unique categories from outfits
     val categories = remember(outfits) {
-        outfits.mapNotNull { it.category } // adjust field name if different
-            .distinct()
-    }
+        outfits.mapNotNull { it.category }
+            .distinct() }
+    val brands = remember(outfits){
+        outfits.mapNotNull { it.website }
+            .distinct() }
+    val colors = remember(outfits){
+        outfits.mapNotNull { it.color }
+            .distinct() }
+    val types = remember(outfits){
+        outfits.mapNotNull { it.type }
+            .distinct() }
 
     // 🔹 State for selected category
-    var selectedCategory by remember { mutableStateOf<String?>(null) }
+    var filters by remember { mutableStateOf(Filters()) }
 
     // 🔹 Filter outfits if a category is selected
-    val filteredOutfits = remember(outfits, selectedCategory) {
-        if (selectedCategory == null) outfits
-        else outfits.filter { it.category == selectedCategory }
+    val filteredOutfits = remember(outfits, filters) {
+        outfits.filter { outfit ->
+            val matchCategory = if (filters.categories.isNotEmpty()) {
+                outfit.category in filters.categories
+            } else true
+
+            val matchBrand = if (filters.websites.isNotEmpty()) {
+                outfit.website in filters.websites
+            } else true
+
+            val matchColor = if (filters.colors.isNotEmpty()) {
+                outfit.color in filters.colors
+            } else true
+            val matchType = filters.type?.let { outfit.type == it } ?: true
+
+            matchCategory && matchBrand && matchColor && matchType
+        }
     }
+
+
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true // allows 60% expansion
+    )
+    var showSheet by remember { mutableStateOf(false) }
+
+    val filterTypes = listOf("Category", "Brand", "Color", "Price")
+    var selectedFilter by remember { mutableStateOf(filterTypes.first()) }
+
 
 
     Column(
@@ -125,44 +177,91 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
         ) {
             Spacer(modifier = Modifier.height(10.dp))
 
-            Text(
-                modifier = Modifier.padding(bottom = 8.dp),
+            Text( modifier = Modifier.padding(bottom = 8.dp),
                 text = "${fieldValue.replaceFirstChar { it.uppercaseChar() }} Collection",
                 fontSize = 22.sp,
-                fontWeight = FontWeight.SemiBold
-            )
-            // 🔹 Category chips
-            if (categories.isNotEmpty() && categories.size > 1) {
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(start = 10.dp, end = 10.dp)
-                ) {
-                    items(categories) { category ->
-                        val chipTitle = category.replaceFirstChar { it.uppercase() }
-                        FilterChip(
-                            selected = selectedCategory == category,
-                            onClick = {
-                                selectedCategory = if (selectedCategory == category) null else category
-                            },
-                            label = {
-                                Text(text = if (selectedCategory == category) chipTitle+ "  ✕" else chipTitle, color = if (selectedCategory == category) Color.White else Color.Black)
-                            },
-                            border = FilterChipDefaults.filterChipBorder(
-                                enabled = true,
-                                selected = selectedCategory == category,
-                                borderWidth = 0.3.dp,
-                                selectedBorderWidth = 0.3.dp
-                            ),
-                            colors = FilterChipDefaults.filterChipColors(
-                                containerColor = Color.Transparent,
-                                selectedContainerColor = Color.Black
-                            )
-                        )
+                fontWeight = FontWeight.SemiBold )
 
+            // 🔹 Category chips
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 5.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Surface(modifier = Modifier.padding(end = 6.dp),
+                        onClick = { showSheet = true },
+                        shape = FilterChipDefaults.shape,
+                        color = Color.Black,
+                        border = BorderStroke(0.3.dp, Color.Black),
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.filter_icon),
+                                contentDescription = "Filter icon",
+                                modifier = Modifier.size(18.dp),
+                                tint = Color.White
+                            )
+                            Spacer(modifier = Modifier.width(6.dp)) // small gap between icon and text
+                            Text(
+                                text = "Filter",
+                                color = Color.White,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
+
+                    LazyRow(
+                        modifier = Modifier.weight(1f),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        contentPadding = PaddingValues(start = 8.dp, end = 10.dp)
+                    ) {
+                        val listToShow = if (categories.isNotEmpty() && categories.size > 1) categories else types
+                        val isCategoryList = categories.isNotEmpty() && categories.size > 1
+
+                        items(listToShow) { item ->
+                            val chipTitle = item.replaceFirstChar { it.uppercase() }
+                            val isSelected = if (isCategoryList) filters.categories.contains(item)
+                            else filters.type?.contains(item) == true // or however you store type filter
+
+                            FilterChip(
+                                selected = isSelected,
+                                onClick = {
+                                    filters = if (isCategoryList) {
+                                        filters.copy(
+                                            categories = if (isSelected) filters.categories - item
+                                            else filters.categories + item
+                                        )
+                                    } else {
+                                        filters.copy(
+                                            type = if (isSelected) null else item // assuming only one type can be selected
+                                        )
+                                    }
+                                },
+                                label = {
+                                    Text(
+                                        text = if (isSelected) "$chipTitle ✕" else chipTitle,
+                                        color = if (isSelected) Color.White else Color.Black
+                                    )
+                                },
+                                border = FilterChipDefaults.filterChipBorder(
+                                    enabled = true,
+                                    selected = isSelected,
+                                    borderWidth = 0.3.dp,
+                                    selectedBorderWidth = 0.3.dp
+                                ),
+                                colors = FilterChipDefaults.filterChipColors(
+                                    containerColor = Color.Transparent,
+                                    selectedContainerColor = Color.Black
+                                )
+                            )
+                        }
                     }
                 }
-            }
 
             Divider(
                 modifier = Modifier
@@ -323,5 +422,190 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                 }
             }
         }
+    }
+    if (showSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showSheet = false },
+            sheetState = sheetState,
+            containerColor = Color.White,
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+            dragHandle = null // hides drag icon
+        ) {
+            // Use Box to allow sticky bottom row
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height((LocalConfiguration.current.screenHeightDp * 0.7).dp) // fixed height
+            ) {
+
+                Column(modifier = Modifier.fillMaxSize()) {
+                    //TITLE
+                    Text(
+                        "Filters", fontSize = 20.sp, fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(16.dp),
+                    )
+                    Divider(
+                        modifier = Modifier.fillMaxWidth(),
+                        color = Color.LightGray,
+                        thickness = 0.3.dp
+                    )
+
+                    // Content
+                    Row(modifier = Modifier.fillMaxWidth()
+                        .heightIn(max = (LocalConfiguration.current.screenHeightDp * 0.7).dp - 135.dp)) {
+                        // Left column: filter types
+                        LazyColumn(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight()
+                                .background(Color(0xFFF5F5F5))
+                        ) {
+                            items(filterTypes) { type ->
+                                Text(
+                                    text = type,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable { selectedFilter = type }
+                                        .background(color = if(selectedFilter == type) Color.White else Color(0xFFF5F5F5),)
+                                        .padding(16.dp),
+                                    color = if (selectedFilter == type) Color.Black else Color.Gray,
+                                    fontWeight = if (selectedFilter == type) FontWeight.Bold else FontWeight.Normal
+                                )
+                            }
+                        }
+                        // Right column: options for the selected filter
+                        LazyColumn(
+                            modifier = Modifier
+                                .weight(2f)
+                                .fillMaxHeight()
+                        ) {
+                            when (selectedFilter) {
+                                "Category" -> {
+                                    items(categories) { category ->
+                                        val categoryTitle = category.replaceFirstChar { it.uppercase() }
+                                        CategoryRow(
+                                            text = categoryTitle,
+                                            isSelected = filters.categories.contains(category),
+                                            onSelectedChange = { selected ->
+                                                filters = filters.copy(
+                                                    categories = if (selected) {
+                                                        filters.categories + category
+                                                    } else {
+                                                        filters.categories - category
+                                                    }
+                                                )
+                                            }
+                                        )
+                                    }
+                                }
+                                "Brand" -> {
+                                    items(brands) { brand ->
+                                        CategoryRow(
+                                            text = brand,
+                                            isSelected = filters.websites.contains(brand),
+                                            onSelectedChange = { selected ->
+                                                filters = filters.copy(
+                                                    websites = if (selected) {
+                                                        filters.websites + brand
+                                                    } else {
+                                                        filters.websites - brand
+                                                    }
+                                                )
+                                            }
+                                        )
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+
+                // Bottom buttons
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White)
+                        .align(Alignment.BottomCenter)
+                        .height(80.dp)
+                ) {
+                    Divider(
+                        modifier = Modifier.fillMaxWidth(),
+                        color = Color.LightGray,
+                        thickness = 0.3.dp
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        OutlinedButton(modifier = Modifier
+                            .width(100.dp)
+                            .height(50.dp),
+                            contentPadding = PaddingValues(0.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.Transparent,   contentColor = Color.Black),
+                            onClick = {
+                                filters = Filters()
+                            },
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text("Clear", fontWeight = FontWeight.Bold, color = Color.Black)
+                        }
+
+                        Button(modifier = Modifier
+                            .width(280.dp)
+                            .height(50.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Black,   contentColor = Color.White),
+                            onClick = {
+                                coroutineScope.launch {
+                                    sheetState.hide()
+                                    showSheet = false
+                                }
+                            },
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text("Apply", fontWeight = FontWeight.Bold, color = Color.White)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CategoryRow(
+    text: String,
+    isSelected: Boolean,
+    onSelectedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onSelectedChange(!isSelected) }
+            .padding(vertical = 8.dp, horizontal = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(20.dp) // shrink overall checkbox footprint
+                .padding(0.dp) // no extra padding
+        ) {
+            Checkbox(
+                checked = isSelected,
+                onCheckedChange = { onSelectedChange(it) },
+                modifier = Modifier.size(20.dp),
+                colors = CheckboxDefaults.colors(checkedColor = Color.Black, uncheckedColor = Color.Black)
+            )
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = text,
+            fontSize = 14.sp,
+        )
     }
 }
