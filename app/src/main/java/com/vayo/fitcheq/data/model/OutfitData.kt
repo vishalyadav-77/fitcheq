@@ -28,9 +28,9 @@ data class Filters(
     val categories: Set<String> = emptySet(),
     val websites: Set<String> = emptySet(),
     val colors: Set<String> = emptySet(),
+    val priceRange: ClosedFloatingPointRange<Float> = 0f..10000f,
     val type: String? = null,
-    val fit: String? = null,
-    val price: String? = null,
+    val fits: Set<String> = emptySet(),
 )
 
 
