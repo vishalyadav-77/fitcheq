@@ -45,7 +45,7 @@ class MaleHomeViewModel: ViewModel() {
                 Log.d("OutfitFetch", "Fetching outfits where $fieldName=$fieldValue and gender=$gender")
 
                 val query = Firebase.firestore.collection("outfits")
-                    .whereEqualTo("gender", gender)
+                    .whereIn("gender", listOf(gender, "unisex"))
 
                 // 👇 Decide based on whether the field is an array
                 val arrayFields = setOf("tags", "style", "occasion","season")
@@ -179,7 +179,7 @@ class MaleHomeViewModel: ViewModel() {
             // Assuming 'outfits' is already loaded in memory (from repository)
             val allOutfits = outfits.value // StateFlow/LiveData of all outfits
             val filtered = allOutfits.filter {
-                it.category == currentOutfit.category && it.id != currentOutfit.id
+                it.category == currentOutfit.category && it.id != currentOutfit.id && it.type == currentOutfit.type
             }
             _relatedOutfits.value = filtered
         }
