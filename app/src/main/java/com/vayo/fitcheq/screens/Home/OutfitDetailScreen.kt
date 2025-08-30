@@ -1,6 +1,7 @@
 package com.vayo.fitcheq.screens.Home
 
 
+import android.util.Log
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
@@ -69,6 +70,7 @@ import com.vayo.fitcheq.AuthScreen
 import java.text.NumberFormat
 import java.util.Locale
 import androidx.compose.foundation.lazy.items   // For LazyRow
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -84,6 +86,11 @@ import com.vayo.fitcheq.R
 import com.vayo.fitcheq.data.model.Filters
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
+import androidx.compose.material.RangeSlider
+import androidx.compose.material.SliderDefaults
+import androidx.compose.material3.HorizontalDivider
+import kotlin.math.min
+import kotlin.math.roundToInt
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -92,7 +99,6 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val currentUser = FirebaseAuth.getInstance().currentUser
-    
     // Local loading state to show immediately
     var isInitialLoading by remember { mutableStateOf(true) }
 
@@ -104,7 +110,6 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
         viewModel.fetchOutfitsByFieldAndGender(fieldName, fieldValue, gender)
         isInitialLoading = false
     }
-
     // Load favorites when screen loads
     LaunchedEffect(Unit) {
         currentUser?.uid?.let { userId ->
@@ -125,15 +130,20 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
             .distinct() }
     val colors = remember(outfits){
         outfits.mapNotNull { it.color }
+            .filter { it.isNotBlank() }
             .distinct() }
     val types = remember(outfits){
         outfits.mapNotNull { it.type }
+            .filter { it.isNotBlank() }
+            .distinct() }
+    val fits = remember(outfits){
+        outfits.mapNotNull { it.fit }
+            .filter { it.isNotBlank() }
             .distinct() }
 
     // 🔹 State for selected category
     var filters by remember { mutableStateOf(Filters()) }
-
-    // 🔹 Filter outfits if a category is selected
+    // 🔹 Filtered outfits if a filter is selected
     val filteredOutfits = remember(outfits, filters) {
         outfits.filter { outfit ->
             val matchCategory = if (filters.categories.isNotEmpty()) {
@@ -147,22 +157,62 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
             val matchColor = if (filters.colors.isNotEmpty()) {
                 outfit.color in filters.colors
             } else true
+
             val matchType = filters.type?.let { outfit.type == it } ?: true
 
-            matchCategory && matchBrand && matchColor && matchType
+            val matchPrice = outfit.price.toFloatOrNull()?.let { price ->
+                price in filters.priceRange
+            } ?: true // if price is null or not a number, include it
+
+            val matchFit = if (filters.fits.isNotEmpty()) {
+                outfit.fit in filters.fits
+            } else true
+
+            matchCategory && matchBrand && matchColor && matchType && matchPrice && matchFit
         }
     }
-
-
+    LaunchedEffect(categories) {
+        if (categories.size == 1) {
+            filters = filters.copy(categories = setOf(categories.first()))
+        }
+    }
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true // allows 60% expansion
     )
     var showSheet by remember { mutableStateOf(false) }
 
-    val filterTypes = listOf("Category", "Brand", "Color", "Price")
-    var selectedFilter by remember { mutableStateOf(filterTypes.first()) }
+    val filterTypes by remember(categories) {
+        mutableStateOf(
+            if (categories.isNotEmpty() && categories.size > 1)
+                listOf("Category", "Brand", "Color", "Price")
+            else
+                listOf("Category", "Brand", "Color", "Price", "Fit")
+        )
+    }
+    // Ensure selectedFilter stays valid if filterTypes changes
+    var selectedFilter by remember(filterTypes) {
+        mutableStateOf(filterTypes.first())
+    }
 
-
+    val categoryMaxMap = mapOf(
+        "accessories" to 2000f,
+        "tshirt" to 5000f,
+        "shirt" to 10000f
+    )
+    val maxPriceLimit by remember(filters.categories) {
+        mutableStateOf(
+            filters.categories
+                .mapNotNull { it.lowercase().let(categoryMaxMap::get) }
+                .minOrNull() ?: 10000f
+        )
+    }
+    LaunchedEffect(maxPriceLimit) {
+        val currentRange = filters.priceRange
+        val newRange = currentRange.start..min(currentRange.endInclusive, maxPriceLimit)
+        if (newRange != currentRange) {
+            filters = filters.copy(priceRange = newRange)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -263,7 +313,7 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                     }
                 }
 
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 4.dp),
@@ -423,6 +473,7 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
             }
         }
     }
+    //FILTER
     if (showSheet) {
         ModalBottomSheet(
             onDismissRequest = { showSheet = false },
@@ -432,20 +483,20 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
             shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
             dragHandle = null // hides drag icon
         ) {
-            // Use Box to allow sticky bottom row
+            // FILTER SHEET
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height((LocalConfiguration.current.screenHeightDp * 0.7).dp) // fixed height
             ) {
-
+                //MAIN
                 Column(modifier = Modifier.fillMaxSize()) {
                     //TITLE
                     Text(
                         "Filters", fontSize = 20.sp, fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(16.dp),
                     )
-                    Divider(
+                    HorizontalDivider(
                         modifier = Modifier.fillMaxWidth(),
                         color = Color.LightGray,
                         thickness = 0.3.dp
@@ -482,6 +533,15 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                         ) {
                             when (selectedFilter) {
                                 "Category" -> {
+                                    item {
+                                        Text(
+                                            text = "Category",
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            modifier = Modifier
+                                                .padding(horizontal = 16.dp, vertical = 14.dp)
+                                        )
+                                    }
                                     items(categories) { category ->
                                         val categoryTitle = category.replaceFirstChar { it.uppercase() }
                                         CategoryRow(
@@ -500,6 +560,15 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                                     }
                                 }
                                 "Brand" -> {
+                                    item {
+                                        Text(
+                                            text = "Brands",
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            modifier = Modifier
+                                                .padding(horizontal = 16.dp, vertical = 14.dp)
+                                        )
+                                    }
                                     items(brands) { brand ->
                                         CategoryRow(
                                             text = brand,
@@ -516,6 +585,73 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                                         )
                                     }
                                 }
+                                "Color" -> {
+                                    item {
+                                        Text(
+                                            text = "Colors",
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            modifier = Modifier
+                                                .padding(horizontal = 16.dp, vertical = 14.dp)
+                                        )
+                                    }
+                                    items(colors) { color ->
+                                        val colorTitle = color.replaceFirstChar { it.uppercase() }
+                                        CategoryRow(
+                                            text = colorTitle,
+                                            isSelected = filters.colors.contains(color),
+                                            onSelectedChange = { selected ->
+                                                filters = filters.copy(
+                                                    colors = if (selected) {
+                                                        filters.colors + color
+                                                    } else {
+                                                        filters.colors - color
+                                                    }
+                                                )
+                                            }
+                                        )
+                                    }
+                                }
+                                "Price" -> {
+                                    item {
+                                        PriceRangeFilter(
+                                            minPrice = 0f,
+                                            maxPrice = maxPriceLimit,
+                                            priceRange = filters.priceRange,
+                                            onRangeChange = { selectedRange ->
+                                                filters = filters.copy(priceRange = selectedRange)
+                                            }
+                                        )
+                                    }
+                                }
+                                "Fit" -> {
+                                    item {
+                                        Text(
+                                            text = "Fit",
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            modifier = Modifier
+                                                .padding(horizontal = 16.dp, vertical = 14.dp)
+                                        )
+                                    }
+                                    items(fits) { fit ->
+                                        val fitTitle = fit.replaceFirstChar { it.uppercase() }
+                                        CategoryRow(
+                                            text = fitTitle,
+                                            isSelected = filters.fits.contains(fit),
+                                            onSelectedChange = { selected ->
+                                                filters = filters.copy(
+                                                    fits = if (selected) {
+                                                        filters.fits + fit
+                                                    } else {
+                                                        filters.fits - fit
+                                                    }
+                                                )
+                                            }
+                                        )
+                                    }
+                                }
+
 
                             }
                         }
@@ -530,7 +666,7 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                         .align(Alignment.BottomCenter)
                         .height(80.dp)
                 ) {
-                    Divider(
+                    HorizontalDivider(
                         modifier = Modifier.fillMaxWidth(),
                         color = Color.LightGray,
                         thickness = 0.3.dp
@@ -583,29 +719,93 @@ fun CategoryRow(
     isSelected: Boolean,
     onSelectedChange: (Boolean) -> Unit
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onSelectedChange(!isSelected) }
-            .padding(vertical = 8.dp, horizontal = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
+    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+        Row(
             modifier = Modifier
-                .size(20.dp) // shrink overall checkbox footprint
-                .padding(0.dp) // no extra padding
+                .fillMaxWidth()
+                .clickable { onSelectedChange(!isSelected) }
+                .padding(top = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Checkbox(
-                checked = isSelected,
-                onCheckedChange = { onSelectedChange(it) },
-                modifier = Modifier.size(20.dp),
-                colors = CheckboxDefaults.colors(checkedColor = Color.Black, uncheckedColor = Color.Black)
+            Box(
+                modifier = Modifier
+                    .size(20.dp) // shrink overall checkbox footprint
+                    .padding(0.dp) // no extra padding
+            ) {
+                Checkbox(
+                    checked = isSelected,
+                    onCheckedChange = { onSelectedChange(it) },
+                    modifier = Modifier.size(20.dp),
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = Color.Black,
+                        uncheckedColor = Color.Black
+                    )
+                )
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = text,
+                fontSize = 14.sp,
             )
         }
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = text,
-            fontSize = 14.sp,
-        )
     }
 }
+
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun PriceRangeFilter(
+    minPrice: Float = 0f,
+    maxPrice: Float = 5000f,
+    priceRange: ClosedFloatingPointRange<Float>,
+    onRangeChange: (ClosedFloatingPointRange<Float>) -> Unit
+) {
+    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp)) {
+        Text(
+            text = "Price",
+            fontSize = 14.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        RangeSlider(
+            value = priceRange,
+            onValueChange = { range ->
+                // Snap both ends to nearest 500
+                val snappedStart = (range.start / 500).roundToInt() * 500
+                val snappedEnd = (range.endInclusive / 500).roundToInt() * 500
+
+                onRangeChange(snappedStart.toFloat()..snappedEnd.toFloat())
+            },
+            valueRange = minPrice..maxPrice,
+            colors = SliderDefaults.colors(
+                thumbColor = Color.Black,
+                activeTrackColor = Color.Black,
+                inactiveTrackColor = Color.Gray
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "₹${priceRange.start.toInt()}",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Text(
+                text = "₹${priceRange.endInclusive.toInt()}",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+        }
+    }
+}
+
+
