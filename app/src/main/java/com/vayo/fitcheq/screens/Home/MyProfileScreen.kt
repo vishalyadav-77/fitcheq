@@ -1,11 +1,16 @@
 package com.vayo.fitcheq.screens.Home
 
+import android.content.Intent
 import android.graphics.Paint
 import android.graphics.fonts.FontStyle
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,7 +18,18 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,6 +43,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -35,11 +55,13 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.google.firebase.firestore.FirebaseFirestore
 import com.vayo.fitcheq.AuthScreen
+import com.vayo.fitcheq.R
 import com.vayo.fitcheq.data.model.UserProfile
 import com.vayo.fitcheq.viewmodels.AuthViewModel
 import com.vayo.fitcheq.navigation.ScreenContainer
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+
 
 @Composable
 fun MyProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
@@ -47,6 +69,10 @@ fun MyProfileScreen(navController: NavController, authViewModel: AuthViewModel) 
     val firestore = remember { FirebaseFirestore.getInstance() }
     var userName by remember { mutableStateOf("Loading...") }
     val context = LocalContext.current
+    val myTitleFont = FontFamily(
+        Font(R.font.title_syarifa)
+    )
+    val report_url = "https://tally.so/r/wAEG10"
     
 
     LaunchedEffect(Unit) {
@@ -63,122 +89,183 @@ fun MyProfileScreen(navController: NavController, authViewModel: AuthViewModel) 
                 .padding(paddingValues)
         ) {
             // Title
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                Text(
-                    text = "Profile",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.align(Alignment.Center)
-                )
+            Text(
+                text = "Profile",
+                fontSize = 22.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
 
-                IconButton(
-                    onClick = { navController.navigate(AuthScreen.SettingsPage.route) },
-                    modifier = Modifier.align(Alignment.CenterEnd).padding(end = 12.dp),
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Settings,
-                        contentDescription = "Settings"
-                    )
-                }
-            }
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 6.dp, bottom = 26.dp),
+                    .padding(top = 6.dp),
                 color = Color.LightGray,
                 thickness = 0.5.dp
             )
 
             // CONTENT
-            Column(
+            LazyColumn(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
-                //USER pfp and Name
-                Column(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.AccountCircle,
-                        contentDescription = "Profile",
-                        modifier = Modifier
-                            .size(78.dp)
-                            .clip(CircleShape)
-                            .background(Color.Black)
-                            .padding(8.dp),
-                        tint = Color.White
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = username,
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                            .padding(bottom = 36.dp)
-                    )
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth()
-                        .padding(horizontal = 12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Details",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Text(
-                        text = "EDIT",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        textDecoration = TextDecoration.Underline
-                    )
-                }
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(400.dp)
-                ) {
-                    Column {
-                        userProfile?.let { profile ->
-                            ProfileRow(label = "Gender", value = profile.gender)
-                            ProfileRow(label = "Height Group", value = profile.height.displayName)
-                            ProfileRow(label = "Age Group", value = profile.ageGroup.displayName)
-                            ProfileRow(label = "Occupation", value = profile.occupation)
-                            ProfileRow(label = "Body Type", value = profile.bodyType.displayName)
-                            ProfileRow(
-                                label = "Preferred Platform",
-                                value = profile.preferPlatform.displayName
+                item {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    //USER pfp and Name
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
+                            .border(width = 0.3.dp, color = Color.LightGray,shape = RoundedCornerShape(12.dp))
+                            .padding(20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Row(modifier= Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
+                            Icon(
+                                painter = painterResource(R.drawable.user_icon),
+                                contentDescription = "Profile",
+                                modifier = Modifier
+                                    .size(84.dp)
+                                    .clip(CircleShape)
+                                    .background(color = colorResource(id = R.color.sage))
+                                    .padding(16.dp),
+                                tint = Color.White
                             )
-                        } ?: run {
-                            Text("Loading...")
+                            Spacer(modifier = Modifier.weight(0.2f))
+                            Text(
+                                text = username,
+                                fontSize = 24.sp,
+                                color = Color.DarkGray,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.align(Alignment.CenterVertically)
+                            )
+                            Spacer(modifier = Modifier.weight(1f))
                         }
                     }
-                }
-                Spacer(modifier = Modifier.height(24.dp))
-                // Logout Button
-                Button(
-                    onClick = {
-                        authViewModel.logout()
-                    },
-                    modifier = Modifier.width(250.dp),
-                    shape = RoundedCornerShape(0.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Black,
-                        contentColor = Color.White
-                    )
-                ) {
-                    Text("LOGOUT",)
-                }
+                    Spacer(modifier = Modifier.height(24.dp))
 
+                    Row(
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(horizontal = 12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Details",
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        Text(
+                            text = "EDIT",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium,
+                            textDecoration = TextDecoration.Underline
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 380.dp)
+                            .border(width = 0.3.dp, color = Color.LightGray,shape = RoundedCornerShape(12.dp)),
+                    ) {
+                        Column(modifier = Modifier.wrapContentHeight().padding(8.dp)) {
+                            userProfile?.let { profile ->
+                                ProfileRow(label = "Gender", value = profile.gender)
+                                ProfileRow(label = "Height", value = profile.height.displayName)
+                                ProfileRow(label = "Age", value = profile.ageGroup.displayName)
+                                ProfileRow(label = "Status", value = profile.occupation)
+                                ProfileRow(label = "Body Type", value = profile.bodyType.displayName)
+                                ProfileRow(
+                                    label = "Favourite Platforms",
+                                    value = profile.preferPlatform.displayName
+                                )
+                            } ?: run {
+                                Text("Loading...")
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
+                            .border(width = 0.3.dp, color = Color.LightGray,shape = RoundedCornerShape(12.dp))
+                            .padding(16.dp),
+                    ) {
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(modifier = Modifier.size(18.dp), painter = painterResource(R.drawable.ps_info), contentDescription = "Info")
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("About us", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                            }
+                            Icon(imageVector = Icons.Outlined.KeyboardArrowRight, contentDescription = "Arrow")
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Row(modifier = Modifier.fillMaxWidth()
+                               .clickable {
+                                   val intent = Intent(Intent.ACTION_VIEW, Uri.parse(report_url))
+                                   context.startActivity(intent)
+                        }
+                            , horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(modifier = Modifier.size(18.dp), painter = painterResource(R.drawable.alert_triangle), contentDescription = "Warning")
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Report an issue", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                            }
+                            Icon(imageVector = Icons.Outlined.KeyboardArrowRight, contentDescription = "Arrow")
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(modifier = Modifier.size(16.dp), painter = painterResource(R.drawable.chat_faq), contentDescription = "faq")
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(" FAQs", fontSize = 15.sp, fontWeight = FontWeight.Medium)
+                            }
+                            Icon(imageVector = Icons.Outlined.KeyboardArrowRight, contentDescription = "Arrow")
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(28.dp))
+                    // Logout Button
+                    Button(
+                        onClick = {
+                            authViewModel.logout()
+                        },
+                        modifier = Modifier.fillMaxWidth().border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.error,
+                            shape = RoundedCornerShape(12.dp)
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text(
+                            text = "LOG OUT",
+                            color = MaterialTheme.colorScheme.error,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(32.dp))
+                    Text(
+                        text = "Fit Cheq",
+                        fontFamily = myTitleFont,
+                        fontSize = 24.sp,
+                        color = Color.DarkGray,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "1.0.0",
+                        fontSize = 16.sp,
+                        color = Color.DarkGray,
+                        fontWeight = FontWeight.Thin,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
             }
 
         }
