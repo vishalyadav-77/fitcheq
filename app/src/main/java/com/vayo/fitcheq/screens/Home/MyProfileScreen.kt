@@ -88,6 +88,7 @@ fun MyProfileScreen(navController: NavController, authViewModel: AuthViewModel) 
                 .background(Color.White)
                 .padding(paddingValues)
         ) {
+            Spacer(modifier = Modifier.height(10.dp))
             // Title
             Text(
                 text = "Profile",
@@ -99,7 +100,7 @@ fun MyProfileScreen(navController: NavController, authViewModel: AuthViewModel) 
             HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 6.dp),
+                    .padding(top = 8.dp),
                 color = Color.LightGray,
                 thickness = 0.5.dp
             )
@@ -111,7 +112,7 @@ fun MyProfileScreen(navController: NavController, authViewModel: AuthViewModel) 
             ) {
                 item {
                     Spacer(modifier = Modifier.height(24.dp))
-                    //USER pfp and Name
+                    // USER pfp and Name
                     Column(
                         modifier = Modifier.fillMaxWidth()
                             .border(width = 0.3.dp, color = Color.LightGray,shape = RoundedCornerShape(12.dp))
@@ -126,30 +127,39 @@ fun MyProfileScreen(navController: NavController, authViewModel: AuthViewModel) 
                                     .size(84.dp)
                                     .clip(CircleShape)
                                     .background(color = colorResource(id = R.color.sage))
-                                    .padding(16.dp),
+                                    .padding(20.dp),
                                 tint = Color.White
                             )
                             Spacer(modifier = Modifier.weight(0.2f))
-                            Text(
-                                text = username,
-                                fontSize = 24.sp,
-                                color = Color.DarkGray,
-                                fontWeight = FontWeight.SemiBold,
-                                modifier = Modifier.align(Alignment.CenterVertically)
-                            )
+                            Column( modifier = Modifier.align(Alignment.CenterVertically)){
+                                Text(
+                                    text = username,
+                                    fontSize = 24.sp,
+                                    color = Color.DarkGray,
+                                    fontWeight = FontWeight.SemiBold,
+                                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                                )
+                                Text(
+                                    text = "+91 9841XXXXXX",
+                                    fontSize = 14.sp,
+                                    color = Color.Gray,
+                                    fontWeight = FontWeight.Medium,
+                                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                                )
+                            }
                             Spacer(modifier = Modifier.weight(1f))
                         }
                     }
                     Spacer(modifier = Modifier.height(24.dp))
 
+                    // DETAILS
                     Row(
-                        modifier = Modifier.fillMaxWidth()
-                            .padding(horizontal = 12.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Details",
-                            fontSize = 22.sp,
+                            text = "DETAILS",
+                            fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                         )
                         Text(
@@ -160,6 +170,7 @@ fun MyProfileScreen(navController: NavController, authViewModel: AuthViewModel) 
                         )
                     }
                     Spacer(modifier = Modifier.height(12.dp))
+                    // Details content
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -184,6 +195,13 @@ fun MyProfileScreen(navController: NavController, authViewModel: AuthViewModel) 
                     }
                     Spacer(modifier = Modifier.height(24.dp))
 
+                    // CONTACT
+                    Text( modifier = Modifier.fillMaxWidth(),
+                        text = "CONTACT",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
                     Column(
                         modifier = Modifier.fillMaxWidth()
                             .border(width = 0.3.dp, color = Color.LightGray,shape = RoundedCornerShape(12.dp))
@@ -274,8 +292,8 @@ fun MyProfileScreen(navController: NavController, authViewModel: AuthViewModel) 
 @Composable
 fun ProfileRow(label: String, value: String) {
     Column(modifier = Modifier.padding(vertical = 8.dp,horizontal = 12.dp)) {
-        Text(text = label, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-        Text(text = value, fontSize = 14.sp, color = Color.DarkGray)
+        Text(text = label, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+        Text(text = value, fontSize = 14.sp, color = Color.DarkGray,fontWeight = FontWeight.Medium)
     }
 }
 

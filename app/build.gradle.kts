@@ -76,6 +76,10 @@ dependencies {
     implementation ("com.google.accompanist:accompanist-pager-indicators:0.36.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     implementation ("com.google.code.gson:gson:2.11.0")
+    implementation ("androidx.core:core-splashscreen:1.0.1")
+
+
+
 
 
 
