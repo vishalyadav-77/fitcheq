@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.vayo.fitcheq.AuthScreen
@@ -44,11 +45,20 @@ fun BottomNavigation(navController: NavController) {
                 }
 
                 NavigationBarItem(
-                    icon = { Icon(
-                        imageVector = item.icon,
-                        contentDescription = item.title,
-                        modifier = Modifier.size(20.dp)
-                    ) },
+                    icon = {
+                        when (val icon = item.icon) {
+                            is IconType.Vector -> Icon(
+                                imageVector = icon.imageVector,
+                                contentDescription = item.title,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            is IconType.PainterRes -> Icon(
+                                painter = painterResource(id = icon.resId),
+                                contentDescription = item.title,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    },
                     label = { Text(text = item.title) },
                     selected = selected,
                     onClick = {
