@@ -44,6 +44,7 @@ import com.vayo.fitcheq.viewmodels.MaleHomeViewModel
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import coil.request.ImageRequest
 import com.vayo.fitcheq.AuthScreen
 
 
@@ -145,7 +146,11 @@ fun SavedOutfitScreen(navController: NavController, viewModel: MaleHomeViewModel
                                         .height(240.dp)
                                 ) {
                                     AsyncImage(
-                                        model = outfit.imageUrl,
+                                        model = ImageRequest.Builder(LocalContext.current)
+                                            .data(outfit.imageUrl)
+                                            .size(500)
+                                            .crossfade(200)
+                                            .build(),
                                         contentDescription = outfit.title,
                                         contentScale = ContentScale.Crop,
                                         modifier = Modifier
