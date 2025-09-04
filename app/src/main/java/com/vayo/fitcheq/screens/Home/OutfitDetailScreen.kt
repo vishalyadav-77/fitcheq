@@ -63,6 +63,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.FilterChip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.navigation.NavController
@@ -89,6 +90,9 @@ import kotlinx.coroutines.launch
 import androidx.compose.material.RangeSlider
 import androidx.compose.material.SliderDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.runtime.snapshotFlow
+import coil.request.ImageRequest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -107,7 +111,7 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
         isInitialLoading = true
         // Clear previous outfits to prevent showing old content
         viewModel.clearOutfits()
-        viewModel.fetchOutfitsByFieldAndGender(fieldName, fieldValue, gender)
+        viewModel.fetchOutfitsByFieldAndGender(context,fieldName, fieldValue, gender)
         isInitialLoading = false
     }
     // Load favorites when screen loads
@@ -176,6 +180,21 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
             filters = filters.copy(categories = setOf(categories.first()))
         }
     }
+    // Pagination
+    val gridState = rememberLazyGridState()
+    LaunchedEffect(gridState, filteredOutfits.size, isLoading) {
+        snapshotFlow { gridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1 }
+            .distinctUntilChanged()
+            .collect { lastVisibleIndex ->
+                if (lastVisibleIndex == -1) return@collect
+                val total = gridState.layoutInfo.totalItemsCount
+                val prefetchThreshold = 4 // 2 rows * 2 columns
+                if (total > 0 && lastVisibleIndex >= total - prefetchThreshold && !isLoading) {
+                    // call the same function you already use — it'll fetch the next page
+                    viewModel.fetchOutfitsByFieldAndGender(context,fieldName, fieldValue, gender)
+                }
+            }
+    }
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true // allows 60% expansion
     )
@@ -214,6 +233,7 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
         }
     }
 
+    // CONTENT
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -329,7 +349,7 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
             .padding(horizontal = 6.dp))
         {
             when {
-                isInitialLoading || isLoading -> {
+                isInitialLoading || (isLoading && outfits.isEmpty())-> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -364,6 +384,7 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
 
                 else -> {
                     LazyVerticalGrid(
+                        state = gridState,
                         columns = GridCells.Fixed(2),
                         modifier = Modifier
                             .fillMaxSize()
@@ -399,7 +420,11 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                                             .aspectRatio(4f / 5f)
                                     ) {
                                         AsyncImage(
-                                            model = outfit.imageUrl,
+                                            model = ImageRequest.Builder(LocalContext.current)
+                                                .data(outfit.imageUrl)
+                                                .size(500)
+                                                .crossfade(200)
+                                                .build(),
                                             contentDescription = outfit.title,
                                             contentScale = ContentScale.Crop,
                                             modifier = Modifier
@@ -473,7 +498,8 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
             }
         }
     }
-    //FILTER
+
+    //FILTER SHEET
     if (showSheet) {
         ModalBottomSheet(
             onDismissRequest = { showSheet = false },
