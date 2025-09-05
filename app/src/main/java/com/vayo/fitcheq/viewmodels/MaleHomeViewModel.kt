@@ -1,12 +1,18 @@
 package com.vayo.fitcheq.viewmodels
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import coil.ImageLoader
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import com.vayo.fitcheq.data.model.OutfitData
@@ -35,25 +41,46 @@ class MaleHomeViewModel: ViewModel() {
     private val _relatedOutfits = MutableStateFlow<List<OutfitData>>(emptyList())
     val relatedOutfits: StateFlow<List<OutfitData>> = _relatedOutfits
 
+    private var lastVisibleDoc: DocumentSnapshot? = null
+    private var isLastPageReached = false
+    private var isFetching = false
 
-    fun fetchOutfitsByFieldAndGender(fieldName: String, fieldValue: String, gender: String) {
+    fun fetchOutfitsByFieldAndGender(
+        context: Context,
+        fieldName: String,
+        fieldValue: String,
+        gender: String,
+        reset: Boolean = false,
+        pageSize: Long = 15L) {
         viewModelScope.launch {
+            // prevent concurrent fetches
+            if (isFetching) return@launch
+            if (reset) clearOutfits()
+            if (isLastPageReached) return@launch
+            isFetching = true
             try {
                 _isLoading.value = true
                 _error.value = null
 
                 Log.d("OutfitFetch", "Fetching outfits where $fieldName=$fieldValue and gender=$gender")
 
-                val query = Firebase.firestore.collection("outfits")
+                val baseQuery= Firebase.firestore.collection("outfits")
                     .whereIn("gender", listOf(gender, "unisex"))
-
-                // 👇 Decide based on whether the field is an array
                 val arrayFields = setOf("tags", "style", "occasion","season")
 
-                val finalQuery = if (fieldName in arrayFields) {
-                    query.whereArrayContains(fieldName, fieldValue)
+                var finalQuery = if (fieldName in arrayFields) {
+                    baseQuery.whereArrayContains(fieldName, fieldValue)
                 } else {
-                    query.whereEqualTo(fieldName, fieldValue)
+                    baseQuery.whereEqualTo(fieldName, fieldValue)
+                }
+
+                finalQuery = finalQuery
+                    .orderBy(FieldPath.documentId())
+                    .limit(pageSize)
+
+                lastVisibleDoc?.let { last ->
+                    // start after last fetched doc id
+                    finalQuery = finalQuery.startAfter(last.id)
                 }
 
                 val result = finalQuery.get().await()
@@ -62,12 +89,22 @@ class MaleHomeViewModel: ViewModel() {
                     doc.toObject(OutfitData::class.java)?.copy(id = doc.id)
                 }
 
-                _outfits.value = outfitList
+                // update vs replace depending on reset
+                _outfits.value = if (reset) outfitList else _outfits.value + outfitList
+                // ✅ prefetch those 15 images
+                prefetchImages(context.applicationContext, outfitList)
+
+                lastVisibleDoc = result.documents.lastOrNull()
+                if (result.documents.size < pageSize.toInt()) {
+                    isLastPageReached = true
+                }
+
             } catch (e: Exception) {
                 Log.e("OutfitFetch", "Error fetching outfits", e)
                 _error.value = "Failed to load outfits: ${e.message}"
             } finally {
                 _isLoading.value = false
+                isFetching = false
             }
         }
     }
@@ -75,6 +112,8 @@ class MaleHomeViewModel: ViewModel() {
     // Clear outfits to prevent showing previous screen content
     fun clearOutfits() {
         _outfits.value = emptyList()
+        lastVisibleDoc = null
+        isLastPageReached = false
         _error.value = null
     }
 
@@ -182,6 +221,20 @@ class MaleHomeViewModel: ViewModel() {
                 it.category == currentOutfit.category && it.id != currentOutfit.id && it.type == currentOutfit.type
             }
             _relatedOutfits.value = filtered
+        }
+    }
+
+    private fun prefetchImages(context: Context, outfits: List<OutfitData>) {
+        val imageLoader = ImageLoader(context)
+        outfits.forEach { outfit ->
+            outfit.imageUrl?.let { url ->
+                val request = ImageRequest.Builder(context)
+                    .data(url)
+                    .diskCachePolicy(CachePolicy.ENABLED)
+                    .memoryCachePolicy(CachePolicy.ENABLED)
+                    .build()
+                imageLoader.enqueue(request)
+            }
         }
     }
 }
