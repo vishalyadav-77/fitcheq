@@ -38,16 +38,24 @@ import com.vayo.fitcheq.data.model.malecategoryList
 import com.vayo.fitcheq.data.model.malefashionList
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.unit.Dp
 import com.vayo.fitcheq.R
 import coil.compose.AsyncImage
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.HorizontalPagerIndicator
+import com.google.accompanist.pager.rememberPagerState
 import com.vayo.fitcheq.data.model.maleSeasonList
 import com.vayo.fitcheq.viewmodels.MaleHomeViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 
 @Composable
 fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
@@ -63,7 +71,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
         Font(R.font.title_syarifa)
     )
     val myHeadingFont = FontFamily(
-        Font(R.font.headings_russo_sans)
+        Font(R.font.headings_kugile)
     )
     val commentFont = FontFamily(
         Font(R.font.comment_badscript_regular)
@@ -109,7 +117,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
             val document = firestore.collection("users")
                 .document(uid)
                 .get()
-                .await() // Use await() instead of callbacks
+                .await() // Using await() instead of callbacks
 
             // 3. Handle document data
             if (document.exists()) {
@@ -120,7 +128,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
             }
         } catch (e: Exception) {
             // 4. Handle errors
-            Toast.makeText(context, "Error loading data: ${e.message}", Toast.LENGTH_SHORT).show()
+            Log.e("Exception babu", "Error loading data: ${e.message}", e)
             userName = "Error loading name"
         } finally {
             // 5. Update loading state
@@ -134,86 +142,266 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                 .fillMaxSize()
                 .background(Color.White)
                 .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
-                .padding(vertical = 18.dp),
+                .padding(vertical = 10.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Top Bar with App Title
+            // APP TITLE
             Text(
                 text = "Fit Cheq",
                 fontFamily = myTitleFont,
-                fontSize = 24.sp,
+                fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-        // TIME FOR TODAY FIT CHEQ
-            Text(
-                text= "Ready for today’s fit cheq?",
-                fontSize = 20.sp,
-                fontFamily = commentFont,
-                fontStyle = FontStyle.Italic,
-            )
-            Spacer(modifier = Modifier.height(40.dp))
-
-        //  ESSENTIALS CATEGORY
-            Card(modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .height(180.dp)
-                .clickable {
-                    navController.navigate(
-                        AuthScreen.OutfitDetails.createRoute(
-                            "male",
-                            "tags",
-                            "essentials"
-                        )
-                    ) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                           },
-                shape = RoundedCornerShape(0.dp),
-                elevation = CardDefaults.cardElevation(0.dp)
+            // CONTENT
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                AsyncImage(
-                    model = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/banners/ess_banner_beta.webp",
-                    contentDescription = "ESS Banner",
-                    contentScale = ContentScale.Crop
-                )
-            }
-            Spacer(modifier = Modifier.height(30.dp))
-
-            // Seasonal Fits Section
-            Text(
-                text = "Fits By Season",
-                fontFamily = myHeadingFont,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(34.dp))
-            Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                contentAlignment = Alignment.Center) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.fillMaxWidth()
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(2.5f / 4f),
+//                    .clickable(onClick ),
+                    shape = RoundedCornerShape(0.dp),
                 ) {
-                    maleSeasonList.forEach { season ->
+                    HomeImageCarousel(
+                        images = listOf(
+                            "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/oldmoney_final.webp",
+                            "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/streetwear_final.webp",
+                            "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/starboy_final.webp"
+                        )
+                    )
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // TIME FOR TODAY FIT CHEQ
+                Text(
+                    text = "Ready for today’s fit cheq?",
+                    fontSize = 20.sp,
+                    fontFamily = commentFont,
+                    fontStyle = FontStyle.Italic,
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+
+                //  ESSENTIALS CATEGORY
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .height(170.dp)
+                        .clickable {
+                            navController.navigate(
+                                AuthScreen.OutfitDetails.createRoute(
+                                    "male",
+                                    "tags",
+                                    "essentials"
+                                )
+                            ) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        },
+                    shape = RoundedCornerShape(0.dp),
+                ) {
+                    AsyncImage(
+                        model = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/banners/ess_banner_beta.webp",
+                        contentDescription = "ESS Banner",
+                        contentScale = ContentScale.Crop
+                    )
+                }
+                Spacer(modifier = Modifier.height(30.dp))
+
+                // Seasonal Fits Section
+                Text(
+                    text = "Fits By Season",
+                    fontFamily = myHeadingFont,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Box(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        maleSeasonList.forEach { season ->
+                            val onCardClick = {
+                                val route = when (season.title) {
+                                    "Summer" -> "summer"
+                                    "Winter" -> "winter"
+                                    else -> ""
+                                }
+                                if (route.isNotEmpty()) {
+                                    navController.navigate(
+                                        AuthScreen.OutfitDetails.createRoute(
+                                            "male",
+                                            "season",
+                                            route
+                                        )
+                                    ) {
+                                        popUpTo(navController.graph.startDestinationId) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
+                                }
+                            }
+                            Card(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .aspectRatio(3f / 4f)
+                                    .clickable(onClick = onCardClick),
+                                shape = RoundedCornerShape(12.dp),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                            ) {
+                                Box(modifier = Modifier.fillMaxSize()) {
+                                    AsyncImage(
+                                        model = season.imageUrl,
+                                        contentDescription = season.title,
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(30.dp))
+
+                // SHOP BY CATEGORY
+                Text(
+                    text = "Shop By Category",
+                    fontFamily = myHeadingFont,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                // Horizontal scrollable 2-row layout
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp)
+                ) {
+                    val chunkedCategories = malecategoryList.chunked(2) // two rows per column
+                    items(chunkedCategories.size) { index ->
+                        val itemsInColumn = chunkedCategories[index]
+
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            modifier = Modifier
+                                .width(100.dp) // ensures 4 max visible at once if LazyRow width ~ 400dp
+                        ) {
+                            itemsInColumn.forEach { category ->
+                                val onCardClick = {
+                                    val route = when (category.title) {
+                                        "Tshirt" -> "tshirt"
+                                        "Shirt" -> "shirt"
+                                        "Jeans" -> "jeans"
+                                        "TrackPants" -> "trackpants"
+                                        "Jacket" -> "jacket"
+                                        "TankTops" -> "tanktops"
+                                        "Accessories" -> "accessories"
+                                        else -> ""
+                                    }
+                                    if (route.isNotEmpty()) {
+                                        navController.navigate(
+                                            AuthScreen.OutfitDetails.createRoute(
+                                                "male",
+                                                "category",
+                                                route
+                                            )
+                                        ) {
+                                            popUpTo(navController.graph.startDestinationId) {
+                                                saveState = true
+                                            }
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        }
+                                    }
+                                }
+
+                                Card(
+                                    modifier = Modifier
+                                        .height(130.dp)
+                                        .fillMaxWidth()
+                                        .clickable(onClick = onCardClick),
+                                    shape = RoundedCornerShape(0.dp),
+                                ) {
+                                    Box(modifier = Modifier.fillMaxSize()) {
+                                        AsyncImage(
+                                            model = category.imageUrl,
+                                            contentDescription = category.title,
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentScale = ContentScale.Crop
+                                        )
+
+                                        Text(
+                                            text = category.title,
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = Color.White,
+                                            modifier = Modifier
+                                                .align(Alignment.BottomStart)
+                                                .padding(8.dp)
+                                                .background(
+                                                    color = Color.Black.copy(alpha = 0.6f),
+                                                    shape = RoundedCornerShape(6.dp)
+                                                )
+                                                .padding(
+                                                    horizontal = 6.dp,
+                                                    vertical = 2.dp
+                                                ) // internal padding inside bg
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(30.dp))
+
+                // FITS BY OCCASION
+                Text(
+                    text = "Fits By Occasion",
+                    fontFamily = myHeadingFont,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp)
+                ) {
+                    items(maleoccasionList, key = { it.title }) { occasion ->
                         val onCardClick = {
-                            val route = when (season.title) {
-                                "Summer" -> "summer"
-                                "Winter" -> "winter"
+                            val route = when (occasion.title) {
+                                "College" -> "college"
+                                "Date" -> "date"
+                                "Beach" -> "beach"
+                                "Wedding" -> "wedding"
+                                "Office" -> "office"
+                                "Gym" -> "gym"
                                 else -> ""
                             }
                             if (route.isNotEmpty()) {
                                 navController.navigate(
                                     AuthScreen.OutfitDetails.createRoute(
                                         "male",
-                                        "season",
+                                        "occasion",
                                         route
                                     )
                                 ) {
@@ -227,238 +415,201 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                         }
                         Card(
                             modifier = Modifier
-                                .weight(1f)
-                                .aspectRatio(3f / 4f)
+                                .width(130.dp)
+                                .height(150.dp)
                                 .clickable(onClick = onCardClick),
                             shape = RoundedCornerShape(12.dp),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                         ) {
                             Box(modifier = Modifier.fillMaxSize()) {
                                 AsyncImage(
-                                    model = season.imageUrl,
-                                    contentDescription = season.title,
+                                    model = occasion.imageUrl,
+                                    contentDescription = occasion.title,
                                     modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+
+                                Text(
+                                    text = occasion.title,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = Color.White,
+                                    modifier = Modifier
+                                        .align(Alignment.BottomStart)
+                                        .padding(8.dp)
+                                        .background(
+                                            color = Color.Black.copy(alpha = 0.6f),
+                                            shape = RoundedCornerShape(6.dp)
+                                        )
+                                        .padding(
+                                            horizontal = 8.dp,
+                                            vertical = 4.dp
+                                        ) // internal padding inside bg
+                                )
+                            }
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(30.dp))
+
+                // FITS BY FASHION
+                Text(
+                    text = "Fits By Fashion",
+                    fontFamily = myHeadingFont,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp)
+                ) {
+                    items(malefashionList, key = { it.title }) { fashion ->
+                        val onCardClick = {
+                            val route = when (fashion.title) {
+                                "Starboy" -> "starboy"
+                                "Soft Boy" -> "softboy"
+                                "Y2K" -> "y2k"
+                                "Old Money" -> "oldmoney"
+                                "Streetwear" -> "streetwear"
+                                "Minimalist" -> "minimalist"
+                                "Dark Academia" -> "dark"
+                                else -> ""
+                            }
+                            if (route.isNotEmpty()) {
+                                navController.navigate(
+                                    AuthScreen.OutfitDetails.createRoute(
+                                        "male",
+                                        "style",
+                                        route
+                                    )
+                                ) {
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
+                        }
+
+                        Card(
+                            modifier = Modifier
+                                .width(180.dp)
+                                .height(210.dp)
+                                .clickable(onClick = onCardClick),
+                            colors = CardDefaults.cardColors(containerColor = Color.White),
+                            shape = RoundedCornerShape(12.dp),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                        ) {
+                            Box(modifier = Modifier.fillMaxSize().padding(4.dp)) {
+                                AsyncImage(
+                                    model = fashion.imageUrl,
+                                    contentDescription = fashion.title,
+                                    modifier = Modifier.fillMaxSize()
+                                        .clip(RoundedCornerShape(12.dp)),
                                     contentScale = ContentScale.Crop
                                 )
                             }
                         }
                     }
                 }
+                Spacer(modifier = Modifier.height(30.dp))
             }
-            Spacer(modifier = Modifier.height(34.dp))
+        }
+    }
+}
 
-            // shop by category Section
-            Text(
-                text = "Shop By Category",
-                fontFamily = myHeadingFont,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+fun HomeImageCarousel(
+    images: List<String>,
+    modifier: Modifier = Modifier,
+    autoScrollDelay: Long = 3000L,
+    repeatCount: Int = 10
+) {
+    if (images.isEmpty()) return
+
+    // Repeat images 10 times for "infinite" feel
+    val block = images
+    val blockSize = block.size
+    val loopedImages = remember(images) { List(repeatCount) { images }.flatten() }
+
+    // Start from the middle
+    val startIndex = (loopedImages.size / 2).floorDiv(images.size) * images.size
+    val pagerState = rememberPagerState(initialPage = startIndex)
+
+    // Auto-scroll
+    LaunchedEffect(pagerState) {
+        while (isActive) {
+            delay(autoScrollDelay)
+            if (!pagerState.isScrollInProgress) {
+                val nextPage = pagerState.currentPage + 1
+                pagerState.animateScrollToPage(nextPage)
+            }
+
+            // Reset back to middle if near edges
+            if (pagerState.currentPage >= loopedImages.size - images.size ||
+                pagerState.currentPage <= images.size
+            ) {
+                val middleIndex = (loopedImages.size / 2).floorDiv(images.size) * images.size
+                pagerState.scrollToPage(middleIndex) // instant jump
+            }
+        }
+    }
+
+
+    Box(
+        modifier = modifier.fillMaxWidth()
+    ) {
+        // Image pager
+        HorizontalPager(
+            count = loopedImages.size,
+            state = pagerState,
+            modifier = Modifier
+                .fillMaxWidth()
+        ) { page ->
+            AsyncImage(
+                model = loopedImages[page],
+                contentDescription = "Carousel Image $page",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
             )
-            Spacer(modifier = Modifier.height(34.dp))
-            // Horizontal scrollable 2-row layout
-            LazyRow(
+        }
+
+        // Correct, remapped indicator
+        val realPage = (pagerState.currentPage % blockSize + blockSize) % blockSize
+        PagerDots(
+            current = realPage,
+            total = blockSize,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 10.dp)
+        )
+    }
+}
+
+@Composable
+private fun PagerDots(
+    current: Int,
+    total: Int,
+    modifier: Modifier = Modifier,
+    activeColor: Color = Color.White,
+    inactiveColor: Color = Color.White.copy(alpha = 0.5f),
+    size: Dp = 6.dp,
+    activeSize: Dp = 6.dp,
+    spacing: Dp = 4.dp
+) {
+    Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(spacing)) {
+        repeat(total) { i ->
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(250.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(start = 16.dp, end = 16.dp)
-            ) {
-                val chunkedCategories = malecategoryList.chunked(2) // two rows per column
-                items(chunkedCategories.size) { index ->
-                    val itemsInColumn = chunkedCategories[index]
-
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        modifier = Modifier
-                            .width(100.dp) // ensures 4 max visible at once if LazyRow width ~ 400dp
-                    ) {
-                        itemsInColumn.forEach { category ->
-                            val onCardClick = {
-                                val route = when (category.title) {
-                                    "Tshirt" -> "tshirt"
-                                    "Shirt" -> "shirt"
-                                    "Jeans" -> "jeans"
-                                    "TrackPants" -> "trackpants"
-                                    "Jacket" -> "jacket"
-                                    "TankTops" -> "tanktops"
-                                    "Accessories" -> "accessories"
-                                    else -> ""
-                                }
-                                if (route.isNotEmpty()) {
-                                    navController.navigate(
-                                        AuthScreen.OutfitDetails.createRoute("male", "category" ,route)
-                                    ) {
-                                        popUpTo(navController.graph.startDestinationId) {
-                                            saveState = true
-                                        }
-                                        launchSingleTop = true
-                                        restoreState = true
-                                    }
-                                }
-                            }
-
-                            Card(
-                                modifier = Modifier
-                                    .height(120.dp)
-                                    .fillMaxWidth()
-                                    .clickable(onClick = onCardClick),
-                                shape = RoundedCornerShape(12.dp),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-                            ) {
-                                Box(modifier = Modifier.fillMaxSize()) {
-                                    AsyncImage(
-                                        model = category.imageUrl,
-                                        contentDescription = category.title,
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentScale = ContentScale.Crop
-                                    )
-
-                                    Text(
-                                        text = category.title,
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = Color.White,
-                                        modifier = Modifier
-                                            .align(Alignment.BottomStart)
-                                            .padding(8.dp)
-                                            .background(
-                                                color = Color.Black.copy(alpha = 0.6f),
-                                                shape = RoundedCornerShape(6.dp)
-                                            )
-                                            .padding(horizontal = 6.dp, vertical = 2.dp) // internal padding inside bg
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-             Spacer(modifier = Modifier.height(34.dp))
-
-            // Occasion Fits Section
-            Text(
-                text = "Fits By Occasion",
-                fontFamily = myHeadingFont,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
+                    .size(if (i == current) activeSize else size)
+                    .background(
+                        color = if (i == current) activeColor else inactiveColor,
+                        shape = CircleShape
+                    )
             )
-            Spacer(modifier = Modifier.height(34.dp))
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(start = 16.dp, end = 16.dp)
-            ) {
-                items(maleoccasionList, key = { it.title }) { occasion ->
-                    val onCardClick = {
-                        val route = when (occasion.title) {
-                            "College" -> "college"
-                            "Date" -> "date"
-                            "Beach" -> "beach"
-                            "Wedding" -> "wedding"
-                            "Office" -> "office"
-                            "Gym" -> "gym"
-                            else -> ""
-                        }
-                        if (route.isNotEmpty()) {
-                            navController.navigate(AuthScreen.OutfitDetails.createRoute("male","occasion", route)) {
-                                popUpTo(navController.graph.startDestinationId) { saveState = true }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
-                    }
-                    Card(
-                        modifier = Modifier
-                            .width(130.dp)
-                            .height(150.dp)
-                            .clickable(onClick = onCardClick),
-                        shape = RoundedCornerShape(12.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-                    ) {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            AsyncImage(
-                                model = occasion.imageUrl,
-                                contentDescription = occasion.title,
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-
-                            Text(
-                                text = occasion.title,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Color.White,
-                                modifier = Modifier
-                                    .align(Alignment.BottomStart)
-                                    .padding(8.dp)
-                                    .background(
-                                        color = Color.Black.copy(alpha = 0.6f),
-                                        shape = RoundedCornerShape(6.dp)
-                                    )
-                                    .padding(horizontal = 8.dp, vertical = 4.dp) // internal padding inside bg
-                            )
-                        }
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(34.dp))
-
-            // Fashion Style Section
-            Text(
-                text = "Fits By Fashion Style",
-                fontFamily = myHeadingFont,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(34.dp))
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(start = 16.dp, end = 16.dp)
-            ) {
-                items(malefashionList, key = { it.title }) { fashion ->
-                    val onCardClick = {
-                        val route = when (fashion.title) {
-                            "Starboy" -> "starboy"
-                            "Soft Boy" -> "softboy"
-                            "Y2K" -> "y2k"
-                            "Old Money" -> "oldmoney"
-                            "Streetwear" -> "streetwear"
-                            "Minimalist" -> "minimalist"
-                            "Dark Academia" -> "dark"
-                            else -> ""
-                        }
-                        if (route.isNotEmpty()) {
-                            navController.navigate(AuthScreen.OutfitDetails.createRoute("male","style", route)) {
-                                popUpTo(navController.graph.startDestinationId) { saveState = true }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
-                    }
-
-                    Card(
-                        modifier = Modifier
-                            .width(180.dp)
-                            .height(210.dp)
-                            .clickable(onClick = onCardClick),
-                        colors = CardDefaults.cardColors(containerColor = Color.White),
-                        shape = RoundedCornerShape(12.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-                    ) {
-                        Box(modifier = Modifier.fillMaxSize().padding(4.dp)) {
-                            AsyncImage(
-                                model = fashion.imageUrl,
-                                contentDescription = fashion.title,
-                                modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp)),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(34.dp))
         }
     }
 }
