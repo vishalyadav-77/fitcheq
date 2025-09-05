@@ -66,14 +66,13 @@ import kotlinx.coroutines.tasks.await
 @Composable
 fun MyProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
     var userProfile by remember { mutableStateOf<UserProfile?>(null) }
-    val firestore = remember { FirebaseFirestore.getInstance() }
-    var userName by remember { mutableStateOf("Loading...") }
     val context = LocalContext.current
     val myTitleFont = FontFamily(
         Font(R.font.title_syarifa)
     )
     val report_url = "https://tally.so/r/wAEG10"
-    
+    val faq_url = "https://tally.so/r/wboMv7"
+
 
     LaunchedEffect(Unit) {
        userProfile = authViewModel.loadUserProfileFromSharedPreferences(context)
@@ -232,7 +231,12 @@ fun MyProfileScreen(navController: NavController, authViewModel: AuthViewModel) 
                             Icon(imageVector = Icons.Outlined.KeyboardArrowRight, contentDescription = "Arrow")
                         }
                         Spacer(modifier = Modifier.height(16.dp))
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
+                        Row(modifier = Modifier.fillMaxWidth()
+                            .clickable {
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(faq_url))
+                                context.startActivity(intent)
+                            }
+                            , horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(modifier = Modifier.size(16.dp), painter = painterResource(R.drawable.chat_faq), contentDescription = "faq")
