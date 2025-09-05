@@ -96,6 +96,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.ViewModel
+import coil.ImageLoader
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.vayo.fitcheq.AuthScreen
 import com.vayo.fitcheq.data.model.brandMap
 import com.vayo.fitcheq.data.model.outfitSizeMap
@@ -104,7 +107,6 @@ import java.text.NumberFormat
 import java.util.Locale
 
 
-//@Preview
 @Composable
 fun ItemInfoScreen(outfit: OutfitData, viewModel: MaleHomeViewModel,navController: NavController){
     val context = LocalContext.current
@@ -135,10 +137,21 @@ fun ItemInfoScreen(outfit: OutfitData, viewModel: MaleHomeViewModel,navControlle
 
     LaunchedEffect(outfit) {
         viewModel.fetchRelatedOutfits(outfit)
+
+        // prefetch carousel images
+        val imageLoader = ImageLoader(context)
+        imagesToUse.forEach { url ->
+            imageLoader.enqueue(
+                ImageRequest.Builder(context)
+                    .data(url)
+                    .diskCachePolicy(CachePolicy.ENABLED)
+                    .memoryCachePolicy(CachePolicy.ENABLED)
+                    .build()
+            )
+        }
     }
 
     val relatedOutfits by viewModel.relatedOutfits.collectAsState()
-
 
     Scaffold(
         bottomBar = {
@@ -528,10 +541,7 @@ fun ImageCarousel(images: List<String>) {
 }
 
 @Composable
-fun BottomActionBar(
-    outfit: OutfitData,
-    viewmodel2: MaleHomeViewModel
-) {
+fun BottomActionBar(outfit: OutfitData, viewmodel2: MaleHomeViewModel ){
     val context = LocalContext.current
     val favoriteMap by viewmodel2.favoriteMap.collectAsState()
     val isFavorite = favoriteMap[outfit.id] ?: false
