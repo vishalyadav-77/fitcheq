@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.gson.Gson
 import com.vayo.fitcheq.data.model.AgeGroup
 import com.vayo.fitcheq.data.model.BodyType
 import com.vayo.fitcheq.data.model.HeightGroup
@@ -55,74 +56,88 @@ class AuthViewModel: ViewModel() {
     fun initializeSharedPreferences(context: Context) {
         if (sharedPreferences == null) {
             Log.d("NavigationDebug", "Initializing SharedPreferences")
-            sharedPreferences = context.getSharedPreferences("user_profile", Context.MODE_PRIVATE)
+            sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
             Log.d("NavigationDebug", "SharedPreferences initialized successfully")
         }
 
         // Check profile after SharedPreferences is initialized
         if (auth.currentUser != null) {
             Log.d("NavigationDebug", "User is logged in, checking profile...")
-            checkUserProfile()
+            checkUserProfile(context)
         } else {
             Log.d("NavigationDebug", "No user logged in, skipping profile check")
         }
     }
 
-    private fun saveProfileToSharedPreferences(profileCompleted: Boolean,
-                                               gender: String?,
-                                               name: String?,
-                                               ageGroup: AgeGroup?,
-                                               occupation: String?,
-                                               preferPlatform: PreferPlatform?,
-                                               height: HeightGroup?,
-                                               bodyType: BodyType?,
-                                               uid: String?) {
-        Log.d("NavigationDebug", "Saving to SharedPreferences - profileCompleted: $profileCompleted, gender: $gender")
-        Log.d("NavigationDebug", "Saving to SharedPreferences - age Group: $ageGroup")
-        sharedPreferences?.edit()?.apply {
-            putBoolean("profile_completed", profileCompleted)
-            putString("user_gender", gender)
-            putString("user_name", name)
-            putString("user_ageGroup", ageGroup?.name)
-            putString("user_occupation", occupation)
-            putString("user_preferPlatform", preferPlatform?.name)
-            putString("user_heightGroup", height?.name)
-            putString("user_bodyType", bodyType?.name)
-            apply()
-        }
-        Log.d("NavigationDebug", "SharedPreferences saved successfully")
-    }
-    fun loadProfile(): UserProfile { // Renamed for clarity
-        return loadProfileFromSharedPreferences()
+    fun saveUserProfileToSharedPreferences(context: Context, userProfile: UserProfile) {
+        val prefs = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+        val editor = prefs.edit()
+        val gson = Gson()
+
+        val json = gson.toJson(userProfile)
+        editor.putString("user_profile", json)
+
+        // Clear old keys to prevent conflicts
+        editor.remove("uId")
+        editor.remove("name")
+        editor.remove("gender")
+        editor.remove("occupation")
+        editor.remove("ageGroup")
+        editor.remove("preferPlatform")
+        editor.remove("profileCompleted")
+        editor.remove("height")
+        editor.remove("bodyType")
+
+        editor.apply()
     }
 
+    fun loadUserProfileFromSharedPreferences(context: Context): UserProfile {
+        val prefs = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+        val gson = Gson()
 
-     fun loadProfileFromSharedPreferences(): UserProfile {
-        return UserProfile(
-            uId = sharedPreferences?.getString("user_uId", "") ?: "",
-            name = sharedPreferences?.getString("user_name", "") ?: "",
-            gender = sharedPreferences?.getString("user_gender", "") ?: "",
-            occupation = sharedPreferences?.getString("user_occupation", "") ?: "",
-            ageGroup = sharedPreferences?.getString("user_ageGroup", null)
-                ?.let { stringValue ->
-                    runCatching { AgeGroup.valueOf(stringValue) }.getOrNull()
-                } ?: AgeGroup.UNSPECIFIED,
-            preferPlatform = sharedPreferences?.getString("user_preferPlatform", null)
-                ?.let { stringValue ->
-                    runCatching { PreferPlatform.valueOf(stringValue) }.getOrNull()
-                } ?: PreferPlatform.moderate,
-            profileCompleted = sharedPreferences?.getBoolean("profile_completed", false) ?: false,
-            height = sharedPreferences?.getString("user_heightGroup", null)
-                ?.let { stringValue ->
-                    runCatching { HeightGroup.valueOf(stringValue) }.getOrNull()
-                } ?: HeightGroup.average,
-            bodyType = sharedPreferences?.getString("user_bodyType", null)
-                ?.let { stringValue ->
-                    runCatching { BodyType.valueOf(stringValue) }.getOrNull()
-                } ?: BodyType.average
-        ).also {
-            Log.d("ProfileLoad", "Loaded profile: $it")
+        // 1. Try JSON version
+        val json = prefs.getString("user_profile", null)
+        if (json != null) {
+            val profile = gson.fromJson(json, UserProfile::class.java)
+            Log.d("UserProfile", "Using migrated UserProfile ✅")
+            return profile
         }
+
+        // 2. Fallback: old style
+        val gender = prefs.getString("gender", "") ?: ""
+        val occupation = prefs.getString("occupation", "") ?: ""
+        val ageGroup = AgeGroup.valueOf(prefs.getString("ageGroup", "UNSPECIFIED") ?: "UNSPECIFIED")
+        val preferPlatform = PreferPlatform.valueOf(prefs.getString("preferPlatform", PreferPlatform.moderate.name) ?: PreferPlatform.moderate.name)
+        val profileCompleted = prefs.getBoolean("profileCompleted", false)
+        val height = try {
+            HeightGroup.valueOf(prefs.getString("height", HeightGroup.average.name) ?: HeightGroup.average.name)
+        } catch (e: Exception) {
+            HeightGroup.average
+        }
+        val bodyType = try {
+            BodyType.valueOf(prefs.getString("bodyType", BodyType.average.name) ?: BodyType.average.name)
+        } catch (e: Exception) {
+            BodyType.average
+        }
+
+        val oldProfile = UserProfile(
+            uId = prefs.getString("uId", "") ?: "",
+            name = prefs.getString("name", "") ?: "",
+            gender = gender,
+            occupation = occupation,
+            ageGroup = ageGroup,
+            preferPlatform = preferPlatform,
+            profileCompleted = profileCompleted,
+            height = height,
+            bodyType = bodyType
+        )
+        Log.d("UserProfile", "Old keys detected: ${prefs.all.keys}")
+
+        // 3. Auto-migrate
+        saveUserProfileToSharedPreferences(context, oldProfile)
+        Log.d("UserProfile", "Migrated old SharedPrefs to JSON ✅")
+
+        return oldProfile
     }
 
     init {
@@ -168,7 +183,7 @@ class AuthViewModel: ViewModel() {
         }
     }
 
-    fun login(email: String, password: String) {
+    fun login(email: String, password: String,context: Context) {
         Log.d("NavigationDebug", "=== Login Process Started ===")
         Log.d("NavigationDebug", "Login attempt with email: $email")
 
@@ -200,7 +215,7 @@ class AuthViewModel: ViewModel() {
                 showToast("Login Successful!")
 
                 // Check user profile after successful login
-                checkUserProfile()
+                checkUserProfile(context)
 
             } catch (e: Exception) {
                 Log.e("NavigationDebug", "Login process failed", e)
@@ -223,7 +238,7 @@ class AuthViewModel: ViewModel() {
             // Clear favorites when logging out
             val maleHomeViewModel = MaleHomeViewModel()
             maleHomeViewModel.clearFavorites()
-            
+            Log.d("UserProfile", "SharedPrefs cleared? keys=${sharedPreferences?.all}")
             Log.d("NavigationDebug", "Logout completed, all states reset and SharedPreferences cleared")
             showToast("Logged out successfully!")
         }
@@ -233,7 +248,7 @@ class AuthViewModel: ViewModel() {
         _toastMessage.value = null
     }
 
-    fun checkUserProfile() {
+    fun checkUserProfile(context: Context) {
         val currentTime = System.currentTimeMillis()
         if (currentTime - lastProfileCheckTime < PROFILE_CHECK_DEBOUNCE) {
             Log.d("NavigationDebug", "Skipping profile check due to debounce")
@@ -263,15 +278,10 @@ class AuthViewModel: ViewModel() {
 
             try {
                 // First check SharedPreferences
-                val userprofile = loadProfileFromSharedPreferences()
-                val localProfileCompleted = userprofile.profileCompleted
-                val localGender = userprofile.gender
-//                val (localProfileCompleted, localGender) = loadProfileFromSharedPreferences()
-
-                if (localProfileCompleted && localGender.isNotEmpty()) {
-                    Log.d("NavigationDebug", "Found valid profile data in SharedPreferences")
+                val userProfile = loadUserProfileFromSharedPreferences(context)
+                if (userProfile != null && userProfile.profileCompleted && userProfile.gender.isNotEmpty()) {
                     _isProfileCompleted.value = true
-                    _userGender.value = localGender
+                    _userGender.value = userProfile.gender
                     _isCheckingProfile.value = false
                     return@launch
                 }
@@ -311,7 +321,19 @@ class AuthViewModel: ViewModel() {
                     Log.d("NavigationDebug", "Found valid profile in Firestore, updating SharedPreferences")
                     _isProfileCompleted.value = true
                     _userGender.value = gender
-                    saveProfileToSharedPreferences(true, gender,name,ageGroup,occupation,preferPlatform,height,bodyType,uid)
+                    val profile = UserProfile(
+                        uId = uid ?: "",
+                        name = name ?: "",
+                        gender = gender ?: "",
+                        occupation = occupation ?: "",
+                        ageGroup = ageGroup,
+                        preferPlatform = preferPlatform,
+                        height = height,
+                        bodyType = bodyType,
+                        profileCompleted = completed
+                    )
+                    saveUserProfileToSharedPreferences(context, profile)
+
                     Log.d("NavigationDebug", "Profile data saved to SharedPreferences")
                 } else {
                     Log.d("NavigationDebug", "Profile incomplete or missing in Firestore")
