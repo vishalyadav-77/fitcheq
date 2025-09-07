@@ -76,68 +76,24 @@ class AuthViewModel: ViewModel() {
 
         val json = gson.toJson(userProfile)
         editor.putString("user_profile", json)
-
-        // Clear old keys to prevent conflicts
-        editor.remove("uId")
-        editor.remove("name")
-        editor.remove("gender")
-        editor.remove("occupation")
-        editor.remove("ageGroup")
-        editor.remove("preferPlatform")
-        editor.remove("profileCompleted")
-        editor.remove("height")
-        editor.remove("bodyType")
-
         editor.apply()
+        Log.d("UserProfile", "UserProfile saved to JSON ✅")
     }
 
-    fun loadUserProfileFromSharedPreferences(context: Context): UserProfile {
+    fun loadUserProfileFromSharedPreferences(context: Context): UserProfile? {
         val prefs = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         val gson = Gson()
 
-        // 1. Try JSON version
+        // 1. JSON version
         val json = prefs.getString("user_profile", null)
-        if (json != null) {
+        return if (json != null) {
             val profile = gson.fromJson(json, UserProfile::class.java)
-            Log.d("UserProfile", "Using migrated UserProfile ✅")
-            return profile
+            Log.d("UserProfile", "Using UserProfile from JSON ✅")
+            profile
+        } else {
+            Log.d("UserProfile", "No UserProfile found in SharedPreferences ⚠️")
+            null
         }
-
-        // 2. Fallback: old style
-        val gender = prefs.getString("gender", "") ?: ""
-        val occupation = prefs.getString("occupation", "") ?: ""
-        val ageGroup = AgeGroup.valueOf(prefs.getString("ageGroup", "UNSPECIFIED") ?: "UNSPECIFIED")
-        val preferPlatform = PreferPlatform.valueOf(prefs.getString("preferPlatform", PreferPlatform.moderate.name) ?: PreferPlatform.moderate.name)
-        val profileCompleted = prefs.getBoolean("profileCompleted", false)
-        val height = try {
-            HeightGroup.valueOf(prefs.getString("height", HeightGroup.average.name) ?: HeightGroup.average.name)
-        } catch (e: Exception) {
-            HeightGroup.average
-        }
-        val bodyType = try {
-            BodyType.valueOf(prefs.getString("bodyType", BodyType.average.name) ?: BodyType.average.name)
-        } catch (e: Exception) {
-            BodyType.average
-        }
-
-        val oldProfile = UserProfile(
-            uId = prefs.getString("uId", "") ?: "",
-            name = prefs.getString("name", "") ?: "",
-            gender = gender,
-            occupation = occupation,
-            ageGroup = ageGroup,
-            preferPlatform = preferPlatform,
-            profileCompleted = profileCompleted,
-            height = height,
-            bodyType = bodyType
-        )
-        Log.d("UserProfile", "Old keys detected: ${prefs.all.keys}")
-
-        // 3. Auto-migrate
-        saveUserProfileToSharedPreferences(context, oldProfile)
-        Log.d("UserProfile", "Migrated old SharedPrefs to JSON ✅")
-
-        return oldProfile
     }
 
     init {
