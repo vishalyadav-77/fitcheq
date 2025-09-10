@@ -28,6 +28,7 @@ import com.vayo.fitcheq.screens.Home.MyProfileScreen
 import com.vayo.fitcheq.screens.Home.ItemInfoScreen
 import com.vayo.fitcheq.screens.Home.SavedOutfitScreen
 import com.vayo.fitcheq.screens.Home.OutfitDetailsScreen
+import com.vayo.fitcheq.screens.auth.ResetPasswordScreen
 import com.vayo.fitcheq.viewmodels.AuthViewModel
 import com.vayo.fitcheq.viewmodels.MaleHomeViewModel
 
@@ -45,7 +46,7 @@ sealed class AuthScreen(val route: String) {
         fun createRoute(gender: String, fieldName: String, fieldValue: String): String =
             "outfit_details/$gender/$fieldName/$fieldValue"
     }
-    object SettingsPage : AuthScreen("settings_page")
+    object ResetPass : AuthScreen("reset_pass")
     object ItemInfo : AuthScreen("itemInfo/{outfit}") {
         fun passOutfit(outfit: OutfitData): String {
             val encoded = Uri.encode(Json.encodeToString(outfit))
@@ -144,6 +145,12 @@ fun AuthNavGraph(
             val outfit = Json.decodeFromString<OutfitData>(json)
             ItemInfoScreen(outfit,maleViewModel,navController)
         }
+
+        composable(
+            route = AuthScreen.ResetPass.route,
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None }
+        ) { ResetPasswordScreen(navController, authViewModel) }
 
 
     }
