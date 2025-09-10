@@ -1,15 +1,35 @@
 package com.vayo.fitcheq.screens.auth
 
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,10 +38,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.vayo.fitcheq.R
 import com.vayo.fitcheq.viewmodels.AuthViewModel
 
 @Composable
@@ -33,33 +66,148 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
     val toastMessage by authViewModel.toastMessage.collectAsStateWithLifecycle()
     val isCheckingProfile by authViewModel.isCheckingProfile.collectAsStateWithLifecycle()
     var loginAttempted by remember { mutableStateOf(false) }
+    val myTitleFont = FontFamily(Font(R.font.title_syarifa))
+    val configuration = LocalConfiguration.current
+    val density = LocalDensity.current
+    val screenHeightPx = with(density) { configuration.screenHeightDp.dp.toPx() }
+    var passwordVisible by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier.Companion.fillMaxSize().padding(20.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.Companion.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier.Companion.height(50.dp))
-        TextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
-        Spacer(modifier = Modifier.Companion.height(10.dp))
-        TextField(value = password, onValueChange = { password = it }, label = { Text("Password") })
-        Spacer(modifier = Modifier.Companion.height(20.dp))
+    Box(modifier = Modifier.fillMaxSize()) {
+        Image(
+            painter = painterResource(id = R.drawable.bg_full),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
 
-        Button(
-            onClick = {
-                loginAttempted = true
-                authViewModel.login(email, password)
-            },
-            enabled = !isCheckingProfile
+        // Gradient overlay
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(Color.Transparent, Color.White),
+                        startY = 0f,
+                        endY = screenHeightPx * 0.4f // fade by 50% of screen height
+                    )
+                )
+        )
+
+        Column(
+            modifier = Modifier.fillMaxSize().padding(20.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.Companion.CenterHorizontally,
         ) {
-            Text(if (isCheckingProfile) "Logging in..." else "Login")
+            Text(
+                "Fit Cheq",
+                fontSize = 34.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = myTitleFont
+            )
+            Spacer(modifier = Modifier.Companion.height(50.dp))
+            Text(
+                "Email",
+                modifier = Modifier.fillMaxWidth(),
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.Companion.height(8.dp))
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                placeholder = { Text("Email", color = Color.Gray) },
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color.Transparent,
+                    unfocusedBorderColor = Color.Transparent,
+                    disabledBorderColor = Color.Transparent,
+                    errorBorderColor = Color.Red,
+                    focusedContainerColor = Color(0xFFEEEEEE), //light gray
+                    unfocusedContainerColor = Color(0xFFEEEEEE),
+                    disabledContainerColor = Color(0xFFE0E0E0)
+                )
+            )
+            Spacer(modifier = Modifier.Companion.height(20.dp))
+
+            Text(
+                "Password",
+                modifier = Modifier.fillMaxWidth(),
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.Companion.height(8.dp))
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                placeholder = { Text("Password", color = Color.Gray) },
+                visualTransformation = if(passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.fillMaxWidth(),
+                trailingIcon = {
+                    val icon = if (passwordVisible) R.drawable.visibility_24px else R.drawable.visibility_off_24px
+                    val description = if (passwordVisible) "Hide password" else "Show password"
+
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        Icon(
+                            painter = painterResource(icon),
+                            contentDescription = description,
+                            tint = Color.Gray
+                        )
+                    }
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color.Transparent,
+                    unfocusedBorderColor = Color.Transparent,
+                    disabledBorderColor = Color.Transparent,
+                    errorBorderColor = Color.Red,
+                    focusedContainerColor = Color(0xFFEEEEEE),
+                    unfocusedContainerColor = Color(0xFFEEEEEE),
+                    disabledContainerColor = Color(0xFFE0E0E0)
+                )
+            )
+            Spacer(modifier = Modifier.Companion.height(6.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                Text(
+                    text = "Forgot Password?",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Blue,
+                    modifier = Modifier.clickable{
+                        navController.navigate("reset_pass")
+                    }
+                )
+            }
+            Spacer(modifier = Modifier.Companion.height(20.dp))
+
+            Button(
+                modifier = Modifier.fillMaxWidth().height(50.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Black,
+                    contentColor = Color.White
+                ),
+                onClick = {
+                    loginAttempted = true
+                    authViewModel.login(email, password, context)
+                },
+                enabled = !isCheckingProfile,
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text(if (isCheckingProfile) "Logging in..." else "Login", fontSize = 18.sp)
+            }
+
+            Spacer(modifier = Modifier.Companion.height(20.dp))
+
+            Row {
+                Text("Don't have an account? ")
+                Text("Sign Up", fontWeight = FontWeight.ExtraBold, color = Color.Blue,
+                    modifier = Modifier.clickable {
+                        navController.navigate("signup")
+                    })
+            }
+
         }
 
-        Spacer(modifier = Modifier.Companion.height(10.dp))
-
-        Button(onClick = { navController.navigate("signup") }) {
-            Text("Don't have an account? Sign Up")
-        }
     }
 
     // Show toast messages from AuthViewModel
