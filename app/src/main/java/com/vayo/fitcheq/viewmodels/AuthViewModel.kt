@@ -181,6 +181,21 @@ class AuthViewModel: ViewModel() {
         }
     }
 
+    fun resetPassword(email: String, onSuccess: () -> Unit, onError: (String) -> Unit){
+        if (email.isBlank()) {
+            onError("Email cannot be empty")
+            return
+        }
+
+        auth.sendPasswordResetEmail(email)
+            .addOnSuccessListener {
+                onSuccess()
+            }
+            .addOnFailureListener { exception ->
+                onError(exception.message ?: "Failed to send password reset email")
+            }
+    }
+
     fun logout() {
         Log.d("NavigationDebug", "=== Logout Started ===")
         viewModelScope.launch {
