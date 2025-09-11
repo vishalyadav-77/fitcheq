@@ -117,9 +117,7 @@ fun AuthNavGraph(
                 navArgument("fieldName") { type = NavType.StringType },
                 navArgument("fieldValue") { type = NavType.StringType }
             ),
-//            enterTransition = { fadeIn(animationSpec = tween(150)) },
             enterTransition = { EnterTransition.None},
-//            exitTransition = { fadeOut(animationSpec = tween(150)) }
             exitTransition = { ExitTransition.None }
         ) { backStackEntry ->
             val gender = backStackEntry.arguments?.getString("gender") ?: "Male"
@@ -149,7 +147,7 @@ fun AuthNavGraph(
         composable(
             route = AuthScreen.ResetPass.route,
             enterTransition = { EnterTransition.None },
-            exitTransition = { ExitTransition.None }
+            exitTransition = { ExitTransition.None },
         ) { ResetPasswordScreen(navController, authViewModel) }
 
 
