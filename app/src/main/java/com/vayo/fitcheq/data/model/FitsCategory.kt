@@ -12,12 +12,12 @@ val maleoccasionList = listOf(
 )
 val malecategoryList = listOf(
     FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/tshirt_man.webp", title =  "Tshirt"),
-    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/shirt_male.webp", title = "Shirt"),
-    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/jeans2male.webp", title = "Jeans"),
+    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/gem_shirt.webp", title = "Shirt"),
+    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/gem_jeans2.webp", title = "Jeans"),
     FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/trackpants.webp", title = "TrackPants"),
-    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/jacket_male.webp", title = "Jacket"),
+    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/gem_jacket2.webp", title = "Jacket"),
     FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/tanktop_male.webp", title = "TankTops"),
-    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/male_accessories.webp", title = "Accessories")
+    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/gem_acc2.webp", title = "Accessories")
 )
 
 val femaleoccasionList = listOf(
