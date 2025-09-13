@@ -1,7 +1,6 @@
 package com.vayo.fitcheq.screens.Home
 
 
-import android.util.Log
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
@@ -89,12 +88,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 import androidx.compose.material.RangeSlider
 import androidx.compose.material.SliderDefaults
+import androidx.compose.material.icons.sharp.KeyboardArrowLeft
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.snapshotFlow
 import coil.request.ImageRequest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlin.math.min
 import kotlin.math.roundToInt
+import androidx.compose.material3.IconButton
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -245,12 +246,36 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(10.dp))
 
-            Text( modifier = Modifier.padding(bottom = 8.dp),
-                text = "${fieldValue.replaceFirstChar { it.uppercaseChar() }} Collection",
-                fontSize = 22.sp,
-                fontWeight = FontWeight.SemiBold )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                // Back button on the left
+                IconButton(
+                    onClick = { navController.navigateUp() },
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .size(38.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Sharp.KeyboardArrowLeft,
+                        contentDescription = "Back",
+                        tint = Color.Black,
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Text(
+                    text = "${fieldValue.replaceFirstChar { it.uppercaseChar() }} Collection",
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
 
             // 🔹 Category chips
                 Row(
