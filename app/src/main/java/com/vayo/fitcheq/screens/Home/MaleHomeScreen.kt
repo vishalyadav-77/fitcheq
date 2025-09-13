@@ -76,6 +76,11 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
     val commentFont = FontFamily(
         Font(R.font.comment_badscript_regular)
     )
+    val imageRouteMap = mapOf(
+        "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/oldmoney.webp" to "oldmoney",
+        "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/streetwear.webp" to "streetwear",
+        "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/starboy.webp" to "starboy"
+    )
 
     // Observe the userId changes to load or clear favorites
     LaunchedEffect(userId) {
@@ -162,31 +167,36 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // CAROUSEL TOP
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(2.5f / 4f),
-//                    .clickable(onClick ),
                     shape = RoundedCornerShape(0.dp),
                 ) {
                     HomeImageCarousel(
-                        images = listOf(
-                            "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/oldmoney_final.webp",
-                            "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/streetwear_final.webp",
-                            "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/starboy_final.webp"
-                        )
+                        images = imageRouteMap.keys.toList(),
+                        onImageClick = { imageUrl ->
+                            val route = imageRouteMap[imageUrl] ?: ""
+                            if (route.isNotEmpty()) {
+                                navController.navigate(
+                                    AuthScreen.OutfitDetails.createRoute(
+                                        "male",
+                                        "style",
+                                        route
+                                    )
+                                ) {
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
+                        }
                     )
                 }
-                Spacer(modifier = Modifier.height(20.dp))
-
-                // TIME FOR TODAY FIT CHEQ
-                Text(
-                    text = "Ready for today’s fit cheq?",
-                    fontSize = 20.sp,
-                    fontFamily = commentFont,
-                    fontStyle = FontStyle.Italic,
-                )
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(30.dp))
 
                 //  ESSENTIALS CATEGORY
                 Card(
@@ -339,6 +349,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                                         .fillMaxWidth()
                                         .clickable(onClick = onCardClick),
                                     shape = RoundedCornerShape(0.dp),
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                                 ) {
                                     Box(modifier = Modifier.fillMaxSize()) {
                                         AsyncImage(
@@ -526,7 +537,8 @@ fun HomeImageCarousel(
     images: List<String>,
     modifier: Modifier = Modifier,
     autoScrollDelay: Long = 3000L,
-    repeatCount: Int = 10
+    repeatCount: Int = 10,
+    onImageClick: (String) -> Unit = {}
 ) {
     if (images.isEmpty()) return
 
@@ -569,11 +581,15 @@ fun HomeImageCarousel(
             modifier = Modifier
                 .fillMaxWidth()
         ) { page ->
+            val imageUrl = loopedImages[page]
             AsyncImage(
-                model = loopedImages[page],
+                model = imageUrl,
                 contentDescription = "Carousel Image $page",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
+                    .clickable{
+                        onImageClick(imageUrl)
+                    }
             )
         }
 
