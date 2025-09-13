@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 data class UserProfile(
     val uId: String = "",
     val name: String = "",
+    val phone: String= "",
     val gender: String = "",
     val occupation: String = "",
     val ageGroup: AgeGroup = AgeGroup.UNSPECIFIED, // Default value
