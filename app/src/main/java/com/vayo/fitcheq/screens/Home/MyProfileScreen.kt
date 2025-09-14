@@ -73,12 +73,12 @@ fun MyProfileScreen(navController: NavController, authViewModel: AuthViewModel) 
     val report_url = "https://tally.so/r/wAEG10"
     val faq_url = "https://tally.so/r/wboMv7"
 
-
     LaunchedEffect(Unit) {
        userProfile = authViewModel.loadUserProfileFromSharedPreferences(context)
     }
 
     val username = userProfile?.name ?: "..."
+    val phoneNumber = "+91 ${userProfile?.phone}" ?: "Phone Number Not Available"
 
     ScreenContainer(navController = navController) { paddingValues ->
         Column(
@@ -106,15 +106,22 @@ fun MyProfileScreen(navController: NavController, authViewModel: AuthViewModel) 
 
             // CONTENT
             LazyColumn(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 14.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 item {
                     Spacer(modifier = Modifier.height(24.dp))
                     // USER pfp and Name
                     Column(
-                        modifier = Modifier.fillMaxWidth()
-                            .border(width = 0.3.dp, color = Color.LightGray,shape = RoundedCornerShape(12.dp))
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .border(
+                                width = 0.3.dp,
+                                color = Color.LightGray,
+                                shape = RoundedCornerShape(12.dp)
+                            )
                             .padding(20.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -139,7 +146,7 @@ fun MyProfileScreen(navController: NavController, authViewModel: AuthViewModel) 
                                     modifier = Modifier.align(Alignment.CenterHorizontally)
                                 )
                                 Text(
-                                    text = "+91 9841XXXXXX",
+                                    text = phoneNumber,
                                     fontSize = 14.sp,
                                     color = Color.Gray,
                                     fontWeight = FontWeight.Medium,
@@ -165,7 +172,11 @@ fun MyProfileScreen(navController: NavController, authViewModel: AuthViewModel) 
                             text = "EDIT",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
-                            textDecoration = TextDecoration.Underline
+                            color = Color.Blue,
+                            textDecoration = TextDecoration.Underline,
+                            modifier = Modifier.clickable{
+                                navController.navigate(AuthScreen.EditProfile.route)
+                            }
                         )
                     }
                     Spacer(modifier = Modifier.height(12.dp))
@@ -174,9 +185,15 @@ fun MyProfileScreen(navController: NavController, authViewModel: AuthViewModel) 
                         modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(min = 380.dp)
-                            .border(width = 0.3.dp, color = Color.LightGray,shape = RoundedCornerShape(12.dp)),
+                            .border(
+                                width = 0.3.dp,
+                                color = Color.LightGray,
+                                shape = RoundedCornerShape(12.dp)
+                            ),
                     ) {
-                        Column(modifier = Modifier.wrapContentHeight().padding(8.dp)) {
+                        Column(modifier = Modifier
+                            .wrapContentHeight()
+                            .padding(8.dp)) {
                             userProfile?.let { profile ->
                                 ProfileRow(label = "Gender", value = profile.gender)
                                 ProfileRow(label = "Height", value = profile.height.displayName)
@@ -202,8 +219,13 @@ fun MyProfileScreen(navController: NavController, authViewModel: AuthViewModel) 
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Column(
-                        modifier = Modifier.fillMaxWidth()
-                            .border(width = 0.3.dp, color = Color.LightGray,shape = RoundedCornerShape(12.dp))
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .border(
+                                width = 0.3.dp,
+                                color = Color.LightGray,
+                                shape = RoundedCornerShape(12.dp)
+                            )
                             .padding(16.dp),
                     ) {
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
@@ -216,11 +238,12 @@ fun MyProfileScreen(navController: NavController, authViewModel: AuthViewModel) 
                             Icon(imageVector = Icons.Outlined.KeyboardArrowRight, contentDescription = "Arrow")
                         }
                         Spacer(modifier = Modifier.height(16.dp))
-                        Row(modifier = Modifier.fillMaxWidth()
-                               .clickable {
-                                   val intent = Intent(Intent.ACTION_VIEW, Uri.parse(report_url))
-                                   context.startActivity(intent)
-                        }
+                        Row(modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(report_url))
+                                context.startActivity(intent)
+                            }
                             , horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -231,7 +254,8 @@ fun MyProfileScreen(navController: NavController, authViewModel: AuthViewModel) 
                             Icon(imageVector = Icons.Outlined.KeyboardArrowRight, contentDescription = "Arrow")
                         }
                         Spacer(modifier = Modifier.height(16.dp))
-                        Row(modifier = Modifier.fillMaxWidth()
+                        Row(modifier = Modifier
+                            .fillMaxWidth()
                             .clickable {
                                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(faq_url))
                                 context.startActivity(intent)
@@ -252,11 +276,13 @@ fun MyProfileScreen(navController: NavController, authViewModel: AuthViewModel) 
                         onClick = {
                             authViewModel.logout()
                         },
-                        modifier = Modifier.fillMaxWidth().border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.error,
-                            shape = RoundedCornerShape(12.dp)
-                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .border(
+                                width = 1.dp,
+                                color = MaterialTheme.colorScheme.error,
+                                shape = RoundedCornerShape(12.dp)
+                            ),
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color.White,
