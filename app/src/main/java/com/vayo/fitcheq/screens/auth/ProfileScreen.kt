@@ -32,6 +32,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -41,6 +42,7 @@ import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -114,7 +116,7 @@ fun SelectableCard(
 }
 
 @Composable
-fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
+fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel, isEditMode: Boolean = false) {
     val context = LocalContext.current
     val firestore = FirebaseFirestore.getInstance()
     val currentUser = FirebaseAuth.getInstance().currentUser
@@ -128,6 +130,47 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
     var bodyType by remember { mutableStateOf(BodyType.average) }
     var phoneNumber by remember { mutableStateOf("") }
     var isError by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+
+    // Load existing profile data if in edit mode
+    LaunchedEffect(isEditMode) {
+        if (isEditMode) {
+            isLoading = true
+            val prefs = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+            val savedProfileJson = prefs.getString("user_profile", null)
+
+            if (savedProfileJson != null) {
+                try {
+                    val gson = Gson()
+                    val userProfile = gson.fromJson(savedProfileJson, UserProfile::class.java)
+                    // Pre-fill the fields
+                    name = userProfile.name
+                    gender = userProfile.gender
+                    occupation = userProfile.occupation
+                    phoneNumber = userProfile.phone
+                    ageGroup = userProfile.ageGroup
+                    preferplatform = userProfile.preferPlatform
+                    height = userProfile.height
+                    bodyType = userProfile.bodyType
+
+                } catch (e: Exception) {
+                    Log.e("ProfileScreen", "Error parsing saved profile", e)
+                    Toast.makeText(context, "Failed to load profile data", Toast.LENGTH_SHORT).show()
+                }
+            }
+            isLoading = false
+        }
+    }
+    // Show loading indicator while fetching data in edit mode
+    if (isEditMode && isLoading) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+        return
+    }
 
     // MAIN
     Column(
@@ -139,7 +182,7 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
         Spacer(modifier = Modifier.Companion.height(10.dp))
         // TITLE
         Text(
-            text = "Tell Us About Yourself",
+            text = if (isEditMode) "Edit Your Profile" else "Tell Us About Yourself",
             fontSize = 20.sp,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier
@@ -492,7 +535,7 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
                 })
             {
                 Text(
-                    text = "Save Profile",
+                    text = if (isEditMode) "Update Profile" else "Save Profile",
                     modifier = Modifier.fillMaxWidth(),
                     fontSize = 18.sp,
                     textAlign = TextAlign.Center
