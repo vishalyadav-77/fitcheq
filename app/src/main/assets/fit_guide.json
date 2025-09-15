@@ -2,35 +2,965 @@
   "guides": [
     {
       "gender": "male",
-      "height": "tall",
+      "height": "very_tall",
       "bodyType": "slim",
-      "chips": ["Layering Adds Volume", "Baggy Outfits Work Well", "Go for Horizontal Patterns", "Wide-Leg Pants Balance Frame"],
+      "chips": ["Layering Adds Volume", "Horizontal Patterns Break Height", "Wide-Leg Pants Add Balance", "Chunky Footwear Works Well"],
       "categories": [
         {
           "id": "shirts",
           "title": "Shirts & T-Shirts",
-          "summary": "Go for slim-fit shirts to avoid looking smaller",
-          "image": "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/shirt_male.webp",
+          "summary": "Add bulk and break vertical flow",
           "details": [
-            "Vertical stripes help elongate your torso",
-            "Avoid oversized clothing",
-            "Layer lightly, don’t drown in fabric"
+            "Horizontal stripes or color blocks reduce lankiness",
+            "Relaxed/oversized tees work without drowning you",
+            "Layering with open shirts adds bulk"
           ],
-          "proTip": "Half-sleeve fitted shirts can make you look broader"
+          "proTip": "Go for thicker fabrics — slim tall guys should avoid clingy thin tees"
         },
         {
           "id": "pants",
           "title": "Pants & Jeans",
-          "summary": "Straight/slim pants balance proportions",
-          "image": "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/jeans2male.webp",
+          "summary": "Relaxed fits balance a long frame",
           "details": [
-            "Avoid baggy jeans that emphasize skinniness",
-            "Go for mid-rise pants",
-            "Dark shades add bulk to legs"
+            "Wide-leg or straight cuts avoid stick-thin look",
+            "Low/mid-rise keeps proportions balanced",
+            "Cuffed pants or slight breaks shorten leg length"
           ],
-          "proTip": "Cropped pants with no break make legs look longer"
+          "proTip": "Two-tone (dark top, light pants) cuts height visually"
+        },
+        {
+          "id": "shoes",
+          "title": "Shoes & Footwear",
+          "summary": "Balance proportions with footwear",
+          "details": [
+            "Chunky sneakers or boots balance tall frame",
+            "Avoid overly slim shoes that make feet look small",
+            "Mid-tops work better than low-tops for tall builds"
+          ],
+          "proTip": "Contrast-colored shoes break the vertical line nicely"
+        },
+        {
+          "id": "jacket",
+          "title": "Outerwear & Jacket",
+          "summary": "Use jackets to add proportion",
+          "details": [
+            "Cropped bomber or denim jacket balances long torso",
+            "Avoid extra-long coats that emphasize height",
+            "Layering with hoodies/shackets adds upper body mass"
+          ],
+          "proTip": "Double-breasted blazers work well to add width on tall frames"
+        }
+      ]
+    },
+    {
+      "gender": "male",
+      "height": "tall",
+      "bodyType": "slim",
+      "chips": [
+        "Layering Adds Width",
+        "Horizontal or Bold Patterns Break Length",
+        "Structured Jackets Build Frame",
+        "Wide/Relaxed Pants Balance Long Legs",
+        "Avoid Longline or Extra-Skinny Fits"
+      ],
+      "categories": [
+        {
+          "id": "shirts",
+          "title": "Shirts & T-Shirts",
+          "summary": "Add bulk and width to avoid lanky look",
+          "details": [
+            "Layer with overshirts, flannels, or cardigans to widen frame",
+            "Horizontal stripes or large checks add visual weight",
+            "Avoid extra-long tees that stretch torso further"
+          ],
+          "proTip": "Go for heavier fabrics like Oxford shirts instead of thin cotton to add structure"
+        },
+        {
+          "id": "pants",
+          "title": "Pants & Jeans",
+          "summary": "Balance long legs with wider fits",
+          "details": [
+            "Straight or wide-leg pants balance proportions",
+            "Mid-rise pants keep torso and legs in proportion",
+            "Avoid super skinny jeans that exaggerate lankiness"
+          ],
+          "proTip": "Cropped or no-break trousers prevent legs from looking endless"
+        },
+        {
+          "id": "shoes",
+          "title": "Shoes & Footwear",
+          "summary": "Ground height and add balance",
+          "details": [
+            "Chunky sneakers, boots, or loafers add proportion to long legs",
+            "Avoid super low-profile shoes that stretch legs further",
+            "Contrast-colored shoes help break vertical dominance"
+          ],
+          "proTip": "High-tops and boots balance long legs better than slip-ons"
+        },
+        {
+          "id": "jacket",
+          "title": "Outerwear & Jackets",
+          "summary": "Use structure to broaden shoulders",
+          "details": [
+            "Structured blazers, bombers, or cropped jackets add bulk",
+            "Avoid overly long coats that drag frame vertically",
+            "Layering with hoodies or sweaters under jackets adds width"
+          ],
+          "proTip": "Single-breasted blazers with broad lapels emphasize chest and shoulders"
+        }
+      ]
+    },
+    {
+      "gender": "male",
+      "height": "average",
+      "bodyType": "slim",
+      "chips": ["Monochrome = Height Boost", "Mid/High-Rise Pants", "Avoid Longline Jackets", "Structured Fabrics Add Bulk"],
+      "categories": [
+        {
+          "id": "shirts",
+          "title": "Shirts & T-Shirts",
+          "summary": "Vertical focus with slight structure",
+          "details": [
+            "Keep shirts ending just below belt, not too long",
+            "Go for vertical stripes or solid dark shades",
+            "Thicker fabrics (oxford, pique) give bulk without losing height"
+          ],
+          "proTip": "Tucked-in shirts make legs look longer instantly"
+        },
+        {
+          "id": "pants",
+          "title": "Pants & Jeans",
+          "summary": "Lengthen legs, avoid excess fabric",
+          "details": [
+            "Slim-tapered or straight fits work best",
+            "Mid/high-rise pants make your frame taller",
+            "Avoid cuffs, cropped lengths or heavy breaks at ankles"
+          ],
+          "proTip": "Dark slim jeans with matching shoes = taller silhouette"
+        },
+        {
+          "id": "shoes",
+          "title": "Shoes & Footwear",
+          "summary": "Elongate frame subtly with shoe choice",
+          "details": [
+            "Low-top sneakers elongate legs",
+            "Leather loafers or chelsea boots with slight heel boost height",
+            "Match shoe color with pants to keep flow"
+          ],
+          "proTip": "Clean white sneakers balance slim legs without shortening height"
+        },
+        {
+          "id": "jacket",
+          "title": "Outerwear & Jacket",
+          "summary": "Add structure, don’t cut your frame",
+          "details": [
+            "Cropped bomber/denim jackets add upper bulk",
+            "Avoid longline or oversized coats",
+            "Single-breasted blazers elongate more than double-breasted"
+          ],
+          "proTip": "Layer in tonal shades (e.g. grey tee + charcoal jacket) for extra height effect"
+        }
+      ]
+    },
+    {
+      "gender": "male",
+      "height": "short",
+      "bodyType": "slim",
+      "chips": ["Monochrome Outfits Add Height", "Layer Smartly for Bulk", "Avoid Oversized Fits", "Structured Fabrics Add Width"],
+      "categories": [
+        {
+          "id": "shirts",
+          "title": "Shirts & T-Shirts",
+          "summary": "Structured slim fits keep you tall without looking too thin",
+          "details": [
+            "Opt for thicker fabrics (oxford cotton, pique polos) instead of thin clingy ones",
+            "Subtle patterns (small checks, micro-prints) add visual weight",
+            "Layer with an open shirt over a fitted tee for width without cutting height"
+          ],
+          "proTip": "Half-sleeve polos or cuffed sleeves make arms look stronger"
+        },
+        {
+          "id": "pants",
+          "title": "Pants & Jeans",
+          "summary": "Slim but not skinny — balance legs without shrinking height",
+          "details": [
+            "Go for slim-tapered or straight fits, avoid ultra-skinny that exaggerates thin legs",
+            "Choose structured fabrics like denim or chinos to add some bulk",
+            "Mid/high-rise makes legs longer and torso proportionate"
+          ],
+          "proTip": "Avoid cropped pants; full length with no break adds length and volume"
+        },
+        {
+          "id": "shoes",
+          "title": "Shoes & Footwear",
+          "summary": "Sleek but slightly chunky shoes balance slim legs",
+          "details": [
+            "Low/mid-top sneakers with a little sole add substance",
+            "Avoid extra-bulky boots that shorten legs",
+            "Match color with pants to elongate silhouette"
+          ],
+          "proTip": "Clean white sneakers add visual weight without cutting height"
+        },
+        {
+          "id": "jacket",
+          "title": "Outerwear & Jacket",
+          "summary": "Add upper-body volume while keeping length short",
+          "details": [
+            "Bomber jackets or cropped denim add chest/shoulder bulk",
+            "Avoid longline jackets that drown your frame",
+            "Go for light padding or structured shoulders to look broader"
+          ],
+          "proTip": "Layering with similar tones (tee + overshirt + cropped jacket) adds depth without breaking height illusion"
+        }
+      ]
+    },
+
+    {
+      "gender": "male",
+      "height": "tall",
+      "bodyType": "athletic",
+      "chips": ["Athletic Fits Show Shape", "Polos & Henleys Add Definition", "Avoid Ultra-Skinny Pants", "Cropped Jackets Highlight Frame"],
+      "categories": [
+        {
+          "id": "shirts",
+          "title": "Shirts & T-Shirts",
+          "summary": "Highlight shape without elongating more",
+          "details": [
+            "Athletic/slim fits work best — fitted chest, tapered waist",
+            "Polos and Henleys add upper body definition",
+            "Avoid oversized tees that hide your proportions"
+          ],
+          "proTip": "Layer a lightweight overshirt to add structure without bulk"
+        },
+        {
+          "id": "pants",
+          "title": "Pants & Jeans",
+          "summary": "Balance long legs with structured fits",
+          "details": [
+            "Slim-tapered or straight fits maintain proportion",
+            "Avoid ultra-skinny that makes legs look thin",
+            "Pleated trousers or slim cargos add subtle volume"
+          ],
+          "proTip": "Break up vertical flow with slightly cuffed chinos or jeans"
+        },
+        {
+          "id": "shoes",
+          "title": "Shoes & Footwear",
+          "summary": "Medium-volume footwear for balance",
+          "details": [
+            "Low or mid-top sneakers maintain proportions",
+            "Avoid narrow dress shoes that make feet look tiny",
+            "Chunky soles add balance but don’t overdo"
+          ],
+          "proTip": "Chelsea boots with a slight heel add height and sharpness without elongating legs too much"
+        },
+        {
+          "id": "jacket",
+          "title": "Outerwear & Jacket",
+          "summary": "Use outerwear to emphasize shoulders",
+          "details": [
+            "Cropped bomber or trucker jackets highlight upper body",
+            "Tailored blazers with structure at shoulders work great",
+            "Avoid longline slim coats that make you look lanky"
+          ],
+          "proTip": "Layer in contrasting tones (dark tee + lighter jacket) to break vertical lines"
+        }
+      ]
+    },
+    {
+      "gender": "male",
+      "height": "average",
+      "bodyType": "athletic",
+      "chips": ["Athletic Fit, Not Boxy", "Mid/High-Rise Pants Add Height", "Avoid Horizontal Stripes", "Cropped Jackets Balance Proportions"],
+      "categories": [
+        {
+          "id": "shirts",
+          "title": "Shirts & T-Shirts",
+          "summary": "Show shape while elongating frame",
+          "details": [
+            "Athletic-fit shirts highlight build without being too tight",
+            "Vertical stripes or solid colors elongate torso",
+            "Avoid horizontal patterns that shorten appearance"
+          ],
+          "proTip": "Short-sleeve polos make arms and chest pop while keeping proportions neat"
+        },
+        {
+          "id": "pants",
+          "title": "Pants & Jeans",
+          "summary": "Slim-tapered to elongate legs and balance thighs",
+          "details": [
+            "Go for slim-tapered fits that accommodate athletic thighs",
+            "Mid/high-rise pants make legs look longer",
+            "Avoid cropped pants or heavy cuffs"
+          ],
+          "proTip": "Dark slim chinos or jeans with matching shoes = taller, leaner silhouette"
+        },
+        {
+          "id": "shoes",
+          "title": "Shoes & Footwear",
+          "summary": "Elongate and sharpen proportions",
+          "details": [
+            "Low-profile sneakers elongate legs",
+            "Chelsea boots or loafers add height subtly",
+            "Avoid bulky high-tops that cut off leg line"
+          ],
+          "proTip": "Match shoe color with pants to create a seamless vertical flow"
+        },
+        {
+          "id": "jacket",
+          "title": "Outerwear & Jacket",
+          "summary": "Keep jackets sharp and cropped",
+          "details": [
+            "Bomber or trucker jackets balance proportions",
+            "Tailored blazers work better single-breasted than double",
+            "Avoid oversized or boxy jackets that shorten frame"
+          ],
+          "proTip": "Go for jackets ending at or just above hip to elongate legs"
+        }
+      ]
+    },
+    {
+      "gender": "male",
+      "height": "short",
+      "bodyType": "athletic",
+      "chips": [
+        "Vertical Focus for Height",
+        "Mid/High-Rise Pants for Longer Legs",
+        "Fitted, Not Skinny",
+        "Cropped Jackets Keep Proportions",
+        "Monochrome Outfits Add Height"
+      ],
+      "categories": [
+        {
+          "id": "shirts",
+          "title": "Shirts & T-Shirts",
+          "summary": "Keep torso elongated while showing athletic shape",
+          "details": [
+            "Athletic-fit t-shirts and polos highlight chest and arms",
+            "Vertical stripes or plain solids create taller look",
+            "Avoid oversized or longline shirts that shrink legs"
+          ],
+          "proTip": "Tuck in slim polos or tees to lengthen leg line instantly"
+        },
+        {
+          "id": "pants",
+          "title": "Pants & Jeans",
+          "summary": "Elongate legs while keeping fit sharp",
+          "details": [
+            "Slim-tapered pants, never baggy or skin-tight",
+            "Mid/high-rise jeans or chinos make legs appear longer",
+            "Avoid drop-crotch or heavily cuffed pants"
+          ],
+          "proTip": "Pair high-rise dark slim jeans with sleek sneakers for max height illusion"
+        },
+        {
+          "id": "shoes",
+          "title": "Shoes & Footwear",
+          "summary": "Add subtle height, avoid bulk",
+          "details": [
+            "Chelsea boots or sleek loafers give a clean lift",
+            "Low-profile sneakers keep leg line long",
+            "Avoid overly chunky sneakers or wide soles"
+          ],
+          "proTip": "Shoes in same color as pants create a seamless vertical flow"
+        },
+        {
+          "id": "jacket",
+          "title": "Outerwear & Jackets",
+          "summary": "Cropped fits to avoid shrinking the frame",
+          "details": [
+            "Bomber or cropped denim jackets end at waistline",
+            "Single-breasted blazers elongate torso",
+            "Avoid long coats or boxy fits that overwhelm proportions"
+          ],
+          "proTip": "Jackets ending just above the hip visually stretch legs"
+        }
+      ]
+    },
+
+    {
+      "gender": "male",
+      "height": "very_tall",
+      "bodyType": "average",
+      "chips": [
+        "Layering Balances Long Frame",
+        "Avoid Super Slim Fits",
+        "Mid-Rise Pants Work Best",
+        "Use Moderate Color Contrast",
+        "Structured Outerwear Adds Weight"
+      ],
+      "categories": [
+        {
+          "id": "shirts",
+          "title": "Shirts & T-Shirts",
+          "summary": "Add structure and avoid lanky silhouette",
+          "details": [
+            "Regular or slim-regular fits work best",
+            "Patterned or textured shirts add visual weight",
+            "Layer with overshirts or hoodies to break height"
+          ],
+          "proTip": "Roll sleeves slightly to balance long arms"
+        },
+        {
+          "id": "pants",
+          "title": "Pants & Jeans",
+          "summary": "Keep pants proportionate to height",
+          "details": [
+            "Straight or slim-regular fits balance legs",
+            "Mid-rise jeans avoid awkward long torso effect",
+            "Avoid overly cropped or skinny pants"
+          ],
+          "proTip": "Go for slight ankle break — no stacked fabric, no crop"
+        },
+        {
+          "id": "shoes",
+          "title": "Shoes & Footwear",
+          "summary": "Add balance and structure to tall frame",
+          "details": [
+            "Chunky sneakers or boots add grounded weight",
+            "High-top sneakers balance long legs",
+            "Avoid ultra-thin shoes that elongate feet"
+          ],
+          "proTip": "Choose shoes with some bulk to anchor tall proportions"
+        },
+        {
+          "id": "jacket",
+          "title": "Outerwear & Jackets",
+          "summary": "Layering and structure break vertical lines",
+          "details": [
+            "Overshirts, shackets, bomber jackets all work great",
+            "Tailored blazers should be regular length, not cropped",
+            "Avoid extra-long coats unless layered smartly"
+          ],
+          "proTip": "Contrast layering (light inside, darker outer) cuts down height visually"
+        }
+      ]
+    },
+    {
+      "gender": "male",
+      "height": "tall",
+      "bodyType": "average",
+      "chips": [
+        "Structured Fits Over Loose",
+        "Layering Adds Balance",
+        "Avoid Super Slim Fits",
+        "Mid-Rise Pants Keep Proportions",
+        "Moderate Contrast Breaks Height"
+      ],
+      "categories": [
+        {
+          "id": "shirts",
+          "title": "Shirts & T-Shirts",
+          "summary": "Keep torso structured and avoid floppy look",
+          "details": [
+            "Polo shirts, henleys, or button-downs add definition",
+            "Go for slim-regular fits, not oversized or skinny",
+            "Solid colors and subtle patterns work better than loud prints"
+          ],
+          "proTip": "Half-tuck a button-down to add casual shape and avoid lanky appearance"
+        },
+        {
+          "id": "pants",
+          "title": "Pants & Jeans",
+          "summary": "Balance leg length with proportionate fits",
+          "details": [
+            "Straight or slim-regular pants keep natural proportions",
+            "Mid-rise jeans/chinos balance torso and legs",
+            "Avoid super skinny pants that exaggerate height"
+          ],
+          "proTip": "Chinos with a slight break at ankle balance out long legs neatly"
+        },
+        {
+          "id": "shoes",
+          "title": "Shoes & Footwear",
+          "summary": "Add bulk subtly without overpowering",
+          "details": [
+            "Classic sneakers (Nike Air Force 1, Stan Smiths) give balance",
+            "Boots add masculine structure and weight",
+            "Avoid ultra-minimal thin shoes that make feet look too long"
+          ],
+          "proTip": "Chunky sneakers in moderation add balance to tall frames"
+        },
+        {
+          "id": "jacket",
+          "title": "Outerwear & Jackets",
+          "summary": "Use layering to add structure and break height",
+          "details": [
+            "Overshirts, shackets, bomber jackets work perfectly",
+            "Blazers should be tailored and not too long",
+            "Avoid long coats that exaggerate tall frame unless styled smartly"
+          ],
+          "proTip": "Layering with contrasting colors breaks vertical lines and adds depth"
+        }
+      ]
+    },
+    {
+      "gender": "male",
+      "height": "average",
+      "bodyType": "average",
+      "chips": [
+        "Mid/High-Rise Pants Elongate Legs",
+        "Avoid Longline Tops",
+        "Monochrome Adds Height",
+        "Fitted, Not Oversized",
+        "Cropped Jackets Balance Frame"
+      ],
+      "categories": [
+        {
+          "id": "shirts",
+          "title": "Shirts & T-Shirts",
+          "summary": "Keep fits clean and elongating",
+          "details": [
+            "Opt for slim-regular fits, avoid baggy or oversized",
+            "Vertical stripes or plain solids create length",
+            "Avoid horizontal stripes and busy checks"
+          ],
+          "proTip": "Tuck shirts into mid/high-rise pants for a taller silhouette"
+        },
+        {
+          "id": "pants",
+          "title": "Pants & Jeans",
+          "summary": "Choose slim-regular cuts to lengthen legs",
+          "details": [
+            "Mid or high-rise pants add vertical balance",
+            "Slim-tapered fits keep legs sharp without bulk",
+            "Avoid heavy cuffs or cropped styles that shorten legs"
+          ],
+          "proTip": "Dark chinos or jeans with matching shoes = instant leg length"
+        },
+        {
+          "id": "shoes",
+          "title": "Shoes & Footwear",
+          "summary": "Keep footwear sleek and height-friendly",
+          "details": [
+            "Low-profile sneakers or loafers elongate legs",
+            "Chelsea boots add subtle lift",
+            "Avoid chunky high-tops that cut off ankle line"
+          ],
+          "proTip": "Match shoe color to pants for seamless vertical flow"
+        },
+        {
+          "id": "jacket",
+          "title": "Outerwear & Jackets",
+          "summary": "Go cropped and structured",
+          "details": [
+            "Bomber, trucker, or cropped denim jackets balance height",
+            "Blazers should be single-breasted, not longline",
+            "Avoid boxy oversized fits that shrink proportions"
+          ],
+          "proTip": "Jackets ending at or just above hip elongate legs naturally"
+        }
+      ]
+    },
+    {
+      "gender": "male",
+      "height": "short",
+      "bodyType": "average",
+      "chips": [
+        "Mid/High-Rise Pants Add Height",
+        "Avoid Oversized Fits",
+        "Monochrome Elongates Frame",
+        "Cropped Jackets Work Best",
+        "Slim-Tapered Keeps Proportions Sharp"
+      ],
+      "categories": [
+        {
+          "id": "shirts",
+          "title": "Shirts & T-Shirts",
+          "summary": "Slim vertical lines elongate short frame",
+          "details": [
+            "Go for slim-regular fits that sit clean on torso",
+            "Vertical stripes or plain solids create taller look",
+            "Avoid horizontal patterns or large busy prints"
+          ],
+          "proTip": "Tuck shirts into high-rise pants to maximize leg length"
+        },
+        {
+          "id": "pants",
+          "title": "Pants & Jeans",
+          "summary": "Tapered fits keep legs sharp and longer",
+          "details": [
+            "Slim-tapered pants elongate without looking skinny",
+            "Mid/high-rise pants extend leg line",
+            "Avoid cropped pants or wide cuffs that cut height"
+          ],
+          "proTip": "Dark slim chinos + shoes of same color = instant taller illusion"
+        },
+        {
+          "id": "shoes",
+          "title": "Shoes & Footwear",
+          "summary": "Streamlined and height-friendly",
+          "details": [
+            "Low-profile sneakers or loafers elongate legs",
+            "Chelsea boots add subtle lift without bulk",
+            "Avoid chunky sneakers or high-tops that shorten legs"
+          ],
+          "proTip": "Pointed or sleek shoes add extra leg length visually"
+        },
+        {
+          "id": "jacket",
+          "title": "Outerwear & Jackets",
+          "summary": "Shorter lengths keep proportions balanced",
+          "details": [
+            "Bomber, cropped denim, or trucker jackets sit well",
+            "Blazers should be single-breasted and not longline",
+            "Avoid oversized or boxy fits that compress frame"
+          ],
+          "proTip": "Jackets ending at or just above hip create longer leg effect"
+        }
+      ]
+    },
+
+    {
+      "gender": "male",
+      "height": "tall",
+      "bodyType": "plus_size",
+      "chips": [
+        "Dark Colors Slim Frame",
+        "Vertical Lines Add Height, Reduce Width",
+        "Avoid Oversized or Clingy Fabrics",
+        "Straight Pants Balance Bulk",
+        "Structured Layers Hide Belly"
+      ],
+      "categories": [
+        {
+          "id": "shirts",
+          "title": "Shirts & T-Shirts",
+          "summary": "Keep torso structured and slimming",
+          "details": [
+            "Dark solid colors or subtle vertical stripes slim body",
+            "Go for regular or relaxed fits, not skinny or oversized",
+            "Choose fabrics with structure (oxford, cotton), avoid stretch polyesters"
+          ],
+          "proTip": "Untucked shirts that end mid-fly cover belly without shortening legs"
+        },
+        {
+          "id": "pants",
+          "title": "Pants & Jeans",
+          "summary": "Balance legs with upper body bulk",
+          "details": [
+            "Straight or slim-straight pants give clean lines",
+            "Mid-rise trousers avoid muffin-top effect",
+            "Avoid skinny jeans that exaggerate belly"
+          ],
+          "proTip": "Dark jeans with no heavy fading or whiskering slim legs naturally"
+        },
+        {
+          "id": "shoes",
+          "title": "Shoes & Footwear",
+          "summary": "Ground frame without exaggerating bulk",
+          "details": [
+            "Chunky sneakers or boots balance proportions",
+            "Avoid sleek ultra-thin shoes that make legs look small",
+            "Dark shoes with dark pants streamline silhouette"
+          ],
+          "proTip": "Monk straps or derbies in dark shades add polish without slimming too much"
+        },
+        {
+          "id": "jacket",
+          "title": "Outerwear & Jackets",
+          "summary": "Structured outerwear sharpens silhouette",
+          "details": [
+            "Blazers or structured jackets streamline belly",
+            "Longline coats elongate and slim tall fat frames",
+            "Avoid cropped or bomber jackets that cut belly wide"
+          ],
+          "proTip": "Single-breasted blazers in dark shades are a tall fat guy’s best weapon"
+        }
+      ]
+    },
+    {
+      "gender": "male",
+      "height": "average",
+      "bodyType": "plus_size",
+      "chips": [
+        "Dark Colors Slim You Down",
+        "Vertical Lines Add Height",
+        "Mid/High-Rise Pants Hide Belly",
+        "Avoid Oversized or Skinny Fits",
+        "Cropped Jackets Keep Proportions Right"
+      ],
+      "categories": [
+        {
+          "id": "shirts",
+          "title": "Shirts & T-Shirts",
+          "summary": "Streamline torso and hide belly",
+          "details": [
+            "Dark solids or subtle vertical stripes elongate frame",
+            "Regular fit shirts (not slim, not oversized) skim body cleanly",
+            "Avoid horizontal patterns, big checks, or shiny fabrics"
+          ],
+          "proTip": "Wear untucked shirts that end mid-fly for taller look"
+        },
+        {
+          "id": "pants",
+          "title": "Pants & Jeans",
+          "summary": "Elongate legs while balancing waist",
+          "details": [
+            "Mid or high-rise jeans cover belly bulge and lengthen legs",
+            "Straight or slim-straight fits keep proportions balanced",
+            "Avoid heavy cuffs or cropped pants that shorten legs"
+          ],
+          "proTip": "Dark straight jeans + dark shoes create a seamless taller effect"
+        },
+        {
+          "id": "shoes",
+          "title": "Shoes & Footwear",
+          "summary": "Add height subtly without bulk",
+          "details": [
+            "Sleek sneakers or loafers elongate frame",
+            "Chelsea boots add a little lift without chunky look",
+            "Avoid bulky sneakers or high-tops that cut legs short"
+          ],
+          "proTip": "Match shoes with pants to avoid breaking vertical line"
+        },
+        {
+          "id": "jacket",
+          "title": "Outerwear & Jackets",
+          "summary": "Keep jackets short and structured",
+          "details": [
+            "Cropped denim, bomber, or single-breasted blazers sharpen silhouette",
+            "Avoid double-breasted or boxy fits that widen torso",
+            "Keep length at hip, not below, to prevent legs from looking short"
+          ],
+          "proTip": "Unbuttoned jacket + darker tee inside = slimmer vertical line"
+        }
+      ]
+    },
+    {
+      "gender": "male",
+      "height": "short",
+      "bodyType": "plus_size",
+      "chips": [
+        "Dark Colors Slim You Down",
+        "Vertical Lines Elongate Frame",
+        "Mid/High-Rise Pants Lengthen Legs",
+        "Avoid Oversized or Baggy Fits",
+        "Cropped Jackets Keep Proportions Sharp"
+      ],
+      "categories": [
+        {
+          "id": "shirts",
+          "title": "Shirts & T-Shirts",
+          "summary": "Slim and elongate torso while hiding belly",
+          "details": [
+            "Opt for dark solid colors or subtle vertical stripes",
+            "Regular or slightly tailored fits skim body cleanly",
+            "Avoid horizontal stripes, big prints, or shiny fabrics that widen torso"
+          ],
+          "proTip": "Tuck in slim-regular shirts to create a taller illusion"
+        },
+        {
+          "id": "pants",
+          "title": "Pants & Jeans",
+          "summary": "Elongate legs and balance waistline",
+          "details": [
+            "Mid or high-rise pants/jeans lengthen legs visually",
+            "Straight or slim-straight fits maintain balance without clinging",
+            "Avoid baggy pants, heavy cuffs, or cropped lengths that shorten legs"
+          ],
+          "proTip": "Dark pants with matching shoes create uninterrupted vertical line"
+        },
+        {
+          "id": "shoes",
+          "title": "Shoes & Footwear",
+          "summary": "Height-friendly, streamline legs",
+          "details": [
+            "Low-profile sneakers or sleek loafers elongate frame",
+            "Chelsea boots add subtle lift without bulk",
+            "Avoid chunky or overly bulky footwear that cuts off leg line"
+          ],
+          "proTip": "Keep shoes color-coordinated with pants for seamless vertical flow"
+        },
+        {
+          "id": "jacket",
+          "title": "Outerwear & Jackets",
+          "summary": "Cropped and structured jackets to avoid shortening frame",
+          "details": [
+            "Cropped denim, bomber, or single-breasted blazers add shape and slim silhouette",
+            "Avoid double-breasted, oversized, or boxy jackets that widen torso",
+            "Keep jacket length at or just above hip to elongate legs"
+          ],
+          "proTip": "Layering a darker tee inside an open jacket creates vertical flow and slimming effect"
+        }
+      ]
+    },
+
+    {
+      "gender": "male",
+      "height": "tall",
+      "bodyType": "muscular",
+      "chips": [
+        "Fitted Clothing Shows Shape",
+        "Layering Adds Style Without Bulk",
+        "Structured Jackets Enhance V-Shape",
+        "Straight/Slim-Straight Pants Balance Legs",
+        "Slight Color Contrast Highlights Muscles"
+      ],
+      "categories": [
+        {
+          "id": "shirts",
+          "title": "Shirts & T-Shirts",
+          "summary": "Showcase muscular torso without looking tight",
+          "details": [
+            "Athletic-fit t-shirts and polos hug chest and arms neatly",
+            "Button-down shirts with slight tapering enhance shoulders-to-waist ratio",
+            "Avoid overly baggy or oversized tops that hide muscle definition"
+          ],
+          "proTip": "Short sleeves ending mid-bicep highlight arms without looking stretched"
+        },
+        {
+          "id": "pants",
+          "title": "Pants & Jeans",
+          "summary": "Balance muscular legs with proportional fit",
+          "details": [
+            "Straight or slim-straight pants maintain natural leg shape",
+            "Mid-rise chinos or jeans prevent torso from looking too long",
+            "Avoid skinny pants that exaggerate calf/quad bulk"
+          ],
+          "proTip": "Dark slim jeans or chinos paired with sleek shoes elongate legs and refine silhouette"
+        },
+        {
+          "id": "shoes",
+          "title": "Shoes & Footwear",
+          "summary": "Ground tall muscular frame",
+          "details": [
+            "Classic sneakers, loafers, or boots balance height and leg bulk",
+            "Avoid ultra-thin shoes that look disproportionate",
+            "Avoid overly chunky sneakers that overemphasize frame"
+          ],
+          "proTip": "Leather boots or sneakers in neutral shades add polished finish to muscular outfits"
+        },
+        {
+          "id": "jacket",
+          "title": "Outerwear & Jackets",
+          "summary": "Structured and fitted outerwear highlights V-shape",
+          "details": [
+            "Blazers or jackets that taper at waist enhance broad shoulders",
+            "Bomber jackets or truckers add style without hiding shape",
+            "Avoid boxy or overly long jackets that hide upper-body definition"
+          ],
+          "proTip": "Single-breasted jackets with structured shoulders emphasize athletic frame"
+        }
+      ]
+    },
+    {
+      "gender": "male",
+      "height": "average",
+      "bodyType": "muscular",
+      "chips": [
+        "Athletic Fit Tops Highlight Shape",
+        "Mid/High-Rise Pants Elongate Legs",
+        "Cropped/Structured Jackets Avoid Cutting Frame",
+        "Monochrome or Vertical Lines Slim Torso",
+        "Avoid Oversized or Baggy Clothing"
+      ],
+      "categories": [
+        {
+          "id": "shirts",
+          "title": "Shirts & T-Shirts",
+          "summary": "Show muscular torso without overwhelming short frame",
+          "details": [
+            "Athletic-fit or slim-regular t-shirts/polos hug chest and arms neatly",
+            "Vertical stripes or solid colors elongate torso",
+            "Avoid baggy tops or heavy patterns that shorten torso visually"
+          ],
+          "proTip": "Short sleeves ending mid-bicep highlight arms proportionately"
+        },
+        {
+          "id": "pants",
+          "title": "Pants & Jeans",
+          "summary": "Balance muscular legs and elongate lower body",
+          "details": [
+            "Mid/high-rise slim-straight pants lengthen legs visually",
+            "Avoid tapered skinny pants that overemphasize calves",
+            "Dark pants create continuous vertical line with shoes"
+          ],
+          "proTip": "Pair slim chinos or jeans with shoes matching pant color for height illusion"
+        },
+        {
+          "id": "shoes",
+          "title": "Shoes & Footwear",
+          "summary": "Keep footwear sleek and proportionate",
+          "details": [
+            "Low-profile sneakers or loafers elongate legs",
+            "Chelsea boots add subtle lift without bulk",
+            "Avoid chunky sneakers or boots that cut leg line"
+          ],
+          "proTip": "Match shoe color to pants for uninterrupted vertical flow"
+        },
+        {
+          "id": "jacket",
+          "title": "Outerwear & Jackets",
+          "summary": "Structured and cropped jackets highlight upper body",
+          "details": [
+            "Bomber, cropped denim, or single-breasted blazers enhance shoulders",
+            "Avoid boxy or overly long jackets that hide V-shape",
+            "Keep jacket length at or just above hip to elongate legs"
+          ],
+          "proTip": "Open jacket with darker inner shirt creates vertical slimming effect"
+        }
+      ]
+    },
+    {
+      "gender": "male",
+      "height": "short",
+      "bodyType": "muscular",
+      "chips": [
+        "Athletic Fit Tops Highlight Shape",
+        "Mid/High-Rise Pants Elongate Legs",
+        "Cropped Jackets Avoid Cutting Frame",
+        "Monochrome or Vertical Lines Slim Torso",
+        "Avoid Oversized or Baggy Clothing"
+      ],
+      "categories": [
+        {
+          "id": "shirts",
+          "title": "Shirts & T-Shirts",
+          "summary": "Show muscular torso without overwhelming short frame",
+          "details": [
+            "Athletic-fit or slim-regular t-shirts/polos hug chest and arms neatly",
+            "Vertical stripes or solid colors elongate torso",
+            "Avoid baggy tops, heavy patterns, or shiny fabrics that shorten frame"
+          ],
+          "proTip": "Short sleeves ending mid-bicep highlight arms proportionately"
+        },
+        {
+          "id": "pants",
+          "title": "Pants & Jeans",
+          "summary": "Balance muscular legs and elongate lower body",
+          "details": [
+            "Mid/high-rise slim-straight pants lengthen legs visually",
+            "Avoid tapered skinny pants that overemphasize calves",
+            "Dark pants create continuous vertical line with shoes"
+          ],
+          "proTip": "Pair slim chinos or jeans with matching shoes for taller illusion"
+        },
+        {
+          "id": "shoes",
+          "title": "Shoes & Footwear",
+          "summary": "Keep footwear sleek and proportionate",
+          "details": [
+            "Low-profile sneakers or loafers elongate legs",
+            "Chelsea boots add subtle lift without bulk",
+            "Avoid chunky sneakers or boots that cut leg line"
+          ],
+          "proTip": "Match shoe color to pants for uninterrupted vertical flow"
+        },
+        {
+          "id": "jacket",
+          "title": "Outerwear & Jackets",
+          "summary": "Cropped and structured jackets highlight upper body",
+          "details": [
+            "Bomber, cropped denim, or single-breasted blazers enhance shoulders",
+            "Avoid boxy or overly long jackets that hide V-shape",
+            "Keep jacket length at or just above hip to elongate legs"
+          ],
+          "proTip": "Open jacket with darker inner shirt creates vertical slimming effect"
         }
       ]
     }
+
+
   ]
 }
