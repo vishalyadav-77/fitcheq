@@ -107,12 +107,6 @@ class AuthViewModel: ViewModel() {
     fun signUp(email: String, password: String, navController: NavController) {
         Log.d("NavigationDebug", "=== SignUp Process Started ===")
         Log.d("NavigationDebug", "SignUp attempt with email: $email")
-
-        if (email.isBlank() || password.isBlank()) {
-            showToast("Email and password cannot be empty")
-            return
-        }
-
         viewModelScope.launch {
             try {
                 val result = auth.createUserWithEmailAndPassword(email, password).await()
@@ -142,11 +136,6 @@ class AuthViewModel: ViewModel() {
     fun login(email: String, password: String,context: Context) {
         Log.d("NavigationDebug", "=== Login Process Started ===")
         Log.d("NavigationDebug", "Login attempt with email: $email")
-
-        if (email.isBlank() || password.isBlank()) {
-            showToast("Email and password cannot be empty")
-            return
-        }
 
         viewModelScope.launch {
             try {
@@ -269,6 +258,7 @@ class AuthViewModel: ViewModel() {
                 val gender = document.getString("gender")
                 val uid = document.getString("uid")
                 val name = document.getString("name")
+                val phone = document.getString("phone")
                 val occupation = document.getString("occupation")
                 val ageGroupName = document.getString("ageGroup") ?: AgeGroup.UNSPECIFIED.name
                 val preferPlatformName = document.getString("preferPlatform") ?: PreferPlatform.moderate.name
@@ -295,6 +285,7 @@ class AuthViewModel: ViewModel() {
                     val profile = UserProfile(
                         uId = uid ?: "",
                         name = name ?: "",
+                        phone = phone ?: "",
                         gender = gender ?: "",
                         occupation = occupation ?: "",
                         ageGroup = ageGroup,
