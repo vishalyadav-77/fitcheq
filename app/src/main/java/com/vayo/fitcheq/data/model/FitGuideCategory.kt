@@ -13,7 +13,6 @@ data class FitGuideCategory(
     val id: String,
     val title: String,
     val summary: String,
-    val image: String,
     val details: List<String>,
     val proTip: String,
 )
