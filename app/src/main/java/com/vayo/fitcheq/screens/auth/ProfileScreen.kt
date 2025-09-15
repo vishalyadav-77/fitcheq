@@ -510,6 +510,7 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel, is
                             name = name,
                             gender = gender,
                             phone = phoneNumber,
+                            email = currentUser?.email ?: "",
                             ageGroup = AgeGroup.valueOf(ageGroup.name),
                             occupation = occupation,
                             preferPlatform = PreferPlatform.valueOf(preferplatform.name),
