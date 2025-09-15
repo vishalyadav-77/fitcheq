@@ -1,15 +1,19 @@
 package com.vayo.fitcheq.screens.Home
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -21,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -30,11 +35,13 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.vayo.fitcheq.AuthScreen
 import com.vayo.fitcheq.R
 import com.vayo.fitcheq.data.model.BodyType
@@ -43,6 +50,8 @@ import com.vayo.fitcheq.data.model.FitGuideCategory
 import com.vayo.fitcheq.data.model.FitGuideWrapper
 import com.vayo.fitcheq.data.model.HeightGroup
 import com.vayo.fitcheq.data.model.UserProfile
+import com.vayo.fitcheq.data.model.indianInstaUsers
+import com.vayo.fitcheq.data.model.instagramUsers
 import com.vayo.fitcheq.data.model.maleoccasionList
 import com.vayo.fitcheq.viewmodels.AuthViewModel
 import com.vayo.fitcheq.navigation.ScreenContainer
@@ -57,8 +66,15 @@ fun CommunityScreen(navController: NavController, authViewModel: AuthViewModel) 
     var userProfile by remember { mutableStateOf<UserProfile?>(null) }
     var fitGuide by remember { mutableStateOf<FitGuide?>(null) }
     var selectedCategory by remember { mutableStateOf<FitGuideCategory?>(null) }
-    val mytextFont = FontFamily(
-    Font(R.font.mini_text_chivo)
+    val mytextFont = FontFamily(Font(R.font.mini_text_chivo))
+    val myHeadingFont = FontFamily(
+        Font(R.font.headings_kugile)
+    )
+    val categoryImageMap = mapOf(
+        "shirts" to "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/fitguide/tshirt_shirt3.webp",
+        "pants" to "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/fitguide/pants_jeans2.webp",
+        "shoes" to "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/fitguide/shoes_footwears2.webp",
+        "jacket" to "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/fitguide/outerwear_jacket2.webp"
     )
 
     LaunchedEffect(Unit) { userProfile = authViewModel.loadUserProfileFromSharedPreferences(context) }
@@ -122,7 +138,8 @@ fun CommunityScreen(navController: NavController, authViewModel: AuthViewModel) 
                Text(
                    text = "YOUR PERSONAL FIT GUIDE",
                    fontStyle = FontStyle.Italic,
-                   fontSize = 18.sp
+                   fontWeight = FontWeight.Thin,
+                   fontSize = 16.sp
                )
                Spacer(modifier = Modifier.height(18.dp))
                //CHARACTER BODY
@@ -140,7 +157,6 @@ fun CommunityScreen(navController: NavController, authViewModel: AuthViewModel) 
                            )
                        }
                    }
-
                    // Height chip
                    userHeight?.let { height ->
                        Surface(
@@ -187,7 +203,6 @@ fun CommunityScreen(navController: NavController, authViewModel: AuthViewModel) 
                    fitGuide == null -> {
                        Text("Loading your fit guide…")
                    }
-
                    fitGuide!!.categories.isEmpty() -> {
                        Text("No categories available for your profile")
                    }
@@ -219,8 +234,15 @@ fun CommunityScreen(navController: NavController, authViewModel: AuthViewModel) 
                                }
                            }
                        }
-                       Spacer(modifier = Modifier.height(18.dp))
+                       Spacer(modifier = Modifier.height(20.dp))
 
+                       Text(
+                           text = "Outfits Guide",
+                           fontFamily = myHeadingFont,
+                           fontSize = 22.sp,
+                           fontWeight = FontWeight.Bold
+                       )
+                       Spacer(modifier = Modifier.height(10.dp))
                        //CARDS
                        Column(
                            modifier = Modifier
@@ -238,6 +260,7 @@ fun CommunityScreen(navController: NavController, authViewModel: AuthViewModel) 
                                ) {
                                    rowItems.forEach { category ->
                                        val onCardClick = { selectedCategory = category }
+                                       val imageUrl = categoryImageMap[category.id] ?: ""
 
                                        Card(
                                            modifier = Modifier
@@ -245,12 +268,12 @@ fun CommunityScreen(navController: NavController, authViewModel: AuthViewModel) 
                                                .aspectRatio(1f)
                                                .clickable(onClick = onCardClick),
                                            shape = RoundedCornerShape(0.dp),
-                                           elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                                           elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                                        ) {
                                            Box(modifier = Modifier.fillMaxSize()) {
-                                               if (category.image.startsWith("http")) {
+                                               if (imageUrl.isNotEmpty()) {
                                                    AsyncImage(
-                                                       model = category.image,
+                                                       model = imageUrl,
                                                        contentDescription = category.title,
                                                        modifier = Modifier.fillMaxSize(),
                                                        contentScale = ContentScale.Crop
@@ -262,10 +285,10 @@ fun CommunityScreen(navController: NavController, authViewModel: AuthViewModel) 
                                }
                            }
                        }
-                       Spacer(modifier = Modifier.height(18.dp))
-
                        // Show dialog only if a category is selected
                        selectedCategory?.let { category ->
+                           val dialogImageUrl = categoryImageMap[category.id] ?: ""
+
                            Dialog(onDismissRequest = { selectedCategory = null }) {
                                Card(
                                    shape = RoundedCornerShape(16.dp),
@@ -295,9 +318,9 @@ fun CommunityScreen(navController: NavController, authViewModel: AuthViewModel) 
                                        )
                                        Spacer(Modifier.height(12.dp))
 
-                                       if (category.image.startsWith("http")) {
+                                       if (dialogImageUrl.isNotEmpty()) {
                                            AsyncImage(
-                                               model = category.image,
+                                               model = dialogImageUrl,
                                                contentDescription = null,
                                                modifier = Modifier.fillMaxWidth(),
                                                contentScale = ContentScale.Crop
@@ -329,10 +352,141 @@ fun CommunityScreen(navController: NavController, authViewModel: AuthViewModel) 
                                    }
                                }
                            }
-                           Spacer(modifier = Modifier.height(18.dp))
+                       }
+                       Spacer(modifier = Modifier.height(20.dp))
+                   }
+               }
+               Text(
+                   text = "Fashion Influencers",
+                   fontFamily = myHeadingFont,
+                   fontSize = 22.sp,
+                   fontWeight = FontWeight.Bold
+               )
+               Spacer(modifier = Modifier.height(10.dp))
+               Row(
+                   modifier = Modifier
+                       .fillMaxWidth()
+                       .horizontalScroll(rememberScrollState())
+                       .padding(start = 16.dp, end = 16.dp),
+                   horizontalArrangement = Arrangement.spacedBy(12.dp)
+               ) {
+                   instagramUsers.forEach { user ->
+                       Card(
+                           colors = CardDefaults.cardColors(containerColor = Color.White),
+                           modifier = Modifier
+                               .width(130.dp)
+                               .height(160.dp)
+                               .clickable {
+                                   val intent = Intent(Intent.ACTION_VIEW, Uri.parse(user.link))
+                                   context.startActivity(intent)
+                               },
+                           shape = RoundedCornerShape(12.dp),
+                           elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                       ) {
+                           Column(
+                               modifier = Modifier
+                                   .fillMaxSize()
+                                   .padding(8.dp),
+                               horizontalAlignment = Alignment.CenterHorizontally,
+                               verticalArrangement = Arrangement.Center
+                           ) {
+                               AsyncImage(
+                                   model = user.profilePic,
+                                   contentDescription = user.username,
+                                   modifier = Modifier
+                                       .size(90.dp)
+                                       .clip(CircleShape),
+                                   contentScale = ContentScale.Crop
+                               )
+                               Spacer(modifier = Modifier.height(6.dp))
+                               Text(
+                                   text = user.name,
+                                   fontSize = 14.sp,
+                                   fontWeight = FontWeight.SemiBold,
+                                   maxLines = 1,
+                                   overflow = TextOverflow.Ellipsis
+                               )
+
+                               Text(
+                                   text = user.username,
+                                   fontSize = 12.sp,
+                                   color = Color.Gray,
+                                   maxLines = 1,
+                                   overflow = TextOverflow.Ellipsis
+                               )
+                           }
                        }
                    }
                }
+               Spacer(modifier = Modifier.height(20.dp))
+
+               Text(
+                   text = "Indian Fashion Influencers",
+                   fontFamily = myHeadingFont,
+                   fontSize = 22.sp,
+                   fontWeight = FontWeight.Bold
+               )
+               Spacer(modifier = Modifier.height(10.dp))
+               Row(
+                   modifier = Modifier
+                       .fillMaxWidth()
+                       .horizontalScroll(rememberScrollState())
+                       .padding(start = 16.dp, end = 16.dp),
+                   horizontalArrangement = Arrangement.spacedBy(12.dp)
+               ) {
+                   indianInstaUsers.forEach { user ->
+                       Card(
+                           colors = CardDefaults.cardColors(containerColor = Color.White),
+                           modifier = Modifier
+                               .width(130.dp)
+                               .height(160.dp)
+                               .clickable {
+                                   val intent = Intent(Intent.ACTION_VIEW, Uri.parse(user.link))
+                                   context.startActivity(intent)
+                               },
+                           shape = RoundedCornerShape(12.dp),
+                           elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                       ) {
+                           Column(
+                               modifier = Modifier
+                                   .fillMaxSize()
+                                   .padding(8.dp),
+                               horizontalAlignment = Alignment.CenterHorizontally,
+                               verticalArrangement = Arrangement.Center
+                           ) {
+                               AsyncImage(
+                                   ImageRequest.Builder(LocalContext.current)
+                                       .data(user.profilePic)
+                                       .size(500,500)
+                                       .build(),
+                                   contentDescription = user.username,
+                                   modifier = Modifier
+                                       .size(90.dp)
+                                       .clip(CircleShape),
+                                   contentScale = ContentScale.Crop
+                               )
+                               Spacer(modifier = Modifier.height(6.dp))
+                               Text(
+                                   text = user.name,
+                                   fontSize = 14.sp,
+                                   fontWeight = FontWeight.SemiBold,
+                                   maxLines = 1,
+                                   overflow = TextOverflow.Ellipsis
+                               )
+
+                               Text(
+                                   text = user.username,
+                                   fontSize = 12.sp,
+                                   color = Color.Gray,
+                                   maxLines = 1,
+                                   overflow = TextOverflow.Ellipsis
+                               )
+                           }
+                       }
+                   }
+               }
+
+               Spacer(modifier = Modifier.height(30.dp))
 
            }
 
