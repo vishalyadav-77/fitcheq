@@ -7,13 +7,16 @@ data class UserProfile(
     val uId: String = "",
     val name: String = "",
     val phone: String= "",
+    val email: String= "",
     val gender: String = "",
     val occupation: String = "",
     val ageGroup: AgeGroup = AgeGroup.UNSPECIFIED, // Default value
     val preferPlatform: PreferPlatform = PreferPlatform.moderate,
     val profileCompleted: Boolean = false,
     val height: HeightGroup = HeightGroup.average,
-    val bodyType: BodyType = BodyType.average
+    val bodyType: BodyType = BodyType.average,
+    val dateJoined: Long = System.currentTimeMillis(), // store as timestamp
+    val lastActive: Long = System.currentTimeMillis()  // update on login/logout
 )
 
 enum class AgeGroup(val displayName: String) {
