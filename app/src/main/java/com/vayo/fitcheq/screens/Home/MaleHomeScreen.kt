@@ -53,6 +53,7 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
 import com.vayo.fitcheq.data.model.maleSeasonList
+import com.vayo.fitcheq.ui.theme.modernShimmer
 import com.vayo.fitcheq.viewmodels.MaleHomeViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -221,11 +222,28 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                         },
                     shape = RoundedCornerShape(0.dp),
                 ) {
-                    AsyncImage(
-                        model = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/banners/ess_banner_beta.webp",
-                        contentDescription = "ESS Banner",
-                        contentScale = ContentScale.Crop
-                    )
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        var isBannerLoading by remember { mutableStateOf(true) }
+                        AsyncImage(
+                            model = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/banners/ess_banner_beta.webp",
+                            contentDescription = "ESS Banner",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize(),
+                            onLoading = { isBannerLoading = true },
+                            onSuccess = { isBannerLoading = false },
+                            onError = { isBannerLoading = false }
+                        )
+                        if (isBannerLoading) {
+                            Box(
+                                modifier = Modifier
+                                    .matchParentSize()
+                                    .modernShimmer(
+                                        isLoading = true,
+                                        cornerRadius = 0.dp
+                                    )
+                            )
+                        }
+                    }
                 }
                 Spacer(modifier = Modifier.height(30.dp))
 
@@ -274,15 +292,32 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                                     .aspectRatio(3f / 4f)
                                     .clickable(onClick = onCardClick),
                                 shape = RoundedCornerShape(12.dp),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = Color.White
+                                )
                             ) {
                                 Box(modifier = Modifier.fillMaxSize()) {
+                                    var isImageLoading by remember { mutableStateOf(true) }
                                     AsyncImage(
                                         model = season.imageUrl,
                                         contentDescription = season.title,
+                                        contentScale = ContentScale.Crop,
                                         modifier = Modifier.fillMaxSize(),
-                                        contentScale = ContentScale.Crop
+                                        onLoading = { isImageLoading = true },
+                                        onSuccess = { isImageLoading = false },
+                                        onError = { isImageLoading = false }
                                     )
+                                    if (isImageLoading) {
+                                        Box(
+                                            modifier = Modifier
+                                                .matchParentSize()
+                                                .modernShimmer(
+                                                    isLoading = true,
+                                                    cornerRadius = 0.dp
+                                                )
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -342,40 +377,57 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                                         }
                                     }
                                 }
-
                                 Card(
                                     modifier = Modifier
                                         .height(130.dp)
                                         .fillMaxWidth()
                                         .clickable(onClick = onCardClick),
                                     shape = RoundedCornerShape(0.dp),
-                                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = Color.White
+                                    )
                                 ) {
                                     Box(modifier = Modifier.fillMaxSize()) {
+                                        var isImageLoading by remember { mutableStateOf(true) }
                                         AsyncImage(
                                             model = category.imageUrl,
                                             contentDescription = category.title,
                                             modifier = Modifier.fillMaxSize(),
-                                            contentScale = ContentScale.Crop
+                                            contentScale = ContentScale.Crop,
+                                            onLoading = { isImageLoading = true },
+                                            onSuccess = { isImageLoading = false },
+                                            onError = { isImageLoading = false }
                                         )
-
-                                        Text(
-                                            text = category.title,
-                                            fontSize = 11.sp,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = Color.White,
-                                            modifier = Modifier
-                                                .align(Alignment.BottomStart)
-                                                .padding(8.dp)
-                                                .background(
-                                                    color = Color.Black.copy(alpha = 0.6f),
-                                                    shape = RoundedCornerShape(6.dp)
-                                                )
-                                                .padding(
-                                                    horizontal = 6.dp,
-                                                    vertical = 2.dp
-                                                ) // internal padding inside bg
-                                        )
+                                        if (isImageLoading) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .matchParentSize()
+                                                    .modernShimmer(
+                                                        isLoading = true,
+                                                        cornerRadius = 0.dp
+                                                    )
+                                            )
+                                        }
+                                        else {
+                                            Text(
+                                                text = category.title,
+                                                fontSize = 11.sp,
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = Color.White,
+                                                modifier = Modifier
+                                                    .align(Alignment.BottomStart)
+                                                    .padding(8.dp)
+                                                    .background(
+                                                        color = Color.Black.copy(alpha = 0.6f),
+                                                        shape = RoundedCornerShape(6.dp)
+                                                    )
+                                                    .padding(
+                                                        horizontal = 6.dp,
+                                                        vertical = 2.dp
+                                                    ) // internal padding inside bg
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -430,32 +482,50 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                                 .height(150.dp)
                                 .clickable(onClick = onCardClick),
                             shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color.White
+                            )
                         ) {
                             Box(modifier = Modifier.fillMaxSize()) {
+                                var isImageLoading by remember { mutableStateOf(true) }
                                 AsyncImage(
                                     model = occasion.imageUrl,
                                     contentDescription = occasion.title,
                                     modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Crop
+                                    contentScale = ContentScale.Crop,
+                                    onLoading = { isImageLoading = true },
+                                    onSuccess = { isImageLoading = false },
+                                    onError = { isImageLoading = false }
                                 )
-
-                                Text(
-                                    text = occasion.title,
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = Color.White,
-                                    modifier = Modifier
-                                        .align(Alignment.BottomStart)
-                                        .padding(8.dp)
-                                        .background(
-                                            color = Color.Black.copy(alpha = 0.6f),
-                                            shape = RoundedCornerShape(6.dp)
-                                        )
-                                        .padding(
-                                            horizontal = 8.dp,
-                                            vertical = 4.dp
-                                        ) // internal padding inside bg
-                                )
+                                if (isImageLoading) {
+                                    Box(
+                                        modifier = Modifier
+                                            .matchParentSize()
+                                            .modernShimmer(
+                                                isLoading = true,
+                                                cornerRadius = 0.dp
+                                            )
+                                    )
+                                }
+                                else {
+                                    Text(
+                                        text = occasion.title,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = Color.White,
+                                        modifier = Modifier
+                                            .align(Alignment.BottomStart)
+                                            .padding(8.dp)
+                                            .background(
+                                                color = Color.Black.copy(alpha = 0.6f),
+                                                shape = RoundedCornerShape(6.dp)
+                                            )
+                                            .padding(
+                                                horizontal = 8.dp,
+                                                vertical = 4.dp
+                                            ) // internal padding inside bg
+                                    )
+                                }
                             }
                         }
                     }
@@ -503,7 +573,6 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                                 }
                             }
                         }
-
                         Card(
                             modifier = Modifier
                                 .width(180.dp)
@@ -514,13 +583,27 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                             elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                         ) {
                             Box(modifier = Modifier.fillMaxSize().padding(4.dp)) {
+                                var isImageLoading by remember { mutableStateOf(true) }
                                 AsyncImage(
                                     model = fashion.imageUrl,
                                     contentDescription = fashion.title,
                                     modifier = Modifier.fillMaxSize()
                                         .clip(RoundedCornerShape(12.dp)),
-                                    contentScale = ContentScale.Crop
+                                    contentScale = ContentScale.Crop,
+                                    onLoading = { isImageLoading = true },
+                                    onSuccess = { isImageLoading = false },
+                                    onError = { isImageLoading = false }
                                 )
+                                if (isImageLoading) {
+                                    Box(
+                                        modifier = Modifier
+                                            .matchParentSize()
+                                            .modernShimmer(
+                                                isLoading = true,
+                                                cornerRadius = 0.dp
+                                            )
+                                    )
+                                }
                             }
                         }
                     }
@@ -569,8 +652,6 @@ fun HomeImageCarousel(
             }
         }
     }
-
-
     Box(
         modifier = modifier.fillMaxWidth()
     ) {
