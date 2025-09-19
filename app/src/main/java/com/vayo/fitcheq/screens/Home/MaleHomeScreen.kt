@@ -209,7 +209,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                             navController.navigate(
                                 AuthScreen.OutfitDetails.createRoute(
                                     "male",
-                                    "tags",
+                                    "style",
                                     "essentials"
                                 )
                             ) {
