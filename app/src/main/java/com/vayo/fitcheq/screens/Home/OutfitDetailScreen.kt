@@ -106,12 +106,16 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
     val currentUser = FirebaseAuth.getInstance().currentUser
     // Local loading state to show immediately
     var isInitialLoading by remember { mutableStateOf(true) }
+    // 🔹 State for selected category
+    var filters by remember { mutableStateOf(Filters()) }
 
     // Clear previous data and start loading immediately
     LaunchedEffect(gender, fieldName, fieldValue) {
+        filters = Filters()
         isInitialLoading = true
         // Clear previous outfits to prevent showing old content
         viewModel.clearOutfits()
+        viewModel.fetchAvailableFilters(gender,fieldName,fieldValue)
         viewModel.fetchOutfitsByFieldAndGender(context,fieldName, fieldValue, gender)
         isInitialLoading = false
     }
@@ -126,28 +130,22 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
     val isLoading = viewModel.isLoading.collectAsState().value
     val error = viewModel.error.collectAsState().value
 
-    // 🔹 Extract unique categories from outfits
-    val categories = remember(outfits) {
-        outfits.mapNotNull { it.category }
-            .distinct() }
-    val brands = remember(outfits){
-        outfits.mapNotNull { it.website }
-            .distinct() }
-    val colors = remember(outfits){
-        outfits.mapNotNull { it.color }
-            .filter { it.isNotBlank() }
-            .distinct() }
-    val types = remember(outfits){
-        outfits.mapNotNull { it.type }
-            .filter { it.isNotBlank() }
-            .distinct() }
-    val fits = remember(outfits){
-        outfits.mapNotNull { it.fit }
-            .filter { it.isNotBlank() }
-            .distinct() }
+    val availableFilters = viewModel.availableFilters.collectAsState().value
 
-    // 🔹 State for selected category
-    var filters by remember { mutableStateOf(Filters()) }
+    val categories = availableFilters.categories.toList()
+    val brands = availableFilters.brands.toList()
+    val colors = availableFilters.colors.toList()
+    val fits = availableFilters.fits.toList()
+    val types = availableFilters.types.toList()
+
+    // Add this helper function to check if any filters are applied
+    val hasActiveFilters = filters.categories.isNotEmpty() ||
+            filters.websites.isNotEmpty() ||
+            filters.colors.isNotEmpty() ||
+            filters.fits.isNotEmpty() ||
+            filters.type != null ||
+            filters.priceRange != 0f..20000f // assuming default range
+
     // 🔹 Filtered outfits if a filter is selected
     val filteredOutfits = remember(outfits, filters) {
         outfits.filter { outfit ->
@@ -176,11 +174,7 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
             matchCategory && matchBrand && matchColor && matchType && matchPrice && matchFit
         }
     }
-    LaunchedEffect(categories) {
-        if (categories.size == 1) {
-            filters = filters.copy(categories = setOf(categories.first()))
-        }
-    }
+
     // Pagination
     val gridState = rememberLazyGridState()
     LaunchedEffect(gridState, filteredOutfits.size, isLoading) {
@@ -203,10 +197,13 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
 
     val filterTypes by remember(categories) {
         mutableStateOf(
-            if (categories.isNotEmpty() && categories.size > 1)
-                listOf("Category", "Brand", "Color", "Price")
-            else
-                listOf("Category", "Brand", "Color", "Price", "Fit")
+            if (categories.isNotEmpty() && categories.size > 1){
+                listOf("Category", "Brand", "Color", "Price")}
+            else if (categories.size == 1) {
+                // Single category - hide Category filter, show Fit
+                listOf("Brand", "Color", "Price", "Fit")
+            }else{
+                listOf("Category", "Brand", "Color", "Price", "Fit")}
         )
     }
     // Ensure selectedFilter stays valid if filterTypes changes
@@ -216,7 +213,7 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
 
     val categoryMaxMap = mapOf(
         "accessories" to 2000f,
-        "tshirt" to 5000f,
+        "tshirt" to 20000f,
         "shirt" to 10000f
     )
     val maxPriceLimit by remember(filters.categories) {
@@ -278,85 +275,85 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
             }
 
             // 🔹 Category chips
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 5.dp),
-                    verticalAlignment = Alignment.CenterVertically
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 5.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Surface(modifier = Modifier.padding(end = 6.dp),
+                    onClick = { showSheet = true },
+                    shape = FilterChipDefaults.shape,
+                    color = Color.Black,
+                    border = BorderStroke(0.3.dp, Color.Black),
                 ) {
-                    Surface(modifier = Modifier.padding(end = 6.dp),
-                        onClick = { showSheet = true },
-                        shape = FilterChipDefaults.shape,
-                        color = Color.Black,
-                        border = BorderStroke(0.3.dp, Color.Black),
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.filter_icon),
-                                contentDescription = "Filter icon",
-                                modifier = Modifier.size(18.dp),
-                                tint = Color.White
-                            )
-                            Spacer(modifier = Modifier.width(6.dp)) // small gap between icon and text
-                            Text(
-                                text = "Filter",
-                                color = Color.White,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-                    }
-
-                    LazyRow(
-                        modifier = Modifier.weight(1f),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        contentPadding = PaddingValues(start = 8.dp, end = 10.dp)
-                    ) {
-                        val listToShow = if (categories.isNotEmpty() && categories.size > 1) categories else types
-                        val isCategoryList = categories.isNotEmpty() && categories.size > 1
-
-                        items(listToShow) { item ->
-                            val chipTitle = item.replaceFirstChar { it.uppercase() }
-                            val isSelected = if (isCategoryList) filters.categories.contains(item)
-                            else filters.type?.contains(item) == true // or however you store type filter
-
-                            FilterChip(
-                                selected = isSelected,
-                                onClick = {
-                                    filters = if (isCategoryList) {
-                                        filters.copy(
-                                            categories = if (isSelected) filters.categories - item
-                                            else filters.categories + item
-                                        )
-                                    } else {
-                                        filters.copy(
-                                            type = if (isSelected) null else item // assuming only one type can be selected
-                                        )
-                                    }
-                                },
-                                label = {
-                                    Text(
-                                        text = if (isSelected) "$chipTitle ✕" else chipTitle,
-                                        color = if (isSelected) Color.White else Color.Black
-                                    )
-                                },
-                                border = FilterChipDefaults.filterChipBorder(
-                                    enabled = true,
-                                    selected = isSelected,
-                                    borderWidth = 0.3.dp,
-                                    selectedBorderWidth = 0.3.dp
-                                ),
-                                colors = FilterChipDefaults.filterChipColors(
-                                    containerColor = Color.Transparent,
-                                    selectedContainerColor = Color.Black
-                                )
-                            )
-                        }
+                        Icon(
+                            painter = painterResource(R.drawable.filter_icon),
+                            contentDescription = "Filter icon",
+                            modifier = Modifier.size(18.dp),
+                            tint = Color.White
+                        )
+                        Spacer(modifier = Modifier.width(6.dp)) // small gap between icon and text
+                        Text(
+                            text = "Filter",
+                            color = Color.White,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium
+                        )
                     }
                 }
+
+                LazyRow(
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(start = 8.dp, end = 10.dp)
+                ) {
+                    val listToShow = if (categories.isNotEmpty() && categories.size > 1) categories else types
+                    val isCategoryList = categories.isNotEmpty() && categories.size > 1
+
+                    items(listToShow) { item ->
+                        val chipTitle = item.replaceFirstChar { it.uppercase() }
+                        val isSelected = if (isCategoryList) filters.categories.contains(item)
+                        else filters.type?.contains(item) == true // or however you store type filter
+
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = {
+                                filters = if (isCategoryList) {
+                                    filters.copy(
+                                        categories = if (isSelected) filters.categories - item
+                                        else filters.categories + item
+                                    )
+                                } else {
+                                    filters.copy(
+                                        type = if (isSelected) null else item // assuming only one type can be selected
+                                    )
+                                }
+                            },
+                            label = {
+                                Text(
+                                    text = if (isSelected) "$chipTitle ✕" else chipTitle,
+                                    color = if (isSelected) Color.White else Color.Black
+                                )
+                            },
+                            border = FilterChipDefaults.filterChipBorder(
+                                enabled = true,
+                                selected = isSelected,
+                                borderWidth = 0.3.dp,
+                                selectedBorderWidth = 0.3.dp
+                            ),
+                            colors = FilterChipDefaults.filterChipColors(
+                                containerColor = Color.Transparent,
+                                selectedContainerColor = Color.Black
+                            )
+                        )
+                    }
+                }
+            }
 
             HorizontalDivider(
                 modifier = Modifier
@@ -392,6 +389,42 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                             color = Color.Red,
                             modifier = Modifier.padding(16.dp)
                         )
+                    }
+                }
+                hasActiveFilters && filteredOutfits.isEmpty() && !isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "No products found",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color.Gray
+                            )
+                            Text(
+                                text = "for selected filters",
+                                fontSize = 14.sp,
+                                color = Color.Gray,
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+                            OutlinedButton(
+                                onClick = {
+                                    filters = Filters()
+                                    viewModel.fetchFilteredOutfits(context, fieldName, fieldValue, gender, filters)
+                                },
+                                modifier = Modifier.padding(top = 16.dp),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = Color.Black
+                                )
+                            ) {
+                                Text("Clear Filters")
+                            }
+                        }
                     }
                 }
                 outfits.isEmpty() -> {
@@ -481,8 +514,11 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                                             .padding(horizontal = 4.dp),
                                         verticalArrangement = Arrangement.spacedBy(2.dp)
                                     ) {
+                                        val formattedTitle = outfit.title
+                                            .split(" ")
+                                            .joinToString(" ") { word -> word.replaceFirstChar { it.uppercase() } }
                                         Text(
-                                            text = outfit.title,
+                                            text = formattedTitle,
                                             fontWeight = FontWeight.SemiBold,
                                             fontSize = 14.sp,
                                             maxLines = 1,
@@ -505,7 +541,7 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                                             horizontalArrangement = Arrangement.End
                                         ) {
                                             Text(
-                                                text = outfit.website,
+                                                text = outfit.website.toUpperCase(),
                                                 fontSize = 12.sp,
                                                 fontStyle = FontStyle.Italic,
                                                 color = Color.DarkGray
@@ -621,17 +657,14 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                                         )
                                     }
                                     items(brands) { brand ->
+                                        val brandTitle = brand.replaceFirstChar { it.uppercase() }
                                         CategoryRow(
-                                            text = brand,
+                                            text = brandTitle,
                                             isSelected = filters.websites.contains(brand),
                                             onSelectedChange = { selected ->
-                                                filters = filters.copy(
-                                                    websites = if (selected) {
-                                                        filters.websites + brand
-                                                    } else {
-                                                        filters.websites - brand
-                                                    }
-                                                )
+                                                filters = filters.copy(websites = if(selected) filters.websites + brand else filters.websites - brand)
+                                                viewModel.fetchFilteredOutfits(context, fieldName, fieldValue, gender, filters)
+
                                             }
                                         )
                                     }
@@ -737,6 +770,7 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                             colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.Transparent,   contentColor = Color.Black),
                             onClick = {
                                 filters = Filters()
+                                viewModel.fetchFilteredOutfits(context, fieldName, fieldValue, gender, filters)
                             },
                             shape = RoundedCornerShape(8.dp)
                         ) {
