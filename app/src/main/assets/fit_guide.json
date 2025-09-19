@@ -959,7 +959,575 @@
           "proTip": "Open jacket with darker inner shirt creates vertical slimming effect"
         }
       ]
+    },
+
+
+    {
+        "gender": "female",
+        "height": "very_tall",
+        "bodyType": "slim",
+        "chips": ["Layering Adds Volume", "Horizontal Patterns Break Height", "Wide-Leg Pants Balance Proportions", "Chunky Footwear Works Well"],
+        "categories": [
+          {
+            "id": "tops",
+            "title": "Tops & Blouses",
+            "summary": "Add width and visual interest to slim frame",
+            "details": [
+              "Horizontal stripes, ruffles, or puff sleeves add volume",
+              "Layering with cardigans or open shirts broadens torso",
+              "Avoid clingy thin fabrics that exaggerate height"
+            ],
+            "proTip": "Thicker fabrics and structured tops help balance tall, slim frames"
+          },
+          {
+            "id": "bottoms",
+            "title": "Pants & Skirts",
+            "summary": "Balance long legs and slim hips",
+            "details": [
+              "Wide-leg or straight pants prevent overly lanky look",
+              "A-line skirts add volume to lower half",
+              "Mid-rise bottoms keep proportions natural"
+            ],
+            "proTip": "Two-tone outfits (dark top, lighter bottoms) visually break height"
+          },
+          {
+            "id": "shoes",
+            "title": "Shoes & Footwear",
+            "summary": "Ground tall frame and add balance",
+            "details": [
+              "Chunky sneakers, boots, or loafers balance height",
+              "Avoid overly slim shoes that elongate legs further",
+              "Mid-heeled shoes work better than flats for proportion"
+            ],
+            "proTip": "Contrast-colored shoes can help break vertical dominance"
+          },
+          {
+            "id": "outerwear",
+            "title": "Outerwear & Jackets",
+            "summary": "Use jackets to add width and proportion",
+            "details": [
+              "Cropped blazers or jackets balance long torso",
+              "Avoid extra-long coats that emphasize height",
+              "Layering with cardigans or shackets adds upper-body bulk"
+            ],
+            "proTip": "Structured jackets with shoulder detail enhance shape"
+          }
+        ]
+      },
+    {
+        "gender": "female",
+        "height": "tall",
+        "bodyType": "slim",
+        "chips": ["Layering Adds Width", "Bold Patterns Break Vertical Flow", "Structured Jackets Build Shape", "Wide-Leg Bottoms Balance Legs", "Avoid Longline Skinny Fits"],
+        "categories": [
+          {
+            "id": "tops",
+            "title": "Tops & Blouses",
+            "summary": "Add width to torso to avoid lanky look",
+            "details": [
+              "Layer with cardigans, cropped jackets, or button-down shirts",
+              "Horizontal stripes or bold prints add visual weight",
+              "Avoid long clingy tops that stretch the torso"
+            ],
+            "proTip": "Heavier fabrics like structured cotton or linen add shape"
+          },
+          {
+            "id": "bottoms",
+            "title": "Pants & Skirts",
+            "summary": "Balance leg length with wider cuts",
+            "details": [
+              "Straight-leg, bootcut, or wide-leg pants create proportion",
+              "Mid-rise skirts or trousers balance torso and legs",
+              "Avoid super-skinny bottoms that exaggerate length"
+            ],
+            "proTip": "Slightly cropped or ankle-grazing hems prevent endless-leg effect"
+          },
+          {
+            "id": "shoes",
+            "title": "Shoes & Footwear",
+            "summary": "Ground height with moderate bulk",
+            "details": [
+              "Chunky sneakers, mid-heeled boots, or platform shoes add balance",
+              "Avoid ultra-slim flats that stretch legs visually",
+              "Contrast or textured shoes break vertical flow"
+            ],
+            "proTip": "Heeled boots can anchor proportions nicely without overdoing height"
+          },
+          {
+            "id": "outerwear",
+            "title": "Outerwear & Jackets",
+            "summary": "Structured layers broaden shoulders and torso",
+            "details": [
+              "Blazers, cropped jackets, and shackets add upper-body width",
+              "Avoid longline coats that drag height",
+              "Layering light sweaters under jackets increases bulk subtly"
+            ],
+            "proTip": "Single-breasted jackets with lapel or shoulder detail enhance shape"
+          }
+        ]
+      },
+    {
+        "gender": "female",
+        "height": "average",
+        "bodyType": "slim",
+        "chips": ["Monochrome Adds Height", "Vertical Lines Elongate", "Structured Fabrics Add Bulk", "Avoid Oversized Tops"],
+        "categories": [
+          {
+            "id": "tops",
+            "title": "Tops & Blouses",
+            "summary": "Slim but structured tops elongate torso",
+            "details": [
+              "Vertical stripes or solid colors elongate frame",
+              "Fitted tops with slight texture add volume",
+              "Keep tops ending at hip or slightly below"
+            ],
+            "proTip": "Tuck tops into high-rise bottoms to lengthen legs visually"
+          },
+          {
+            "id": "bottoms",
+            "title": "Pants & Skirts",
+            "summary": "Enhance leg line without excessive volume",
+            "details": [
+              "Slim-straight or tapered pants elongate legs",
+              "Mid/high-rise skirts or pants maintain proportions",
+              "Avoid cuffs or cropped lengths that shorten legs"
+            ],
+            "proTip": "Dark slim pants with matching shoes create continuous leg line"
+          },
+          {
+            "id": "shoes",
+            "title": "Shoes & Footwear",
+            "summary": "Keep footwear sleek and elongating",
+            "details": [
+              "Low heels or pointed flats extend leg line",
+              "Match shoe color to pants for vertical continuity",
+              "Avoid chunky footwear that cuts off leg flow"
+            ],
+            "proTip": "Subtle heeled sneakers or loafers balance proportions"
+          },
+          {
+            "id": "outerwear",
+            "title": "Outerwear & Jackets",
+            "summary": "Cropped structured jackets add shape",
+            "details": [
+              "Bomber, cropped denim, or fitted blazers work best",
+              "Avoid oversized or longline coats that compress frame",
+              "Layer in tonal shades to elongate torso"
+            ],
+            "proTip": "Keep jackets ending at or just above hip for best leg effect"
+          }
+        ]
+      },
+    {
+      "gender": "female",
+      "height": "short",
+      "bodyType": "slim",
+      "chips": [
+        "Monochrome Outfits Elongate Frame",
+        "High-Waist Pants/Skirts Lengthen Legs",
+        "Vertical Lines Create Height Illusion",
+        "Cropped Jackets & Tops Keep Proportions",
+        "Avoid Baggy or Oversized Clothing"
+      ],
+      "categories": [
+        {
+          "id": "tops",
+          "title": "Tops & Blouses",
+          "summary": "Keep torso slim and elongated",
+          "details": [
+            "Fitted tops or slightly cropped styles avoid drowning frame",
+            "Vertical stripes or V-necklines elongate torso",
+            "Avoid bulky or oversized tops that shorten appearance"
+          ],
+          "proTip": "Tuck tops into high-waist bottoms to visually lengthen legs"
+        },
+        {
+          "id": "bottoms",
+          "title": "Pants, Jeans & Skirts",
+          "summary": "Lengthen legs and balance proportions",
+          "details": [
+            "High-waist pants, straight or slim cuts elongate legs",
+            "A-line or pencil skirts create streamlined lower body",
+            "Avoid overly baggy or long bottoms that cut height"
+          ],
+          "proTip": "Pointed-toe shoes or heels in same color as bottoms extend leg line"
+        },
+        {
+          "id": "shoes",
+          "title": "Shoes & Footwear",
+          "summary": "Add subtle height without bulk",
+          "details": [
+            "Pointed flats, heels, or low-heeled boots elongate legs",
+            "Avoid overly chunky or platform shoes that overwhelm frame",
+            "Match shoe color to pants/skirts for vertical flow"
+          ],
+          "proTip": "Nude or tonal shoes visually extend legs, especially with skirts or cropped pants"
+        },
+        {
+          "id": "outerwear",
+          "title": "Jackets & Coats",
+          "summary": "Keep jackets cropped and proportionate",
+          "details": [
+            "Cropped jackets, short blazers, or boleros maintain balance",
+            "Avoid longline coats or boxy styles that shorten frame",
+            "Lightweight layering prevents looking bulky"
+          ],
+          "proTip": "End jackets at waist or hip to preserve leg length visually"
+        }
+      ]
+    },
+
+    {
+      "gender": "female",
+      "height": "tall",
+      "bodyType": "plus_size",
+      "chips": [
+        "Accentuate Waist & Curves",
+        "Layer Smartly to Avoid Bulk",
+        "V-Neck or Scoop Necklines Flatter Upper Body",
+        "Balance Proportions with Bottoms",
+        "Structured Clothing Prevents Slouching"
+      ],
+      "categories": [
+        {
+          "id": "tops",
+          "title": "Tops & Blouses",
+          "summary": "Highlight waist and avoid long torso overwhelm",
+          "details": [
+            "Wrap tops or belted shirts define waist",
+            "V-necklines elongate neck without adding bulk",
+            "Avoid shapeless or overly long tops that hide figure"
+          ],
+          "proTip": "Pair tops with mid-rise bottoms to maintain proportion"
+        },
+        {
+          "id": "bottoms",
+          "title": "Pants, Jeans & Skirts",
+          "summary": "Create balance between legs and torso",
+          "details": [
+            "Straight or wide-leg pants balance long legs",
+            "High-waist bottoms enhance torso proportion",
+            "A-line or midi skirts maintain visual balance"
+          ],
+          "proTip": "Avoid overly tight bottoms that exaggerate height"
+        },
+        {
+          "id": "shoes",
+          "title": "Shoes & Footwear",
+          "summary": "Comfortable heels or flats without exaggerating height",
+          "details": [
+            "Block heels or stylish flats maintain elegance",
+            "Avoid extremely high heels unless for formal styling",
+            "Match shoes to pants or skirts for visual harmony"
+          ],
+          "proTip": "Neutral or tonal shoes maintain a clean leg line"
+        },
+        {
+          "id": "outerwear",
+          "title": "Jackets & Coats",
+          "summary": "Structured jackets to define torso",
+          "details": [
+            "Long blazers or tailored coats balance height",
+            "Avoid boxy or shapeless layers that add bulk",
+            "Lightweight fabrics prevent slouching"
+          ],
+          "proTip": "Belted coats emphasize waist and add shape"
+        }
+      ]
+    },
+    {
+      "gender": "female",
+      "height": "average",
+      "bodyType": "plus_size",
+      "chips": [
+        "Define Waist to Create Shape",
+        "Balance Upper & Lower Body",
+        "Avoid Overly Baggy Clothing",
+        "Structured Layers Prevent Bulk",
+        "V-Necklines Flatter Upper Body"
+      ],
+      "categories": [
+        {
+          "id": "tops",
+          "title": "Tops & Blouses",
+          "summary": "Highlight waist and upper body without adding bulk",
+          "details": [
+            "Wrap tops or belted shirts emphasize waist",
+            "V-neck or scoop neck elongates upper body",
+            "Avoid shapeless, oversized tops that hide curves"
+          ],
+          "proTip": "Pair tops with mid-rise or high-waist bottoms for proportion"
+        },
+        {
+          "id": "bottoms",
+          "title": "Pants, Jeans & Skirts",
+          "summary": "Balance torso and legs",
+          "details": [
+            "Straight or slightly flared pants create proportional legs",
+            "High-waist skirts/pants enhance waist definition",
+            "A-line or midi skirts maintain visual balance"
+          ],
+          "proTip": "Avoid overly tight bottoms that exaggerate body bulk"
+        },
+        {
+          "id": "shoes",
+          "title": "Shoes & Footwear",
+          "summary": "Comfortable and proportionate",
+          "details": [
+            "Low to medium heels or flats maintain elegance",
+            "Avoid very high heels unless for special styling",
+            "Match shoes to pants or skirts for visual harmony"
+          ],
+          "proTip": "Neutral shoes create a smooth leg line"
+        },
+        {
+          "id": "outerwear",
+          "title": "Jackets & Coats",
+          "summary": "Structured jackets to define torso",
+          "details": [
+            "Tailored or belted jackets add shape",
+            "Avoid boxy or shapeless layers that add bulk",
+            "Lightweight fabrics prevent heaviness"
+          ],
+          "proTip": "Belted coats naturally emphasize waist"
+        }
+      ]
+    },
+    {
+      "gender": "female",
+      "height": "short",
+      "bodyType": "plus_size",
+      "chips": [
+        "Vertical Patterns Slim & Lengthen",
+        "High-Waist Bottoms Define Waist",
+        "Structured Layers Avoid Bulk",
+        "V-Necks Elongate Neck & Torso",
+        "Avoid Overly Baggy or Boxy Clothing"
+      ],
+      "categories": [
+        {
+          "id": "tops",
+          "title": "Tops & Blouses",
+          "summary": "Slim torso and highlight waist",
+          "details": [
+            "V-necklines or slightly fitted tops elongate upper body",
+            "Wrap or belted tops emphasize waistline",
+            "Avoid shapeless, oversized tops that hide figure"
+          ],
+          "proTip": "Tuck tops into high-waist bottoms for a streamlined silhouette"
+        },
+        {
+          "id": "bottoms",
+          "title": "Pants, Jeans & Skirts",
+          "summary": "Lengthen legs and balance proportions",
+          "details": [
+            "High-waist pants and straight or slightly flared cuts elongate legs",
+            "A-line skirts skim hips without adding bulk",
+            "Avoid low-rise or extremely wide bottoms that shorten height"
+          ],
+          "proTip": "Choose monochrome or tonal bottoms to create vertical flow"
+        },
+        {
+          "id": "shoes",
+          "title": "Shoes & Footwear",
+          "summary": "Add height without heavy appearance",
+          "details": [
+            "Pointed heels or nude flats elongate legs",
+            "Avoid chunky platforms that overwhelm short frame",
+            "Keep color consistent with bottoms for visual continuity"
+          ],
+          "proTip": "Low block heels or wedges give comfort and subtle lift"
+        },
+        {
+          "id": "outerwear",
+          "title": "Jackets & Coats",
+          "summary": "Structured and cropped works best",
+          "details": [
+            "Cropped blazers or jackets hit at waist for proportion",
+            "Avoid boxy, longline coats that shorten torso",
+            "Lightweight fabrics prevent bulky silhouette"
+          ],
+          "proTip": "Belts or tie-waist coats emphasize shape without sacrificing height"
+        }
+      ]
+    },
+
+    {
+      "gender": "female",
+      "height": "tall",
+      "bodyType": "average",
+      "chips": [
+        "Balance Upper & Lower Body",
+        "Elongate Neck & Torso",
+        "Structured Layers Prevent Slouching",
+        "High-Waist Bottoms Add Proportion",
+        "Avoid Oversized or Baggy Clothing"
+      ],
+      "categories": [
+        {
+          "id": "tops",
+          "title": "Tops & Blouses",
+          "summary": "Maintain proportion and elongate torso",
+          "details": [
+            "Fitted or slightly tapered tops balance upper body",
+            "V-neck or scoop neck elongates neck naturally",
+            "Avoid oversized, shapeless tops that hide figure"
+          ],
+          "proTip": "Tuck tops slightly into mid or high-waist bottoms"
+        },
+        {
+          "id": "bottoms",
+          "title": "Pants, Jeans & Skirts",
+          "summary": "Balance long legs without exaggerating height",
+          "details": [
+            "Straight or slightly flared pants create balance",
+            "Midi skirts or high-waist skirts maintain proportion",
+            "Avoid extremely wide or baggy pants that reduce elegance"
+          ],
+          "proTip": "Pointed shoes or tonal footwear create a smooth line"
+        },
+        {
+          "id": "shoes",
+          "title": "Shoes & Footwear",
+          "summary": "Stylish yet proportionate",
+          "details": [
+            "Low to medium heels or flats maintain elegance",
+            "Avoid heavy platforms that overwhelm frame",
+            "Match shoe color to outfit for streamlined look"
+          ],
+          "proTip": "Neutral shoes visually elongate legs without exaggeration"
+        },
+        {
+          "id": "outerwear",
+          "title": "Jackets & Coats",
+          "summary": "Structured and tailored layers",
+          "details": [
+            "Long blazers, trench coats, or tailored jackets define shape",
+            "Avoid shapeless or overly baggy coats",
+            "Lightweight fabrics prevent heaviness"
+          ],
+          "proTip": "Belted jackets or coats add waist definition naturally"
+        }
+      ]
+    },
+    {
+      "gender": "female",
+      "height": "average",
+      "bodyType": "average",
+      "chips": [
+        "Balance Upper & Lower Body",
+        "Structured Layers Add Shape",
+        "Avoid Oversized or Baggy Clothing",
+        "High-Waist Bottoms Maintain Proportion",
+        "V-Necks or Scoop Necks Flatter Upper Body"
+      ],
+      "categories": [
+        {
+          "id": "tops",
+          "title": "Tops & Blouses",
+          "summary": "Maintain proportion and elongate torso",
+          "details": [
+            "Fitted or slightly tapered tops balance frame",
+            "V-neck or scoop neck elongates neck naturally",
+            "Avoid oversized tops that hide figure"
+          ],
+          "proTip": "Tuck tops slightly into mid or high-waist bottoms"
+        },
+        {
+          "id": "bottoms",
+          "title": "Pants, Jeans & Skirts",
+          "summary": "Balance torso and legs proportionally",
+          "details": [
+            "Straight, slim, or slightly flared pants create harmony",
+            "Midi or high-waist skirts maintain body balance",
+            "Avoid extremely wide or baggy pants that reduce elegance"
+          ],
+          "proTip": "Pointed shoes or tonal footwear create smooth leg line"
+        },
+        {
+          "id": "shoes",
+          "title": "Shoes & Footwear",
+          "summary": "Stylish yet proportionate",
+          "details": [
+            "Low to medium heels or flats maintain elegance",
+            "Avoid heavy or chunky platforms",
+            "Match shoe color to outfit for streamlined look"
+          ],
+          "proTip": "Neutral shoes visually elongate legs"
+        },
+        {
+          "id": "outerwear",
+          "title": "Jackets & Coats",
+          "summary": "Structured layers for proportion",
+          "details": [
+            "Tailored jackets, trench coats, or blazers define shape",
+            "Avoid shapeless or overly baggy coats",
+            "Lightweight fabrics prevent heaviness"
+          ],
+          "proTip": "Belted jackets naturally add waist definition"
+        }
+      ]
+    },
+    {
+      "gender": "female",
+      "height": "short",
+      "bodyType": "average",
+      "chips": [
+        "High-Waist Bottoms Elongate Legs",
+        "Cropped Jackets Keep Proportions",
+        "Vertical Patterns Add Height Illusion",
+        "Monochrome Outfits Streamline Silhouette",
+        "Avoid Oversized or Baggy Clothing"
+      ],
+      "categories": [
+        {
+          "id": "tops",
+          "title": "Tops & Blouses",
+          "summary": "Elongate torso and define waist",
+          "details": [
+            "Fitted tops or cropped styles balance frame",
+            "V-neck or scoop necklines elongate neck",
+            "Avoid overly loose tops that reduce perceived height"
+          ],
+          "proTip": "Tuck into high-waist bottoms for a taller appearance"
+        },
+        {
+          "id": "bottoms",
+          "title": "Pants, Jeans & Skirts",
+          "summary": "Streamline legs and balance body",
+          "details": [
+            "High-waist, straight, or slim pants lengthen legs",
+            "A-line skirts maintain proportion without adding bulk",
+            "Avoid wide-legged or baggy pants that cut height"
+          ],
+          "proTip": "Pointed shoes or tonal footwear visually extend legs"
+        },
+        {
+          "id": "shoes",
+          "title": "Shoes & Footwear",
+          "summary": "Enhance height subtly",
+          "details": [
+            "Low heels, pointed flats, or boots elongate legs",
+            "Avoid clunky or platform-heavy shoes",
+            "Match shoes with pants/skirt color for smooth line"
+          ],
+          "proTip": "Nude or tonal shoes visually add height with skirts or cropped pants"
+        },
+        {
+          "id": "outerwear",
+          "title": "Jackets & Coats",
+          "summary": "Cropped, light layers for proportion",
+          "details": [
+            "Cropped blazers or jackets maintain height ratio",
+            "Avoid overly long or boxy coats",
+            "Lightweight fabrics prevent heaviness"
+          ],
+          "proTip": "End jackets at waist or slightly above hip for visual balance"
+        }
+      ]
     }
+
+
 
 
   ]
