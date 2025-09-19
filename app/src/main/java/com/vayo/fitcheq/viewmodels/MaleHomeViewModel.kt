@@ -2,8 +2,6 @@ package com.vayo.fitcheq.viewmodels
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import coil.ImageLoader
@@ -14,7 +12,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
+import com.vayo.fitcheq.data.model.AppliedFilters
+import com.vayo.fitcheq.data.model.AvailableFilters
+import com.vayo.fitcheq.data.model.Filters
 import com.vayo.fitcheq.data.model.OutfitData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,13 +27,13 @@ class MaleHomeViewModel: ViewModel() {
     private val firestore = FirebaseFirestore.getInstance()
     private val _outfits = MutableStateFlow<List<OutfitData>>(emptyList())
     val outfits: StateFlow<List<OutfitData>> = _outfits
-    
+
     private val _savedOutfits = MutableStateFlow<List<OutfitData>>(emptyList())
     val savedOutfits: StateFlow<List<OutfitData>> = _savedOutfits
-    
+
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
-    
+
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
@@ -44,6 +46,14 @@ class MaleHomeViewModel: ViewModel() {
     private var lastVisibleDoc: DocumentSnapshot? = null
     private var isLastPageReached = false
     private var isFetching = false
+
+    private val _availableFilters = MutableStateFlow(AvailableFilters())
+    val availableFilters: StateFlow<AvailableFilters> = _availableFilters
+
+    private val _appliedFilters = MutableStateFlow(AppliedFilters())
+    val appliedFilters: StateFlow<AppliedFilters> = _appliedFilters
+
+
 
     fun fetchOutfitsByFieldAndGender(
         context: Context,
@@ -237,4 +247,132 @@ class MaleHomeViewModel: ViewModel() {
             }
         }
     }
+
+    fun fetchAvailableFilters(gender: String, fieldName: String, fieldValue: String) {
+        viewModelScope.launch {
+            try {
+                val gendersToFetch = listOf(gender, "unisex") // both gender + unisex
+                val mergedFilters = AvailableFilters(
+                    categories = mutableSetOf(),
+                    brands = mutableSetOf(),
+                    colors = mutableSetOf(),
+                    fits = mutableSetOf(),
+                    types = mutableSetOf()
+                )
+
+                gendersToFetch.forEach { g ->
+                    val docId = "${fieldName}_${fieldValue}_$g"
+                    val doc = firestore.collection("filters")
+                        .document(docId)
+                        .get()
+                        .await()
+
+                    if (doc.exists()) {
+                        val data = doc.data ?: return@forEach
+
+                        mergedFilters.categories += (data["categories"] as? List<String>)?.toSet() ?: emptySet()
+                        mergedFilters.brands += (data["brand"] as? List<String>)?.toSet() ?: emptySet()
+                        mergedFilters.colors += (data["colors"] as? List<String>)?.toSet() ?: emptySet()
+                        mergedFilters.fits += (data["fits"] as? List<String>)?.toSet() ?: emptySet()
+                        mergedFilters.types += (data["type"] as? List<String>)?.toSet() ?: emptySet()
+                    }
+                }
+
+                // Update StateFlow once with merged results
+                _availableFilters.value = mergedFilters
+
+            } catch (e: Exception) {
+                Log.e("FilterFetch", "Error fetching filters", e)
+                _availableFilters.value = AvailableFilters() // fallback
+            }
+        }
+    }
+
+
+    fun fetchFilteredOutfits(
+        context: Context,
+        fieldName: String,
+        fieldValue: String,
+        gender: String,
+        filters: Filters,
+        reset: Boolean = true,
+        pageSize: Long = 15L
+    ) {
+        viewModelScope.launch {
+            // Reset state if new search
+            if (reset) {
+                clearOutfits()
+                lastVisibleDoc = null
+                isLastPageReached = false
+            }
+            if (isFetching || isLastPageReached) return@launch
+
+            isFetching = true
+            _isLoading.value = true
+            _error.value = null
+
+            try {
+                // Base query: match current screen field + gender/unisex
+                val baseQuery: Query = Firebase.firestore.collection("outfits")
+                    .whereIn("gender", listOf(gender, "unisex"))
+
+                val arrayFields = setOf("tags", "style", "occasion", "season")
+                var finalQuery: Query = if (fieldName in arrayFields) {
+                    baseQuery.whereArrayContains(fieldName, fieldValue)
+                } else {
+                    baseQuery.whereEqualTo(fieldName, fieldValue)
+                }
+
+                // Apply filters
+                filters.categories.takeIf { it.isNotEmpty() }?.let {
+                    finalQuery = finalQuery.whereIn("category", it.toList())
+                }
+                filters.websites.takeIf { it.isNotEmpty() }?.let {
+                    finalQuery = finalQuery.whereIn("website", it.toList())
+                }
+                filters.colors.takeIf { it.isNotEmpty() }?.let {
+                    finalQuery = finalQuery.whereIn("color", it.toList())
+                }
+                filters.type?.let { finalQuery = finalQuery.whereEqualTo("type", it) }
+                filters.fits.takeIf { it.isNotEmpty() }?.let {
+                    finalQuery = finalQuery.whereIn("fit", it.toList())
+                }
+
+                // Pagination
+                lastVisibleDoc?.let { last ->
+                    finalQuery = finalQuery.startAfter(last)
+                }
+
+                finalQuery = finalQuery.orderBy(FieldPath.documentId()).limit(pageSize)
+
+                // Fetch data
+                val result = finalQuery.get().await()
+                val outfitList = result.documents.mapNotNull { doc ->
+                    doc.toObject(OutfitData::class.java)?.copy(id = doc.id)
+                }
+
+                // Append or replace based on reset
+                _outfits.value = if (reset) outfitList else _outfits.value + outfitList
+
+                // Prefetch images for smoother UI
+                prefetchImages(context.applicationContext, outfitList)
+
+                lastVisibleDoc = result.documents.lastOrNull()
+                if (result.documents.size < pageSize.toInt()) {
+                    isLastPageReached = true
+                }
+
+            } catch (e: Exception) {
+                Log.e("OutfitFetch", "Error fetching filtered outfits", e)
+                _error.value = "Failed to fetch outfits: ${e.message}"
+            } finally {
+                _isLoading.value = false
+                isFetching = false
+            }
+        }
+    }
+
+
+
+
 }
