@@ -33,6 +33,25 @@ data class Filters(
     val fits: Set<String> = emptySet(),
 )
 
+// All possible filters fetched from Firestore
+data class AvailableFilters(
+    var categories: Set<String> = emptySet(),
+    var brands: Set<String> = emptySet(),
+    var colors: Set<String> = emptySet(),
+    var fits: Set<String> = emptySet(),
+    var types: Set<String> = emptySet(),
+)
+
+// What the user has currently selected
+data class AppliedFilters(
+    val categories: Set<String> = emptySet(),
+    val brands: Set<String> = emptySet(),
+    val colors: Set<String> = emptySet(),
+    val fits: Set<String> = emptySet(),
+    val type: String? = null,
+    val priceRange: ClosedFloatingPointRange<Float> = 0f..10000f
+)
+
 
 val outfitSizeMap = mapOf(
     "tshirt" to listOf("S", "M", "L", "XL"),
