@@ -188,8 +188,11 @@ fun ItemInfoScreen(outfit: OutfitData, viewModel: MaleHomeViewModel,navControlle
                             .padding(horizontal = 18.dp)
                     ) {
                         Spacer(modifier = Modifier.height(16.dp))
-                        Text(text = outfit.website, fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                        Text(text = outfit.title, color = Color.Gray)
+                        Text(text = outfit.website.toUpperCase(), fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                        val formattedTitle = outfit.title
+                            .split(" ")
+                            .joinToString(" ") { word -> word.replaceFirstChar { it.uppercase() } }
+                        Text(text = formattedTitle, color = Color.Gray)
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(text = "₹ $formattedPrice", fontWeight = FontWeight.Bold, fontSize = 24.sp)
                         Spacer(modifier = Modifier.height(16.dp))
@@ -347,7 +350,10 @@ fun ItemInfoScreen(outfit: OutfitData, viewModel: MaleHomeViewModel,navControlle
                             .padding(horizontal = 18.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ){
-                        Text(text = "RELATED PRODUCTS", fontWeight = FontWeight.Bold, fontSize = 22.sp,fontFamily = myHeadingFont )
+                        if(relatedOutfits.isEmpty()){
+                        } else{
+                            Text(text = "RELATED PRODUCTS", fontWeight = FontWeight.Bold, fontSize = 22.sp,fontFamily = myHeadingFont )
+                        }
                         Spacer(modifier = Modifier.height(18.dp))
                     }
                 }
