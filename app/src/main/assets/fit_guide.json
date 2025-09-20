@@ -991,8 +991,8 @@
             "proTip": "Two-tone outfits (dark top, lighter bottoms) visually break height"
           },
           {
-            "id": "shoes",
-            "title": "Shoes & Footwear",
+            "id": "heels",
+            "title": "Shoes & Heels",
             "summary": "Ground tall frame and add balance",
             "details": [
               "Chunky sneakers, boots, or loafers balance height",
@@ -1043,8 +1043,8 @@
             "proTip": "Slightly cropped or ankle-grazing hems prevent endless-leg effect"
           },
           {
-            "id": "shoes",
-            "title": "Shoes & Footwear",
+            "id": "heels",
+            "title": "Shoes & Heels",
             "summary": "Ground height with moderate bulk",
             "details": [
               "Chunky sneakers, mid-heeled boots, or platform shoes add balance",
@@ -1095,8 +1095,8 @@
             "proTip": "Dark slim pants with matching shoes create continuous leg line"
           },
           {
-            "id": "shoes",
-            "title": "Shoes & Footwear",
+            "id": "heels",
+            "title": "Shoes & Heels",
             "summary": "Keep footwear sleek and elongating",
             "details": [
               "Low heels or pointed flats extend leg line",
@@ -1153,8 +1153,8 @@
           "proTip": "Pointed-toe shoes or heels in same color as bottoms extend leg line"
         },
         {
-          "id": "shoes",
-          "title": "Shoes & Footwear",
+          "id": "heels",
+          "title": "Shoes & Heels",
           "summary": "Add subtle height without bulk",
           "details": [
             "Pointed flats, heels, or low-heeled boots elongate legs",
@@ -1212,8 +1212,8 @@
           "proTip": "Avoid overly tight bottoms that exaggerate height"
         },
         {
-          "id": "shoes",
-          "title": "Shoes & Footwear",
+          "id": "heels",
+          "title": "Shoes & Heels",
           "summary": "Comfortable heels or flats without exaggerating height",
           "details": [
             "Block heels or stylish flats maintain elegance",
@@ -1270,8 +1270,8 @@
           "proTip": "Avoid overly tight bottoms that exaggerate body bulk"
         },
         {
-          "id": "shoes",
-          "title": "Shoes & Footwear",
+          "id": "heels",
+          "title": "Shoes & Heels",
           "summary": "Comfortable and proportionate",
           "details": [
             "Low to medium heels or flats maintain elegance",
@@ -1328,8 +1328,8 @@
           "proTip": "Choose monochrome or tonal bottoms to create vertical flow"
         },
         {
-          "id": "shoes",
-          "title": "Shoes & Footwear",
+          "id": "heels",
+          "title": "Shoes & Heels",
           "summary": "Add height without heavy appearance",
           "details": [
             "Pointed heels or nude flats elongate legs",
@@ -1387,8 +1387,8 @@
           "proTip": "Pointed shoes or tonal footwear create a smooth line"
         },
         {
-          "id": "shoes",
-          "title": "Shoes & Footwear",
+          "id": "heels",
+          "title": "Shoes & Heels",
           "summary": "Stylish yet proportionate",
           "details": [
             "Low to medium heels or flats maintain elegance",
@@ -1445,8 +1445,8 @@
           "proTip": "Pointed shoes or tonal footwear create smooth leg line"
         },
         {
-          "id": "shoes",
-          "title": "Shoes & Footwear",
+          "id": "heels",
+          "title": "Shoes & Heels",
           "summary": "Stylish yet proportionate",
           "details": [
             "Low to medium heels or flats maintain elegance",
@@ -1503,8 +1503,8 @@
           "proTip": "Pointed shoes or tonal footwear visually extend legs"
         },
         {
-          "id": "shoes",
-          "title": "Shoes & Footwear",
+          "id": "heels",
+          "title": "Shoes & Heels",
           "summary": "Enhance height subtly",
           "details": [
             "Low heels, pointed flats, or boots elongate legs",
