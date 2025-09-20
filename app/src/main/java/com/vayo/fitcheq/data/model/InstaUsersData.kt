@@ -26,3 +26,12 @@ val indianInstaUsers = listOf(
     InstaUsersData("4","https://www.instagram.com/sankalra/","sankalra","San Kalra","https://raw.githubusercontent.com/vishalyadav-77/fitcheq-assests/refs/heads/main/InfluencersData/indian/san.webp"),
     InstaUsersData("5","https://www.instagram.com/sushilbhagtanii/","sushilbhagtanii","Sushil Bhagtani","https://raw.githubusercontent.com/vishalyadav-77/fitcheq-assests/refs/heads/main/InfluencersData/indian/sushil.webp")
 )
+
+val indianFemaleUsers = listOf(
+    InstaUsersData("1", link = "https://www.instagram.com/durgeshwaariii/", username = "durgeshwaariii", name = "Durgeshwari Tanwar", profilePic = "https://raw.githubusercontent.com/vishalyadav-77/fitcheq-assests/refs/heads/main/InfluencersData/indian/female/durgeshwari.webp"),
+    InstaUsersData("1", link = "https://www.instagram.com/britney.khaturiya/", username = "britney.khaturiya", name = "Britney", profilePic = "https://raw.githubusercontent.com/vishalyadav-77/fitcheq-assests/refs/heads/main/InfluencersData/indian/female/britney.webp"),
+    InstaUsersData("1", link = "https://www.instagram.com/sukruhhti/", username = "sukruhhti", name = "Sukruti Airi", "https://raw.githubusercontent.com/vishalyadav-77/fitcheq-assests/refs/heads/main/InfluencersData/indian/female/sukruti.webp"),
+    InstaUsersData("1", link = "https://www.instagram.com/snehamc/", username = "snehamc", name = "Sneha Mc Nair", profilePic = "https://raw.githubusercontent.com/vishalyadav-77/fitcheq-assests/refs/heads/main/InfluencersData/indian/female/sneha.webp"),
+    InstaUsersData("1", link = "https://www.instagram.com/asmitapathik/", username = "asmitapathik", name = "Asmita Pathik", profilePic = "https://raw.githubusercontent.com/vishalyadav-77/fitcheq-assests/refs/heads/main/InfluencersData/indian/female/asmita.webp"),
+
+    )
