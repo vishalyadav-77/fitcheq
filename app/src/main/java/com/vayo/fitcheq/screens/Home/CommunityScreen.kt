@@ -50,6 +50,7 @@ import com.vayo.fitcheq.data.model.FitGuideCategory
 import com.vayo.fitcheq.data.model.FitGuideWrapper
 import com.vayo.fitcheq.data.model.HeightGroup
 import com.vayo.fitcheq.data.model.UserProfile
+import com.vayo.fitcheq.data.model.indianFemaleUsers
 import com.vayo.fitcheq.data.model.indianInstaUsers
 import com.vayo.fitcheq.data.model.instagramUsers
 import com.vayo.fitcheq.data.model.maleoccasionList
@@ -74,7 +75,11 @@ fun CommunityScreen(navController: NavController, authViewModel: AuthViewModel) 
         "shirts" to "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/fitguide/tshirt_shirt3.webp",
         "pants" to "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/fitguide/pants_jeans2.webp",
         "shoes" to "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/fitguide/shoes_footwears2.webp",
-        "jacket" to "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/fitguide/outerwear_jacket2.webp"
+        "jacket" to "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/fitguide/outerwear_jacket2.webp",
+        "heels" to "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/fitguide/shoes.webp",
+        "tops" to "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/fitguide/tops.webp",
+        "bottoms" to "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/fitguide/pants.webp",
+        "outerwear" to "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/fitguide/outerwear.webp"
     )
 
     LaunchedEffect(Unit) { userProfile = authViewModel.loadUserProfileFromSharedPreferences(context) }
@@ -90,13 +95,33 @@ fun CommunityScreen(navController: NavController, authViewModel: AuthViewModel) 
             }
         }
     }
-    val iconRes = when (userProfile?.bodyType) {
-        BodyType.slim -> R.drawable.male_skinny
-        BodyType.athletic -> R.drawable.male_athletic
-        BodyType.average -> R.drawable.male_normal
-        BodyType.muscular -> R.drawable.male_athletic
-        BodyType.plus_size -> R.drawable.male_plus_size
-        null -> null //DEFAULT
+    val iconRes: Int? = userProfile?.let { profile ->
+        val genderPrefix = when (profile.gender?.lowercase()) {
+            "male" -> "male"
+            "female" -> "female"
+            else -> return@let null
+        }
+
+        val bodyTypeSuffix = when (profile.bodyType) {
+            BodyType.slim -> "skinny"
+            BodyType.athletic, BodyType.muscular -> "athletic"
+            BodyType.average -> "normal"
+            BodyType.plus_size -> "plus_size"
+            null -> return@let null
+        }
+
+        val resName = "${genderPrefix}_${bodyTypeSuffix}"
+        val resId = context.resources.getIdentifier(resName, "drawable", context.packageName)
+        // **Just return the resource ID directly**
+        context.resources.getIdentifier(resName, "drawable", context.packageName)
+        if (resId != 0) resId
+        else context.resources.getIdentifier("${genderPrefix}_normal", "drawable", context.packageName)
+
+    }
+    val usersToShow = if (userProfile?.gender == "male") {
+        instagramUsers
+    } else {
+        indianFemaleUsers
     }
 
     ScreenContainer(navController = navController) { paddingValues ->
@@ -370,7 +395,7 @@ fun CommunityScreen(navController: NavController, authViewModel: AuthViewModel) 
                        .padding(start = 16.dp, end = 16.dp),
                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                ) {
-                   instagramUsers.forEach { user ->
+                   usersToShow.forEach { user ->
                        Card(
                            colors = CardDefaults.cardColors(containerColor = Color.White),
                            modifier = Modifier
@@ -420,67 +445,69 @@ fun CommunityScreen(navController: NavController, authViewModel: AuthViewModel) 
                }
                Spacer(modifier = Modifier.height(20.dp))
 
-               Text(
-                   text = "Indian Fashion Influencers",
-                   fontFamily = myHeadingFont,
-                   fontSize = 22.sp,
-                   fontWeight = FontWeight.Bold
-               )
-               Spacer(modifier = Modifier.height(10.dp))
-               Row(
-                   modifier = Modifier
-                       .fillMaxWidth()
-                       .horizontalScroll(rememberScrollState())
-                       .padding(start = 16.dp, end = 16.dp),
-                   horizontalArrangement = Arrangement.spacedBy(12.dp)
-               ) {
-                   indianInstaUsers.forEach { user ->
-                       Card(
-                           colors = CardDefaults.cardColors(containerColor = Color.White),
-                           modifier = Modifier
-                               .width(130.dp)
-                               .height(160.dp)
-                               .clickable {
-                                   val intent = Intent(Intent.ACTION_VIEW, Uri.parse(user.link))
-                                   context.startActivity(intent)
-                               },
-                           shape = RoundedCornerShape(12.dp),
-                           elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                       ) {
-                           Column(
+               if(userProfile?.gender=="male") {
+                   Text(
+                       text = "Indian Fashion Influencers",
+                       fontFamily = myHeadingFont,
+                       fontSize = 22.sp,
+                       fontWeight = FontWeight.Bold
+                   )
+                   Spacer(modifier = Modifier.height(10.dp))
+                   Row(
+                       modifier = Modifier
+                           .fillMaxWidth()
+                           .horizontalScroll(rememberScrollState())
+                           .padding(start = 16.dp, end = 16.dp),
+                       horizontalArrangement = Arrangement.spacedBy(12.dp)
+                   ) {
+                       indianInstaUsers.forEach { user ->
+                           Card(
+                               colors = CardDefaults.cardColors(containerColor = Color.White),
                                modifier = Modifier
-                                   .fillMaxSize()
-                                   .padding(8.dp),
-                               horizontalAlignment = Alignment.CenterHorizontally,
-                               verticalArrangement = Arrangement.Center
+                                   .width(130.dp)
+                                   .height(160.dp)
+                                   .clickable {
+                                       val intent = Intent(Intent.ACTION_VIEW, Uri.parse(user.link))
+                                       context.startActivity(intent)
+                                   },
+                               shape = RoundedCornerShape(12.dp),
+                               elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                            ) {
-                               AsyncImage(
-                                   ImageRequest.Builder(LocalContext.current)
-                                       .data(user.profilePic)
-                                       .size(500,500)
-                                       .build(),
-                                   contentDescription = user.username,
+                               Column(
                                    modifier = Modifier
-                                       .size(90.dp)
-                                       .clip(CircleShape),
-                                   contentScale = ContentScale.Crop
-                               )
-                               Spacer(modifier = Modifier.height(6.dp))
-                               Text(
-                                   text = user.name,
-                                   fontSize = 14.sp,
-                                   fontWeight = FontWeight.SemiBold,
-                                   maxLines = 1,
-                                   overflow = TextOverflow.Ellipsis
-                               )
+                                       .fillMaxSize()
+                                       .padding(8.dp),
+                                   horizontalAlignment = Alignment.CenterHorizontally,
+                                   verticalArrangement = Arrangement.Center
+                               ) {
+                                   AsyncImage(
+                                       ImageRequest.Builder(LocalContext.current)
+                                           .data(user.profilePic)
+                                           .size(500, 500)
+                                           .build(),
+                                       contentDescription = user.username,
+                                       modifier = Modifier
+                                           .size(90.dp)
+                                           .clip(CircleShape),
+                                       contentScale = ContentScale.Crop
+                                   )
+                                   Spacer(modifier = Modifier.height(6.dp))
+                                   Text(
+                                       text = user.name,
+                                       fontSize = 14.sp,
+                                       fontWeight = FontWeight.SemiBold,
+                                       maxLines = 1,
+                                       overflow = TextOverflow.Ellipsis
+                                   )
 
-                               Text(
-                                   text = user.username,
-                                   fontSize = 12.sp,
-                                   color = Color.Gray,
-                                   maxLines = 1,
-                                   overflow = TextOverflow.Ellipsis
-                               )
+                                   Text(
+                                       text = user.username,
+                                       fontSize = 12.sp,
+                                       color = Color.Gray,
+                                       maxLines = 1,
+                                       overflow = TextOverflow.Ellipsis
+                                   )
+                               }
                            }
                        }
                    }
