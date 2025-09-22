@@ -12,7 +12,7 @@ data class BrandInfo(
 )
 
 val brandMap = mapOf(
-    "UNTLD" to BrandInfo(
+    "untld" to BrandInfo(
         name = "UNTLD",
         shippingPolicy = """
             • Ships in 24–36 hrs (if ordered before 1 PM).
@@ -33,7 +33,7 @@ val brandMap = mapOf(
         websiteUrl = "https://untld.in",
         logoUrl = "https://untld.in/cdn/shop/files/Untitled_1000_x_1000_px.png?v=1661777427&width=500",
     ),
-    "AJIO" to BrandInfo(
+    "ajio" to BrandInfo(
         name = "AJIO",
         shippingPolicy = """
                • Delivery in 2–9 working days, based on your pin code.
@@ -47,7 +47,7 @@ val brandMap = mapOf(
         websiteUrl = "https://www.ajio.com/",
         logoUrl = "https://assets.ajio.com/static/img/Ajio-Logo.svg",
     ),
-    "URBANO" to BrandInfo(
+    "urbano" to BrandInfo(
         name = "URBANO",
         shippingPolicy = """
             • Dispatched in 1–2 days
@@ -65,7 +65,7 @@ val brandMap = mapOf(
         websiteUrl = "https://www.urbanofashion.com/",
         logoUrl = "https://www.urbanofashion.com/cdn/shop/files/Logo_Urbano_50ht.svg?v=1684135107",
     ),
-    "ONE FIT" to BrandInfo(
+    "one fit" to BrandInfo(
         name = "ONE FIT",
         shippingPolicy = """
             • We currently offer free shipping worldwide on all orders over 1099/-
@@ -85,7 +85,7 @@ val brandMap = mapOf(
         websiteUrl = "https://1fit.in/",
         logoUrl = "https://1fit.in/wp-content/uploads/2024/09/cropped-cropped-Image-Placeholder.png",
     ),
-    "TRAPIN" to BrandInfo(
+    "trapin" to BrandInfo(
         name = "TRAPIN",
         shippingPolicy = """
             • Orders processed within 24 hrs, shipped in 2–3 days
@@ -109,27 +109,7 @@ val brandMap = mapOf(
         websiteUrl = "https://trapin.co/",
         logoUrl = "https://trapin.co/cdn/shop/files/Trapin_White_ac0e4112-6ce7-4b96-a459-5d1f1e6f08e6.png?v=1726561310&width=165",
     ),
-    "5 Feet 11" to BrandInfo(
-        name = "5 FEET 11",
-        shippingPolicy = """
-            • Dispatched in 1–2 business days (up to 7 for pre-order/made-to-order items)
-            • Delivery within 5–7 days from dispatch
-            • Free shipping on prepaid orders
-            • COD orders: ₹99 shipping fee
-            • Prices include GST
-            """.trimIndent(),
-        returnPolicy = """
-        • Return/exchange within 72 hrs (excludes sale & made-to-order items)
-        • ₹100 fee per product for return/exchange
-        • Prepaid orders: refund to bank (7–10 business days)
-        • COD orders: store credit within 7–10 days
-        • Reverse pickup charge of ₹100 per item applies
-        """.trimIndent(),
-        instagramUrl = "https://www.instagram.com/5feet11/",
-        websiteUrl = "https://www.5feet11.com/",
-        logoUrl = "https://www.5feet11.com/cdn/shop/files/5feet11-light-png.png?crop=center&height=360&v=1739774879&width=744",
-    ),
-    "5 Feet 11" to BrandInfo(
+    "5 feet 11" to BrandInfo(
         name = "5 Feet 11",
         shippingPolicy = """
             • Dispatched in 1–2 business days (up to 7 for pre-order/made-to-order items)
@@ -149,7 +129,7 @@ val brandMap = mapOf(
         websiteUrl = "https://www.5feet11.com/",
         logoUrl = "https://www.5feet11.com/cdn/shop/files/5feet11-light-png.png?crop=center&height=360&v=1739774879&width=744",
     ),
-    "Blurg Village" to BrandInfo(
+    "blurg village" to BrandInfo(
         name = "Blurg Village",
         shippingPolicy = """
             • Delivery within 10 days
@@ -162,7 +142,7 @@ val brandMap = mapOf(
         websiteUrl = "https://blurgvillage.com/",
         logoUrl = "https://blurgvillage.com/wp-content/uploads/2025/06/IMG_5610-NEW-800x800.png?crop=1",
     ),
-    "BANANA CLUB" to BrandInfo(
+    "banana club" to BrandInfo(
         name = "BANANA CLUB",
         shippingPolicy = """
 • Shipped within 24–48 hours
@@ -182,7 +162,7 @@ val brandMap = mapOf(
         websiteUrl = "https://bananaclub.co.in/",
         logoUrl = "https://bananaclub.co.in/cdn/shop/files/banana-club_520x.png?v=1681805284",
     ),
-    "BOTNIA" to BrandInfo(
+    "botnia" to BrandInfo(
         name = "BOTNIA",
         shippingPolicy = """
 • Free shipping on prepaid orders (COD fee extra)
@@ -205,4 +185,106 @@ val brandMap = mapOf(
         websiteUrl = "https://www.botnia.in/",
         logoUrl = "https://www.botnia.in/cdn/shop/files/Botnia_Logo-01_W_800x.png?v=1731577710",
     ),
+    "myntra" to BrandInfo(
+        name = "Myntra",
+        shippingPolicy = """
+            • Order Tracking: Track orders in MyMyntra → Track Orders.
+            • Platform Fee: Charged to maintain smooth platform operations.
+                • Refunded if order is lost/undelivered or if full order is cancelled.
+                • Not refunded for partial cancellations/returns or accounts flagged under Fair Usage Policy.
+            • Fair Usage Policy: Accounts with excessive returns or non-acceptance of shipments may lose refund eligibility for platform fees.
+            • PIN Code Serviceability: Check on product page via “Check Delivery Options.”
+            """.trimIndent(),
+        returnPolicy = """
+            • Return/Exchange Window: As per product details page. Item must be unused, with original tags/packaging intact.
+            • Options:
+                • Pick-up: Free service in most locations (refund/exchange initiated after quality check).
+                • Self-ship: Allowed if pickup not available. Courier charges reimbursed in Myntra credits with receipt proof.
+            • Refunds: Doorstep refund or post-warehouse quality check.
+            • Exchanges:
+                • Allowed for size/style change or different items (value differences adjusted).
+                • Delivered to the same address only.
+                • Subject to stock availability & serviceability.
+            • Exceptions (Non-returnable/Exchangeable): Innerwear, lingerie (with briefs), socks, swimwear, shapewear bottoms, mittens, wrist-bands, Swarovski/precious jewelry, Ray-Ban sunglasses, some fine jewelry, watches, sherwanis (exchange only).
+            • Rules:
+                • Product must pass quality check.
+                • Free gifts/offers must also be returned if the main item is.
+                • Self-shipped returns must be securely packed.
+                • Refunds/exchanges may be restricted if policy is misused.
+            """.trimIndent(),
+        instagramUrl = "https://www.instagram.com/myntra/?hl=en",
+        websiteUrl = "https://www.myntra.com/",
+    ),
+    "amazon" to BrandInfo(
+        name = "Amazon",
+        shippingPolicy = """
+            • Options: Standard, Same-Day, One-Day (eligible items/locations).
+            • Fees: Vary by item size, weight, and delivery option.
+            • Prime Members: Free fast delivery on eligible items (e.g., 2-day).
+            • Fulfilled by Amazon (FBA): Amazon handles storage, packing, delivery; usually Prime-eligible.
+            • Other Sellers: Policies vary (Easy Ship, Self-Ship).
+International Shipping: Limited; most items not shipped outside India.
+""".trimIndent(),
+        returnPolicy = """
+• General Policy: Returns allowed within product-specific Returns Window.
+• Return Windows: 2–10 days (varies by category).
+• Replacement vs. Refund: Defective/damaged items often replaced; refund only if replacement unavailable.
+• Non-Returnable Items: Hygiene, health, consumables, cosmetics, innerwear, certain food items.
+• Condition: Must be unused, original packaging & accessories intact.
+• Process: Initiate via Your Orders → Amazon arranges pickup.
+• Seller-Specific Policies: May vary, check product page.
+• Policy Abuse: Amazon may charge fees or restrict accounts for misuse/fraud.
+""".trimIndent(),
+        instagramUrl = "https://www.instagram.com/amazondotin/?hl=en",
+        websiteUrl = "https://www.amazon.in/",
+    ),
+    "the bear house" to BrandInfo(
+        name = "The Bear House",
+        shippingPolicy = """
+            • Processing Time: Orders shipped within 1 business day.
+            • Charges: Free shipping on prepaid orders; ₹100 fee on COD orders.
+            • Tracking: Details shared via WhatsApp, Email, or SMS.
+""".trimIndent(),
+        returnPolicy = """
+• Initiation: Only via Bear House mobile app (iOS & Android).
+• Window: 7 days from delivery; ₹100 reverse shipping fee.
+• Exchange: Once per item, size availability only. No re-exchange.
+• Sale Orders: No returns; one exchange allowed (same/higher value).
+• Pickup: 2 attempts, else self-ship. Depends on pin code.
+• Condition: Must be unused, with original tags/packaging.
+• Refunds:
+    • Prepaid: Original payment method.
+    • COD: Store credits (valid 6 months).
+• Exclusions: Accessories, socks, innerwear, flat store items.
+""".trimIndent(),
+        instagramUrl = "https://www.instagram.com/bearhouseindia/?hl=en",
+        websiteUrl = "https://thebearhouse.com/collections/newarrival?utm_content=&utm_term=&gad_campaignid=22589529038&sort_by=created-descending",
+    ),
+    "newme" to BrandInfo(
+        name = "NEWME",
+        shippingPolicy = """
+            • Fee: ₹49 on all orders (non-refundable).
+            • Standard Delivery: 10–15 business days.
+            • Expedited Options:
+                • 90-min Delivery: ₹49.
+                • 4-hr / Same-Day / Next-Day: Free above ₹999; ₹49 below ₹999; ₹99 below ₹499.
+            • International: Standard delivery in 10–15 days (check product page for details).
+""".trimIndent(),
+        returnPolicy = """
+• Window: 3 days from delivery.
+• Dresses & Gowns: ₹300 reverse pickup/exchange fee.
+• Condition: Must be unused, with original packaging, tags, labels, and invoice.
+• Partial Returns: Allowed (must return complete item with gifts/freebies).
+• Exchange: Only once per order; exchanged items cannot be refunded.
+• Refunds:
+    • Order Cancellation: Full refund incl. shipping.
+    • Post-Delivery Return: Shipping & COD fees not refunded.
+    • COD Orders: Refund credited to Newmi Wallet (lifetime validity).
+• Non-Returnable Items: Some categories (e.g., healthcare devices, electronics, yoga mats); eligible for replacement within 7 days if defective/damaged.
+• Return Handling Fee: ₹100 may apply for unusual/repeated return activity.
+""".trimIndent(),
+        instagramUrl = "https://www.instagram.com/newme.asia/?hl=en",
+        websiteUrl = "https://newme.asia/"
+    ),
+
 )
