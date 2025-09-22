@@ -8,6 +8,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -58,6 +59,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -192,8 +194,8 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel, is
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(30.dp)
-                .background(color = Color(0xFFF8E1AB)),
+                .background(color = Color(0xFFF8E1AB))
+                .padding(horizontal = 8.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
         ) {
@@ -208,7 +210,9 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel, is
             Text(
                 text = "We use this information to improve user experience & suggestions",
                 fontSize = 11.sp,
-                fontWeight = FontWeight.Medium
+                maxLines = 2,
+                fontWeight = FontWeight.Medium,
+                overflow = TextOverflow.Ellipsis
             )
         }
 
@@ -315,7 +319,7 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel, is
             //Age GROUP SELECTION
             Text("AGE", fontSize = 16.sp, fontWeight = FontWeight.Companion.Bold)
             Spacer(modifier = Modifier.Companion.height(10.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 SelectableCard(
                     text = "  ${AgeGroup.BELOW_18.displayName}  ",
                     isSelected = ageGroup == AgeGroup.BELOW_18,
@@ -343,7 +347,7 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel, is
             Text("HEIGHT", fontSize = 16.sp, fontWeight = FontWeight.Companion.Bold)
             Spacer(modifier = Modifier.Companion.height(10.dp))
             // First row
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 SelectableCard(
                     text = HeightGroup.short.displayName,
                     isSelected = height == HeightGroup.short,
@@ -357,7 +361,7 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel, is
             }
             Spacer(modifier = Modifier.height(8.dp))
             // Second row
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 SelectableCard(
                     text = HeightGroup.tall.displayName,
                     isSelected = height == HeightGroup.tall,
@@ -437,8 +441,8 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel, is
             //BODY TYPE
             Text("BODY TYPE", fontSize = 16.sp, fontWeight = FontWeight.Companion.Bold)
             Spacer(modifier = Modifier.Companion.height(10.dp))
-            // First row
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            // male row
+            Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     SelectableCard(
                         text = BodyType.slim.displayName,
@@ -466,10 +470,6 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel, is
                     )
                     Text(BodyType.average.displayName, fontSize = 14.sp)
                 }
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            // Second row
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     SelectableCard(
                         text = BodyType.muscular.displayName,
@@ -488,7 +488,37 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel, is
                     )
                     Text(BodyType.plus_size.displayName, fontSize = 14.sp)
                 }
-
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            // female row
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    SelectableCard(
+                        text = BodyType.slim.displayName,
+                        isSelected = bodyType == BodyType.slim,
+                        onClick = { bodyType = BodyType.slim },
+                        iconRes = R.drawable.female_skinny
+                    )
+                    Text(BodyType.slim.displayName, fontSize = 14.sp)
+                }
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    SelectableCard(
+                        text = BodyType.average.displayName,
+                        isSelected = bodyType == BodyType.average,
+                        onClick = { bodyType = BodyType.average },
+                        iconRes = R.drawable.female_normal
+                    )
+                    Text(BodyType.average.displayName, fontSize = 14.sp)
+                }
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    SelectableCard(
+                        text = BodyType.plus_size.displayName,
+                        isSelected = bodyType == BodyType.plus_size,
+                        onClick = { bodyType = BodyType.plus_size },
+                        iconRes = R.drawable.female_plus_size
+                    )
+                    Text(BodyType.plus_size.displayName, fontSize = 14.sp)
+                }
             }
             Spacer(modifier = Modifier.Companion.height(20.dp))
 
