@@ -37,6 +37,7 @@ sealed class AuthScreen(val route: String) {
     object Login : AuthScreen("login")
     object SignUp : AuthScreen("signup")
     object UserProfile : AuthScreen("user_profile")
+    object EditProfile : AuthScreen("edit_profile")
     object MaleHome : AuthScreen("male_home")
     object FemaleHome : AuthScreen("female_home")
     object Community : AuthScreen("community")
@@ -78,7 +79,13 @@ fun AuthNavGraph(
             route = AuthScreen.UserProfile.route,
             enterTransition = { EnterTransition.None },
             exitTransition = { ExitTransition.None }
-        ) { ProfileScreen(navController, authViewModel) }
+        ) { ProfileScreen(navController, authViewModel, isEditMode = false) }
+
+        // Edit profile
+        composable(AuthScreen.EditProfile.route,
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None })
+        { ProfileScreen(navController, authViewModel, isEditMode = true) }
         
         composable(
             route = AuthScreen.MaleHome.route,
