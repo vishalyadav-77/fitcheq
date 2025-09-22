@@ -1,6 +1,7 @@
 package com.vayo.fitcheq.screens.Home
 
 
+import android.util.Log
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
@@ -210,6 +211,16 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
     var selectedFilter by remember(filterTypes) {
         mutableStateOf(filterTypes.first())
     }
+    LaunchedEffect(filters) {
+        Log.d("FilterDebug", "LaunchedEffect triggered with filters: $filters")
+
+        if (filters != Filters()) {
+            Log.d("FilterDebug", "Fetching outfits with filters: $filters")
+            viewModel.fetchFilteredOutfits(context, fieldName, fieldValue, gender, filters)
+        } else {
+            Log.d("FilterDebug", "Filters are empty, not fetching")
+        }
+    }
 
     val categoryMaxMap = mapOf(
         "accessories" to 2000f,
@@ -323,16 +334,19 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                         FilterChip(
                             selected = isSelected,
                             onClick = {
-                                filters = if (isCategoryList) {
+                                val newFilters = if (isCategoryList) {
                                     filters.copy(
                                         categories = if (isSelected) filters.categories - item
                                         else filters.categories + item
                                     )
                                 } else {
                                     filters.copy(
-                                        type = if (isSelected) null else item // assuming only one type can be selected
+                                        type = if (isSelected) null else item
                                     )
                                 }
+                                Log.d("FilterDebug", "Chip clicked. Old filters: $filters, New filters: $newFilters")
+                                filters = newFilters
+
                             },
                             label = {
                                 Text(
