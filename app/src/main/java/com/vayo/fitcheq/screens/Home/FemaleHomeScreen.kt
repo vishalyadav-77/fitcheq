@@ -51,6 +51,7 @@ import com.vayo.fitcheq.navigation.ScreenContainer
 import com.vayo.fitcheq.ui.theme.modernShimmer
 import kotlin.collections.chunked
 import kotlin.collections.forEach
+import kotlin.text.isNotEmpty
 
 @Composable
 fun FemaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
@@ -66,6 +67,10 @@ fun FemaleHomeScreen(navController: NavController, authViewModel: AuthViewModel)
     )
     val myHeadingFont = FontFamily(
         Font(R.font.headings_kugile)
+    )
+    val imageRouteMap = mapOf(
+        "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/female/grungestyle.webp" to "grunge",
+        "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/female/barbie.webp" to "barbie"
     )
 
     LaunchedEffect(isLoggedIn) {
@@ -103,6 +108,36 @@ fun FemaleHomeScreen(navController: NavController, authViewModel: AuthViewModel)
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(modifier = Modifier.height(6.dp))
+                // CAROUSEL TOP
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(2.5f / 4f),
+                    shape = RoundedCornerShape(0.dp),
+                ) {
+                    HomeImageCarousel(
+                        images = imageRouteMap.keys.toList(),
+                        onImageClick = { imageUrl ->
+                            val route = imageRouteMap[imageUrl] ?: ""
+                            if (route.isNotEmpty()) {
+                                navController.navigate(
+                                    AuthScreen.OutfitDetails.createRoute(
+                                        "female",
+                                        "style",
+                                        route
+                                    )
+                                ) {
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
+                        }
+                    )
+                }
+                Spacer(modifier = Modifier.height(30.dp))
 
                 //  BANNER
                 Card(
