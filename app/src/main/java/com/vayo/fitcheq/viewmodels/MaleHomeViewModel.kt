@@ -43,17 +43,22 @@ class MaleHomeViewModel: ViewModel() {
     private val _relatedOutfits = MutableStateFlow<List<OutfitData>>(emptyList())
     val relatedOutfits: StateFlow<List<OutfitData>> = _relatedOutfits
 
+    // Pagination state
     private var lastVisibleDoc: DocumentSnapshot? = null
     private var isLastPageReached = false
     private var isFetching = false
+
+    // Filter state to track what's currently being used
+    private var currentFilters: Filters? = null
+    private var currentFieldName: String? = null
+    private var currentFieldValue: String? = null
+    private var currentGender: String? = null
 
     private val _availableFilters = MutableStateFlow(AvailableFilters())
     val availableFilters: StateFlow<AvailableFilters> = _availableFilters
 
     private val _appliedFilters = MutableStateFlow(AppliedFilters())
     val appliedFilters: StateFlow<AppliedFilters> = _appliedFilters
-
-
 
     fun fetchOutfitsByFieldAndGender(
         context: Context,
@@ -62,55 +67,101 @@ class MaleHomeViewModel: ViewModel() {
         gender: String,
         reset: Boolean = false,
         pageSize: Long = 15L) {
+
+        Log.d("MaleHomeViewModel", "🔄 fetchOutfitsByFieldAndGender called - fieldName: $fieldName, fieldValue: $fieldValue, gender: $gender, reset: $reset")
+
         viewModelScope.launch {
             // prevent concurrent fetches
-            if (isFetching) return@launch
-            if (reset) clearOutfits()
-            if (isLastPageReached) return@launch
+            if (isFetching) {
+                Log.d("MaleHomeViewModel", "⏸️ Already fetching, skipping...")
+                return@launch
+            }
+
+            // Always reset when switching from filtered to unfiltered or when explicitly requested
+            if (reset || currentFilters != null) {
+                Log.d("MaleHomeViewModel", "🔄 Resetting state (switching from filtered to unfiltered or explicit reset)...")
+                clearOutfits()
+                currentFilters = null
+            }
+
+            if (isLastPageReached && !reset && currentFilters == null) {
+                Log.d("MaleHomeViewModel", "🚫 Last page reached, skipping...")
+                return@launch
+            }
+
+            // Store current fetch params
+            currentFieldName = fieldName
+            currentFieldValue = fieldValue
+            currentGender = gender
+
             isFetching = true
+
             try {
                 _isLoading.value = true
                 _error.value = null
 
-                Log.d("OutfitFetch", "Fetching outfits where $fieldName=$fieldValue and gender=$gender")
+                Log.d("MaleHomeViewModel", "📡 Building query for $fieldName=$fieldValue and gender=$gender")
 
-                val baseQuery= Firebase.firestore.collection("outfits")
+                val baseQuery = Firebase.firestore.collection("outfits")
                     .whereIn("gender", listOf(gender, "unisex"))
+
                 val arrayFields = setOf("tags", "style", "occasion","season")
 
                 var finalQuery = if (fieldName in arrayFields) {
+                    Log.d("MaleHomeViewModel", "🎯 Using array contains for field: $fieldName")
                     baseQuery.whereArrayContains(fieldName, fieldValue)
                 } else {
+                    Log.d("MaleHomeViewModel", "🎯 Using equal to for field: $fieldName")
                     baseQuery.whereEqualTo(fieldName, fieldValue)
                 }
 
-                finalQuery = finalQuery
-                    .orderBy(FieldPath.documentId())
-                    .limit(pageSize)
+                // Apply ordering first, then pagination
+                finalQuery = finalQuery.orderBy(FieldPath.documentId())
 
                 lastVisibleDoc?.let { last ->
-                    // start after last fetched doc id
+                    Log.d("MaleHomeViewModel", "📄 Starting after document: ${last.id}")
                     finalQuery = finalQuery.startAfter(last.id)
                 }
 
+                finalQuery = finalQuery.limit(pageSize)
+
                 val result = finalQuery.get().await()
+                Log.d("MaleHomeViewModel", "✅ Query returned ${result.documents.size} documents")
 
                 val outfitList = result.documents.mapNotNull { doc ->
-                    doc.toObject(OutfitData::class.java)?.copy(id = doc.id)
+                    try {
+                        doc.toObject(OutfitData::class.java)?.copy(id = doc.id)
+                    } catch (e: Exception) {
+                        Log.e("MaleHomeViewModel", "❌ Error parsing document ${doc.id}", e)
+                        null
+                    }
                 }
 
+                Log.d("MaleHomeViewModel", "📊 Successfully parsed ${outfitList.size} outfits")
+
                 // update vs replace depending on reset
-                _outfits.value = if (reset) outfitList else _outfits.value + outfitList
-                // ✅ prefetch those 15 images
+                val shouldReset = reset || currentFilters != null
+                _outfits.value = if (shouldReset) {
+                    Log.d("MaleHomeViewModel", "🔄 Replacing outfits with new list")
+                    outfitList
+                } else {
+                    Log.d("MaleHomeViewModel", "➕ Appending ${outfitList.size} outfits to existing ${_outfits.value.size}")
+                    _outfits.value + outfitList
+                }
+
+                // prefetch images
                 prefetchImages(context.applicationContext, outfitList)
 
                 lastVisibleDoc = result.documents.lastOrNull()
                 if (result.documents.size < pageSize.toInt()) {
+                    Log.d("MaleHomeViewModel", "🏁 Last page reached (${result.documents.size} < $pageSize)")
                     isLastPageReached = true
                 }
 
+                Log.d("MaleHomeViewModel", "✅ Fetch completed. Total outfits: ${_outfits.value.size}")
+
             } catch (e: Exception) {
-                Log.e("OutfitFetch", "Error fetching outfits", e)
+                Log.e("MaleHomeViewModel", "❌ Error fetching outfits", e)
                 _error.value = "Failed to load outfits: ${e.message}"
             } finally {
                 _isLoading.value = false
@@ -119,16 +170,17 @@ class MaleHomeViewModel: ViewModel() {
         }
     }
 
-    // Clear outfits to prevent showing previous screen content
     fun clearOutfits() {
+        Log.d("MaleHomeViewModel", "🧹 Clearing outfits and pagination state")
         _outfits.value = emptyList()
         lastVisibleDoc = null
         isLastPageReached = false
         _error.value = null
+        currentFilters = null
     }
 
-    // Load the user's favorite outfits from Firestore
     fun loadFavorites(userId: String) {
+        Log.d("MaleHomeViewModel", "❤️ Loading favorites for user: $userId")
         viewModelScope.launch {
             try {
                 _isLoading.value = true
@@ -142,31 +194,36 @@ class MaleHomeViewModel: ViewModel() {
 
                 val favorites = mutableMapOf<String, Boolean>()
 
-                // Iterate over the saved outfits to populate favorite status
                 result.documents.forEach { doc ->
                     val outfitId = doc.id
-                    favorites[outfitId] = true  // If it exists, it's a favorite
+                    favorites[outfitId] = true
                 }
 
-                // Update the favoriteMap in ViewModel
+                Log.d("MaleHomeViewModel", "❤️ Loaded ${favorites.size} favorites")
                 _favoriteMap.value = favorites
+
             } catch (e: Exception) {
+                Log.e("MaleHomeViewModel", "❌ Error loading favorites", e)
                 _error.value = "Failed to load favorites: ${e.message}"
             } finally {
                 _isLoading.value = false
             }
         }
     }
-    // Clear favorites when the user logs out or when no user is logged in
+
     fun clearFavorites() {
+        Log.d("MaleHomeViewModel", "💔 Clearing favorites")
         _favoriteMap.value = emptyMap()
     }
+
     fun toggleFavorite(outfit: OutfitData) {
         val outfitId = outfit.id
         val isCurrentlyFavorite = _favoriteMap.value[outfitId] ?: false
         val newMap = _favoriteMap.value.toMutableMap()
         newMap[outfitId] = !isCurrentlyFavorite
         _favoriteMap.value = newMap
+
+        Log.d("MaleHomeViewModel", "❤️ Toggling favorite for ${outfit.id}: ${!isCurrentlyFavorite}")
 
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val db = Firebase.firestore
@@ -178,11 +235,14 @@ class MaleHomeViewModel: ViewModel() {
         viewModelScope.launch {
             try {
                 if (!isCurrentlyFavorite) {
-                    outfitRef.set(outfit)  // If it's now a favorite, save it to Firestore
+                    Log.d("MaleHomeViewModel", "❤️ Adding to favorites: ${outfit.id}")
+                    outfitRef.set(outfit)
                 } else {
-                    outfitRef.delete()  // If it's removed from favorites, delete from Firestore
+                    Log.d("MaleHomeViewModel", "💔 Removing from favorites: ${outfit.id}")
+                    outfitRef.delete()
                 }
             } catch (e: Exception) {
+                Log.e("MaleHomeViewModel", "❌ Error updating favorite", e)
                 // Revert the favorite status if the Firestore operation fails
                 val revertMap = _favoriteMap.value.toMutableMap()
                 revertMap[outfitId] = isCurrentlyFavorite
@@ -203,38 +263,49 @@ class MaleHomeViewModel: ViewModel() {
             }
         }
     }
+
     fun fetchSavedOutfits() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val db = Firebase.firestore
+
+        Log.d("MaleHomeViewModel", "💾 Setting up saved outfits listener for user: $userId")
 
         db.collection("users")
             .document(userId)
             .collection("savedOutfits")
             .addSnapshotListener { snapshot, error ->
-                if (error != null || snapshot == null) return@addSnapshotListener
+                if (error != null || snapshot == null) {
+                    Log.e("MaleHomeViewModel", "❌ Error in saved outfits listener", error)
+                    return@addSnapshotListener
+                }
 
                 val saved = snapshot.documents.mapNotNull { it.toObject(OutfitData::class.java) }
                 _savedOutfits.value = saved
 
-                // Update favorite map
                 val newFavoriteMap = mutableMapOf<String, Boolean>()
                 saved.forEach { newFavoriteMap[it.id] = true }
                 _favoriteMap.value = newFavoriteMap
+
+                Log.d("MaleHomeViewModel", "💾 Updated saved outfits: ${saved.size} items")
             }
     }
 
     fun fetchRelatedOutfits(currentOutfit: OutfitData) {
+        Log.d("MaleHomeViewModel", "🔗 Fetching related outfits for: ${currentOutfit.id}")
         viewModelScope.launch {
-            // Assuming 'outfits' is already loaded in memory (from repository)
-            val allOutfits = outfits.value // StateFlow/LiveData of all outfits
+            val allOutfits = outfits.value
             val filtered = allOutfits.filter {
-                it.category == currentOutfit.category && it.id != currentOutfit.id && it.type == currentOutfit.type
+                it.category == currentOutfit.category &&
+                        it.id != currentOutfit.id &&
+                        it.type == currentOutfit.type
             }
+            Log.d("MaleHomeViewModel", "🔗 Found ${filtered.size} related outfits")
             _relatedOutfits.value = filtered
         }
     }
 
     private fun prefetchImages(context: Context, outfits: List<OutfitData>) {
+        Log.d("MaleHomeViewModel", "🖼️ Prefetching ${outfits.size} images")
         val imageLoader = ImageLoader(context)
         outfits.forEach { outfit ->
             outfit.imageUrl?.let { url ->
@@ -249,9 +320,10 @@ class MaleHomeViewModel: ViewModel() {
     }
 
     fun fetchAvailableFilters(gender: String, fieldName: String, fieldValue: String) {
+        Log.d("MaleHomeViewModel", "🎛️ Fetching available filters for: gender=$gender, field=$fieldName, value=$fieldValue")
         viewModelScope.launch {
             try {
-                val gendersToFetch = listOf(gender, "unisex") // both gender + unisex
+                val gendersToFetch = listOf(gender, "unisex")
                 val mergedFilters = AvailableFilters(
                     categories = mutableSetOf(),
                     brands = mutableSetOf(),
@@ -262,6 +334,8 @@ class MaleHomeViewModel: ViewModel() {
 
                 gendersToFetch.forEach { g ->
                     val docId = "${fieldName}_${fieldValue}_$g"
+                    Log.d("MaleHomeViewModel", "🎛️ Fetching filter document: $docId")
+
                     val doc = firestore.collection("filters")
                         .document(docId)
                         .get()
@@ -269,25 +343,27 @@ class MaleHomeViewModel: ViewModel() {
 
                     if (doc.exists()) {
                         val data = doc.data ?: return@forEach
+                        Log.d("MaleHomeViewModel", "✅ Filter document exists for $docId")
 
                         mergedFilters.categories += (data["categories"] as? List<String>)?.toSet() ?: emptySet()
                         mergedFilters.brands += (data["brand"] as? List<String>)?.toSet() ?: emptySet()
                         mergedFilters.colors += (data["colors"] as? List<String>)?.toSet() ?: emptySet()
                         mergedFilters.fits += (data["fits"] as? List<String>)?.toSet() ?: emptySet()
                         mergedFilters.types += (data["type"] as? List<String>)?.toSet() ?: emptySet()
+                    } else {
+                        Log.w("MaleHomeViewModel", "⚠️ Filter document does not exist: $docId")
                     }
                 }
 
-                // Update StateFlow once with merged results
+                Log.d("MaleHomeViewModel", "🎛️ Merged filters - Categories: ${mergedFilters.categories.size}, Brands: ${mergedFilters.brands.size}, Colors: ${mergedFilters.colors.size}, Types: ${mergedFilters.types.size}, Fits: ${mergedFilters.fits.size}")
                 _availableFilters.value = mergedFilters
 
             } catch (e: Exception) {
-                Log.e("FilterFetch", "Error fetching filters", e)
-                _availableFilters.value = AvailableFilters() // fallback
+                Log.e("MaleHomeViewModel", "❌ Error fetching filters", e)
+                _availableFilters.value = AvailableFilters()
             }
         }
     }
-
 
     fun fetchFilteredOutfits(
         context: Context,
@@ -298,14 +374,26 @@ class MaleHomeViewModel: ViewModel() {
         reset: Boolean = true,
         pageSize: Long = 15L
     ) {
+        Log.d("MaleHomeViewModel", "🎯 fetchFilteredOutfits called - fieldName: $fieldName, fieldValue: $fieldValue, gender: $gender, reset: $reset")
+        Log.d("MaleHomeViewModel", "🎯 Filters: $filters")
+
         viewModelScope.launch {
-            // Reset state if new search
-            if (reset) {
+            // Reset pagination state if new search or filters changed
+            if (reset || currentFilters != filters) {
+                Log.d("MaleHomeViewModel", "🔄 Resetting for new filter search")
                 clearOutfits()
                 lastVisibleDoc = null
                 isLastPageReached = false
+                currentFilters = filters
+                currentFieldName = fieldName
+                currentFieldValue = fieldValue
+                currentGender = gender
             }
-            if (isFetching || isLastPageReached) return@launch
+
+            if (isFetching || isLastPageReached) {
+                Log.d("MaleHomeViewModel", if (isFetching) "⏸️ Already fetching" else "🚫 Last page reached")
+                return@launch
+            }
 
             isFetching = true
             _isLoading.value = true
@@ -313,66 +401,113 @@ class MaleHomeViewModel: ViewModel() {
 
             try {
                 // Base query: match current screen field + gender/unisex
+                Log.d("MaleHomeViewModel", "🔨 Building base query...")
                 val baseQuery: Query = Firebase.firestore.collection("outfits")
                     .whereIn("gender", listOf(gender, "unisex"))
 
                 val arrayFields = setOf("tags", "style", "occasion", "season")
                 var finalQuery: Query = if (fieldName in arrayFields) {
+                    Log.d("MaleHomeViewModel", "🎯 Using array contains for field: $fieldName")
                     baseQuery.whereArrayContains(fieldName, fieldValue)
                 } else {
+                    Log.d("MaleHomeViewModel", "🎯 Using equal to for field: $fieldName")
                     baseQuery.whereEqualTo(fieldName, fieldValue)
                 }
 
-                // Apply filters
-                filters.categories.takeIf { it.isNotEmpty() }?.let {
-                    finalQuery = finalQuery.whereIn("category", it.toList())
+                // Apply filters with detailed logging
+                filters.categories.takeIf { it.isNotEmpty() }?.let { categories ->
+                    Log.d("MaleHomeViewModel", "🎯 Applying category filter: $categories")
+                    finalQuery = finalQuery.whereIn("category", categories.toList())
                 }
-                filters.websites.takeIf { it.isNotEmpty() }?.let {
-                    finalQuery = finalQuery.whereIn("website", it.toList())
+
+                filters.websites.takeIf { it.isNotEmpty() }?.let { websites ->
+                    Log.d("MaleHomeViewModel", "🎯 Applying website filter: $websites")
+                    finalQuery = finalQuery.whereIn("website", websites.toList())
                 }
-                filters.colors.takeIf { it.isNotEmpty() }?.let {
-                    finalQuery = finalQuery.whereIn("color", it.toList())
+
+                filters.colors.takeIf { it.isNotEmpty() }?.let { colors ->
+                    Log.d("MaleHomeViewModel", "🎯 Applying color filter: $colors")
+                    finalQuery = finalQuery.whereIn("color", colors.toList())
                 }
-                filters.type?.let { finalQuery = finalQuery.whereEqualTo("type", it) }
-                filters.fits.takeIf { it.isNotEmpty() }?.let {
-                    finalQuery = finalQuery.whereIn("fit", it.toList())
+
+                filters.type?.let { type ->
+                    Log.d("MaleHomeViewModel", "🎯 Applying type filter: $type")
+                    finalQuery = finalQuery.whereEqualTo("type", type)
                 }
+
+                filters.fits.takeIf { it.isNotEmpty() }?.let { fits ->
+                    Log.d("MaleHomeViewModel", "🎯 Applying fit filter: $fits")
+                    finalQuery = finalQuery.whereIn("fit", fits.toList())
+                }
+
+                // Price filtering will be done in-memory since Firestore can't handle string comparison properly
+
+                // Apply ordering FIRST, then pagination
+                finalQuery = finalQuery.orderBy(FieldPath.documentId())
 
                 // Pagination
                 lastVisibleDoc?.let { last ->
+                    Log.d("MaleHomeViewModel", "📄 Starting after document: ${last.id}")
                     finalQuery = finalQuery.startAfter(last)
                 }
 
-                finalQuery = finalQuery.orderBy(FieldPath.documentId()).limit(pageSize)
+                finalQuery = finalQuery.limit(pageSize)
 
                 // Fetch data
+                Log.d("MaleHomeViewModel", "📡 Executing filtered query...")
                 val result = finalQuery.get().await()
+                Log.d("MaleHomeViewModel", "✅ Filtered query returned ${result.documents.size} documents")
+
                 val outfitList = result.documents.mapNotNull { doc ->
-                    doc.toObject(OutfitData::class.java)?.copy(id = doc.id)
+                    try {
+                        doc.toObject(OutfitData::class.java)?.copy(id = doc.id)
+                    } catch (e: Exception) {
+                        Log.e("MaleHomeViewModel", "❌ Error parsing document ${doc.id}", e)
+                        null
+                    }
                 }
 
-                // Append or replace based on reset
-                _outfits.value = if (reset) outfitList else _outfits.value + outfitList
+                // Apply price filter in-memory if needed
+                val filteredOutfits = if (filters.priceRange != 0f..20000f) {
+                    Log.d("MaleHomeViewModel", "💰 Applying price filter in-memory: ${filters.priceRange}")
+                    outfitList.filter { outfit ->
+                        outfit.price.toFloatOrNull()?.let { price ->
+                            price in filters.priceRange
+                        } ?: true
+                    }
+                } else {
+                    outfitList
+                }
 
-                // Prefetch images for smoother UI
-                prefetchImages(context.applicationContext, outfitList)
+                Log.d("MaleHomeViewModel", "📊 Final filtered list: ${filteredOutfits.size} outfits")
+
+                // Append or replace based on reset
+                _outfits.value = if (reset) {
+                    Log.d("MaleHomeViewModel", "🔄 Replacing with filtered results")
+                    filteredOutfits
+                } else {
+                    Log.d("MaleHomeViewModel", "➕ Appending filtered results")
+                    _outfits.value + filteredOutfits
+                }
+
+                // Prefetch images
+                prefetchImages(context.applicationContext, filteredOutfits)
 
                 lastVisibleDoc = result.documents.lastOrNull()
                 if (result.documents.size < pageSize.toInt()) {
+                    Log.d("MaleHomeViewModel", "🏁 Last page reached for filtered results")
                     isLastPageReached = true
                 }
 
+                Log.d("MaleHomeViewModel", "✅ Filtered fetch completed. Total outfits: ${_outfits.value.size}")
+
             } catch (e: Exception) {
-                Log.e("OutfitFetch", "Error fetching filtered outfits", e)
-                _error.value = "Failed to fetch outfits: ${e.message}"
+                Log.e("MaleHomeViewModel", "❌ Error fetching filtered outfits", e)
+                _error.value = "Failed to fetch filtered outfits: ${e.message}"
             } finally {
                 _isLoading.value = false
                 isFetching = false
             }
         }
     }
-
-
-
-
 }

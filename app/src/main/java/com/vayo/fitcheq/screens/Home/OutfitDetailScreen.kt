@@ -107,22 +107,35 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
     val currentUser = FirebaseAuth.getInstance().currentUser
     // Local loading state to show immediately
     var isInitialLoading by remember { mutableStateOf(true) }
-    // 🔹 State for selected category
+    // State for selected filters
     var filters by remember { mutableStateOf(Filters()) }
+    // Track if we're applying filters to show loading
+    var isApplyingFilters by remember { mutableStateOf(false) }
 
     // Clear previous data and start loading immediately
     LaunchedEffect(gender, fieldName, fieldValue) {
+        Log.d("OutfitDetailsScreen", "🔄 Screen params changed: gender=$gender, field=$fieldName, value=$fieldValue")
         filters = Filters()
         isInitialLoading = true
+        isApplyingFilters = false
+
         // Clear previous outfits to prevent showing old content
         viewModel.clearOutfits()
-        viewModel.fetchAvailableFilters(gender,fieldName,fieldValue)
-        viewModel.fetchOutfitsByFieldAndGender(context,fieldName, fieldValue, gender)
+
+        // Fetch filters and initial outfits
+        Log.d("OutfitDetailsScreen", "📡 Fetching available filters...")
+        viewModel.fetchAvailableFilters(gender, fieldName, fieldValue)
+
+        Log.d("OutfitDetailsScreen", "📡 Fetching initial outfits...")
+        viewModel.fetchOutfitsByFieldAndGender(context, fieldName, fieldValue, gender)
+
         isInitialLoading = false
     }
+
     // Load favorites when screen loads
     LaunchedEffect(Unit) {
         currentUser?.uid?.let { userId ->
+            Log.d("OutfitDetailsScreen", "❤️ Loading favorites for user: $userId")
             viewModel.loadFavorites(userId)
         }
     }
@@ -130,7 +143,6 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
     val outfits = viewModel.outfits.collectAsState().value
     val isLoading = viewModel.isLoading.collectAsState().value
     val error = viewModel.error.collectAsState().value
-
     val availableFilters = viewModel.availableFilters.collectAsState().value
 
     val categories = availableFilters.categories.toList()
@@ -138,6 +150,8 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
     val colors = availableFilters.colors.toList()
     val fits = availableFilters.fits.toList()
     val types = availableFilters.types.toList()
+
+    Log.d("OutfitDetailsScreen", "🔍 Available filters - Categories: ${categories.size}, Brands: ${brands.size}, Colors: ${colors.size}, Types: ${types.size}, Fits: ${fits.size}")
 
     // Add this helper function to check if any filters are applied
     val hasActiveFilters = filters.categories.isNotEmpty() ||
@@ -147,50 +161,61 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
             filters.type != null ||
             filters.priceRange != 0f..20000f // assuming default range
 
-    // 🔹 Filtered outfits if a filter is selected
-    val filteredOutfits = remember(outfits, filters) {
-        outfits.filter { outfit ->
-            val matchCategory = if (filters.categories.isNotEmpty()) {
-                outfit.category in filters.categories
-            } else true
+    Log.d("OutfitDetailsScreen", "🎯 Current filters - Categories: ${filters.categories}, Websites: ${filters.websites}, Colors: ${filters.colors}, Type: ${filters.type}, Fits: ${filters.fits}, HasActive: $hasActiveFilters")
 
-            val matchBrand = if (filters.websites.isNotEmpty()) {
-                outfit.website in filters.websites
-            } else true
+    // Function to apply filters consistently
+    val applyFilters = { newFilters: Filters ->
+        Log.d("OutfitDetailsScreen", "🔧 Applying filters: $newFilters")
+        filters = newFilters
+        isApplyingFilters = true
 
-            val matchColor = if (filters.colors.isNotEmpty()) {
-                outfit.color in filters.colors
-            } else true
+        coroutineScope.launch {
+            try {
+                val hasNewActiveFilters = newFilters.categories.isNotEmpty() ||
+                        newFilters.websites.isNotEmpty() ||
+                        newFilters.colors.isNotEmpty() ||
+                        newFilters.fits.isNotEmpty() ||
+                        newFilters.type != null ||
+                        newFilters.priceRange != 0f..20000f
 
-            val matchType = filters.type?.let { outfit.type == it } ?: true
-
-            val matchPrice = outfit.price.toFloatOrNull()?.let { price ->
-                price in filters.priceRange
-            } ?: true // if price is null or not a number, include it
-
-            val matchFit = if (filters.fits.isNotEmpty()) {
-                outfit.fit in filters.fits
-            } else true
-
-            matchCategory && matchBrand && matchColor && matchType && matchPrice && matchFit
+                if (hasNewActiveFilters) {
+                    Log.d("OutfitDetailsScreen", "📡 Fetching filtered outfits...")
+                    viewModel.fetchFilteredOutfits(context, fieldName, fieldValue, gender, newFilters, reset = true)
+                } else {
+                    Log.d("OutfitDetailsScreen", "📡 No filters active, fetching all outfits...")
+                    viewModel.clearOutfits()
+                    viewModel.fetchOutfitsByFieldAndGender(context, fieldName, fieldValue, gender)
+                }
+            } finally {
+                isApplyingFilters = false
+            }
         }
     }
 
     // Pagination
     val gridState = rememberLazyGridState()
-    LaunchedEffect(gridState, filteredOutfits.size, isLoading) {
+    LaunchedEffect(gridState, outfits.size, isLoading, hasActiveFilters) {
         snapshotFlow { gridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1 }
             .distinctUntilChanged()
             .collect { lastVisibleIndex ->
                 if (lastVisibleIndex == -1) return@collect
                 val total = gridState.layoutInfo.totalItemsCount
                 val prefetchThreshold = 4 // 2 rows * 2 columns
-                if (total > 0 && lastVisibleIndex >= total - prefetchThreshold && !isLoading) {
-                    // call the same function you already use — it'll fetch the next page
-                    viewModel.fetchOutfitsByFieldAndGender(context,fieldName, fieldValue, gender)
+
+                if (total > 0 && lastVisibleIndex >= total - prefetchThreshold && !isLoading && !isApplyingFilters) {
+                    Log.d("OutfitDetailsScreen", "📄 Loading more items... lastVisible: $lastVisibleIndex, total: $total, hasActiveFilters: $hasActiveFilters")
+
+                    if (hasActiveFilters) {
+                        Log.d("OutfitDetailsScreen", "📄 Loading more filtered items...")
+                        viewModel.fetchFilteredOutfits(context, fieldName, fieldValue, gender, filters, reset = false)
+                    } else {
+                        Log.d("OutfitDetailsScreen", "📄 Loading more unfiltered items...")
+                        viewModel.fetchOutfitsByFieldAndGender(context, fieldName, fieldValue, gender, reset = false)
+                    }
                 }
             }
     }
+
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true // allows 60% expansion
     )
@@ -211,16 +236,6 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
     var selectedFilter by remember(filterTypes) {
         mutableStateOf(filterTypes.first())
     }
-    LaunchedEffect(filters) {
-        Log.d("FilterDebug", "LaunchedEffect triggered with filters: $filters")
-
-        if (filters != Filters()) {
-            Log.d("FilterDebug", "Fetching outfits with filters: $filters")
-            viewModel.fetchFilteredOutfits(context, fieldName, fieldValue, gender, filters)
-        } else {
-            Log.d("FilterDebug", "Filters are empty, not fetching")
-        }
-    }
 
     val categoryMaxMap = mapOf(
         "accessories" to 2000f,
@@ -234,11 +249,26 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                 .minOrNull() ?: 10000f
         )
     }
+    LaunchedEffect(maxPriceLimit, filters.categories) {
+        // Reset price range when categories change or when max limit changes
+        val shouldResetPriceRange = filters.categories.isEmpty() ||
+                filters.priceRange.endInclusive != maxPriceLimit
+
+        if (shouldResetPriceRange) {
+            val newRange = 0f..maxPriceLimit
+            if (newRange != filters.priceRange) {
+                Log.d("OutfitDetailsScreen", "💰 Resetting price range to: $newRange (maxLimit: $maxPriceLimit)")
+                val newFilters = filters.copy(priceRange = newRange)
+                filters = newFilters // Update local state without triggering new fetch
+            }
+        }
+    }
     LaunchedEffect(maxPriceLimit) {
         val currentRange = filters.priceRange
         val newRange = currentRange.start..min(currentRange.endInclusive, maxPriceLimit)
         if (newRange != currentRange) {
-            filters = filters.copy(priceRange = newRange)
+            val newFilters = filters.copy(priceRange = newRange)
+            applyFilters(newFilters)
         }
     }
 
@@ -326,14 +356,20 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                     val listToShow = if (categories.isNotEmpty() && categories.size > 1) categories else types
                     val isCategoryList = categories.isNotEmpty() && categories.size > 1
 
+                    Log.d("OutfitDetailsScreen", "🎨 Showing chips - isCategoryList: $isCategoryList, listToShow: $listToShow")
+
                     items(listToShow) { item ->
                         val chipTitle = item.replaceFirstChar { it.uppercase() }
                         val isSelected = if (isCategoryList) filters.categories.contains(item)
-                        else filters.type?.contains(item) == true // or however you store type filter
+                        else filters.type == item
+
+                        Log.d("OutfitDetailsScreen", "🎯 Chip '$item' - selected: $isSelected, isCategoryList: $isCategoryList")
 
                         FilterChip(
                             selected = isSelected,
                             onClick = {
+                                Log.d("OutfitDetailsScreen", "🎯 Chip clicked: $item, currentlySelected: $isSelected")
+
                                 val newFilters = if (isCategoryList) {
                                     filters.copy(
                                         categories = if (isSelected) filters.categories - item
@@ -344,9 +380,9 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                                         type = if (isSelected) null else item
                                     )
                                 }
-                                Log.d("FilterDebug", "Chip clicked. Old filters: $filters, New filters: $newFilters")
-                                filters = newFilters
 
+                                Log.d("OutfitDetailsScreen", "🎯 New filters after chip click: $newFilters")
+                                applyFilters(newFilters)
                             },
                             label = {
                                 Text(
@@ -386,6 +422,7 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
         {
             when {
                 isInitialLoading || (isLoading && outfits.isEmpty())-> {
+                    Log.d("OutfitDetailsScreen", "⏳ Showing initial loading...")
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -394,6 +431,7 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                     }
                 }
                 error != null -> {
+                    Log.e("OutfitDetailsScreen", "❌ Error state: $error")
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -405,7 +443,8 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                         )
                     }
                 }
-                hasActiveFilters && filteredOutfits.isEmpty() && !isLoading -> {
+                hasActiveFilters && outfits.isEmpty() && !isLoading && !isApplyingFilters -> {
+                    Log.d("OutfitDetailsScreen", "🚫 No filtered results")
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -428,8 +467,8 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                             )
                             OutlinedButton(
                                 onClick = {
-                                    filters = Filters()
-                                    viewModel.fetchFilteredOutfits(context, fieldName, fieldValue, gender, filters)
+                                    Log.d("OutfitDetailsScreen", "🔄 Clearing all filters")
+                                    applyFilters(Filters())
                                 },
                                 modifier = Modifier.padding(top = 16.dp),
                                 colors = ButtonDefaults.outlinedButtonColors(
@@ -442,6 +481,7 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                     }
                 }
                 outfits.isEmpty() -> {
+                    Log.d("OutfitDetailsScreen", "📭 No outfits found")
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -455,118 +495,157 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                 }
 
                 else -> {
-                    LazyVerticalGrid(
-                        state = gridState,
-                        columns = GridCells.Fixed(2),
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 0.dp),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        item(span = { GridItemSpan(2) }) { Spacer(modifier = Modifier.height(8.dp)) }
-                        items(filteredOutfits) { outfit ->
-                            val favoriteMap by viewModel.favoriteMap.collectAsState()
-                            val isFavorite = favoriteMap[outfit.id] ?: false
-                            val priceNumber = outfit.price.toLongOrNull() ?: 0L
-                            val formattedPrice = NumberFormat.getNumberInstance(Locale("en", "IN"))
-                                .format(priceNumber)
-                            Card(
-                                colors = CardDefaults.cardColors(containerColor = Color.White),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(2.dp)
-                                    .clickable {
-                                        navController.navigate(AuthScreen.ItemInfo.passOutfit(outfit))
-                                    },
-                                elevation = CardDefaults.cardElevation(1.dp),
-                                shape = RoundedCornerShape(12.dp),
-                            ) {
-                                Column(
-                                    modifier = Modifier.padding(8.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
+                    Log.d("OutfitDetailsScreen", "📱 Displaying ${outfits.size} outfits")
+
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        LazyVerticalGrid(
+                            state = gridState,
+                            columns = GridCells.Fixed(2),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 0.dp),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            item(span = { GridItemSpan(2) }) { Spacer(modifier = Modifier.height(8.dp)) }
+                            items(outfits) { outfit ->
+                                val favoriteMap by viewModel.favoriteMap.collectAsState()
+                                val isFavorite = favoriteMap[outfit.id] ?: false
+                                val priceNumber = outfit.price.toLongOrNull() ?: 0L
+                                val formattedPrice = NumberFormat.getNumberInstance(Locale("en", "IN"))
+                                    .format(priceNumber)
+                                Card(
+                                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(2.dp)
+                                        .clickable {
+                                            navController.navigate(AuthScreen.ItemInfo.passOutfit(outfit))
+                                        },
+                                    elevation = CardDefaults.cardElevation(1.dp),
+                                    shape = RoundedCornerShape(12.dp),
                                 ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .aspectRatio(4f / 5f)
-                                    ) {
-                                        AsyncImage(
-                                            model = ImageRequest.Builder(LocalContext.current)
-                                                .data(outfit.imageUrl)
-                                                .size(500)
-                                                .crossfade(200)
-                                                .build(),
-                                            contentDescription = outfit.title,
-                                            contentScale = ContentScale.Crop,
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                                .clip(RoundedCornerShape(8.dp))
-                                        )
-                                        Icon(
-                                            imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                                            contentDescription = "Favorite",
-                                            tint = if (isFavorite) Color.Red else Color.White,
-                                            modifier = Modifier
-                                                .align(Alignment.TopEnd)
-                                                .padding(8.dp)
-                                                .size(24.dp)
-                                                .clickable {
-                                                    viewModel.toggleFavorite(outfit)
-                                                    Toast.makeText(
-                                                        context,
-                                                        if (isFavorite) "Removed from wishlist" else "Added to wishlist",
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
-                                                }
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.height(8.dp))
                                     Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 4.dp),
-                                        verticalArrangement = Arrangement.spacedBy(2.dp)
+                                        modifier = Modifier.padding(8.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
-                                        val formattedTitle = outfit.title
-                                            .split(" ")
-                                            .joinToString(" ") { word -> word.replaceFirstChar { it.uppercase() } }
-                                        Text(
-                                            text = formattedTitle,
-                                            fontWeight = FontWeight.SemiBold,
-                                            fontSize = 14.sp,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis,
+                                        Box(
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .basicMarquee()
-                                                .focusable()
-                                        )
-
-                                        Spacer(modifier = Modifier.width(4.dp))
-
-                                        Text(
-                                            text = "₹${formattedPrice}",
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 14.sp,
-                                        )
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.End
+                                                .aspectRatio(4f / 5f)
                                         ) {
-                                            Text(
-                                                text = outfit.website.toUpperCase(),
-                                                fontSize = 12.sp,
-                                                fontStyle = FontStyle.Italic,
-                                                color = Color.DarkGray
+                                            AsyncImage(
+                                                model = ImageRequest.Builder(LocalContext.current)
+                                                    .data(outfit.imageUrl)
+                                                    .size(500)
+                                                    .crossfade(200)
+                                                    .build(),
+                                                contentDescription = outfit.title,
+                                                contentScale = ContentScale.Crop,
+                                                modifier = Modifier
+                                                    .fillMaxSize()
+                                                    .clip(RoundedCornerShape(8.dp))
                                             )
+                                            Icon(
+                                                imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                                                contentDescription = "Favorite",
+                                                tint = if (isFavorite) Color.Red else Color.White,
+                                                modifier = Modifier
+                                                    .align(Alignment.TopEnd)
+                                                    .padding(8.dp)
+                                                    .size(24.dp)
+                                                    .clickable {
+                                                        viewModel.toggleFavorite(outfit)
+                                                        Toast.makeText(
+                                                            context,
+                                                            if (isFavorite) "Removed from wishlist" else "Added to wishlist",
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+                                                    }
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 4.dp),
+                                            verticalArrangement = Arrangement.spacedBy(2.dp)
+                                        ) {
+                                            val formattedTitle = outfit.title
+                                                .split(" ")
+                                                .joinToString(" ") { word -> word.replaceFirstChar { it.uppercase() } }
+                                            Text(
+                                                text = formattedTitle,
+                                                fontWeight = FontWeight.SemiBold,
+                                                fontSize = 14.sp,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .basicMarquee()
+                                                    .focusable()
+                                            )
+
+                                            Spacer(modifier = Modifier.width(4.dp))
+
+                                            Text(
+                                                text = "₹${formattedPrice}",
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 14.sp,
+                                            )
+                                            Row(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                horizontalArrangement = Arrangement.End
+                                            ) {
+                                                Text(
+                                                    text = outfit.website.toUpperCase(),
+                                                    fontSize = 12.sp,
+                                                    fontStyle = FontStyle.Italic,
+                                                    color = Color.DarkGray
+                                                )
+                                            }
                                         }
                                     }
                                 }
                             }
+                            item(span = { GridItemSpan(maxLineSpan) }) {
+                                if (isLoading) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(60.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                                    }
+                                } else {
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                }
+                            }
                         }
-                        item(span = { GridItemSpan(maxLineSpan) }) {
-                            Spacer(modifier = Modifier.height(12.dp))
+
+                        // Show loading overlay when applying filters
+                        if (isApplyingFilters) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(Color.Black.copy(alpha = 0.3f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Card(
+                                    modifier = Modifier.padding(16.dp),
+                                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(16.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        CircularProgressIndicator(modifier = Modifier.size(20.dp))
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text("Applying filters...")
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -649,13 +728,15 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                                             text = categoryTitle,
                                             isSelected = filters.categories.contains(category),
                                             onSelectedChange = { selected ->
-                                                filters = filters.copy(
+                                                val newFilters = filters.copy(
                                                     categories = if (selected) {
                                                         filters.categories + category
                                                     } else {
                                                         filters.categories - category
                                                     }
                                                 )
+                                                Log.d("OutfitDetailsScreen", "🎯 Category filter changed: $category, selected: $selected, newFilters: $newFilters")
+                                                filters = newFilters
                                             }
                                         )
                                     }
@@ -676,9 +757,9 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                                             text = brandTitle,
                                             isSelected = filters.websites.contains(brand),
                                             onSelectedChange = { selected ->
-                                                filters = filters.copy(websites = if(selected) filters.websites + brand else filters.websites - brand)
-                                                viewModel.fetchFilteredOutfits(context, fieldName, fieldValue, gender, filters)
-
+                                                val newFilters = filters.copy(websites = if(selected) filters.websites + brand else filters.websites - brand)
+                                                Log.d("OutfitDetailsScreen", "🎯 Brand filter changed: $brand, selected: $selected")
+                                                filters = newFilters
                                             }
                                         )
                                     }
@@ -699,13 +780,15 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                                             text = colorTitle,
                                             isSelected = filters.colors.contains(color),
                                             onSelectedChange = { selected ->
-                                                filters = filters.copy(
+                                                val newFilters = filters.copy(
                                                     colors = if (selected) {
                                                         filters.colors + color
                                                     } else {
                                                         filters.colors - color
                                                     }
                                                 )
+                                                Log.d("OutfitDetailsScreen", "🎯 Color filter changed: $color, selected: $selected")
+                                                filters = newFilters
                                             }
                                         )
                                     }
@@ -717,6 +800,7 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                                             maxPrice = maxPriceLimit,
                                             priceRange = filters.priceRange,
                                             onRangeChange = { selectedRange ->
+                                                Log.d("OutfitDetailsScreen", "💰 Price range changed: $selectedRange")
                                                 filters = filters.copy(priceRange = selectedRange)
                                             }
                                         )
@@ -738,19 +822,19 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                                             text = fitTitle,
                                             isSelected = filters.fits.contains(fit),
                                             onSelectedChange = { selected ->
-                                                filters = filters.copy(
+                                                val newFilters = filters.copy(
                                                     fits = if (selected) {
                                                         filters.fits + fit
                                                     } else {
                                                         filters.fits - fit
                                                     }
                                                 )
+                                                Log.d("OutfitDetailsScreen", "🎯 Fit filter changed: $fit, selected: $selected")
+                                                filters = newFilters
                                             }
                                         )
                                     }
                                 }
-
-
                             }
                         }
                     }
@@ -783,8 +867,8 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                             contentPadding = PaddingValues(0.dp),
                             colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.Transparent,   contentColor = Color.Black),
                             onClick = {
+                                Log.d("OutfitDetailsScreen", "🔄 Clear button clicked")
                                 filters = Filters()
-                                viewModel.fetchFilteredOutfits(context, fieldName, fieldValue, gender, filters)
                             },
                             shape = RoundedCornerShape(8.dp)
                         ) {
@@ -796,9 +880,11 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                             .height(50.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color.Black,   contentColor = Color.White),
                             onClick = {
+                                Log.d("OutfitDetailsScreen", "✅ Apply button clicked with filters: $filters")
                                 coroutineScope.launch {
                                     sheetState.hide()
                                     showSheet = false
+                                    applyFilters(filters)
                                 }
                             },
                             shape = RoundedCornerShape(8.dp)
@@ -906,5 +992,4 @@ fun PriceRangeFilter(
         }
     }
 }
-
 
