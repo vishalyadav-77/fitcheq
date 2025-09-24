@@ -87,23 +87,28 @@ fun FemaleHomeScreen(navController: NavController, authViewModel: AuthViewModel)
                 .fillMaxSize()
                 .background(Color.White)
                 .padding(paddingValues)
-                .padding(vertical = 10.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // APP TITLE
-            Text(
-                text = "Fit Cheq",
-                fontFamily = myTitleFont,
-                fontSize = 26.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
-            Spacer(modifier = Modifier.height(14.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 10.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Fit Cheq",
+                    fontFamily = myTitleFont,
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+                Spacer(modifier = Modifier.height(14.dp))
+            }
 
             // CONTENT
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .weight(1f)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
