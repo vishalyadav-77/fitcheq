@@ -1,13 +1,16 @@
 package com.vayo.fitcheq.navigation
 
+import androidx.compose.foundation.background
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -27,13 +30,15 @@ fun BottomNavigation(navController: NavController) {
         BottomNavItem.SavedOutfit,
         BottomNavItem.MyProfile
     )
-    Surface(
-        shadowElevation = 2.dp,
-        color = Color.White
-    ) {
-        NavigationBar(containerColor = Color.White,
-            tonalElevation = 0.dp,
-            modifier = Modifier.height(78.dp)
+    Column {
+        HorizontalDivider(
+            color = Color.LightGray, // adjust color if needed
+            thickness = 0.5.dp
+        )
+        NavigationBar(
+            containerColor = Color.White, // Debug color for NavigationBar
+//                tonalElevation = 2.dp,
+            modifier = Modifier.fillMaxWidth()
         ) {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route
@@ -52,6 +57,7 @@ fun BottomNavigation(navController: NavController) {
                                 contentDescription = item.title,
                                 modifier = Modifier.size(20.dp)
                             )
+
                             is IconType.PainterRes -> Icon(
                                 painter = painterResource(id = icon.resId),
                                 contentDescription = item.title,
@@ -116,4 +122,4 @@ fun BottomNavigation(navController: NavController) {
             }
         }
     }
-} 
+}

@@ -148,10 +148,14 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                 .fillMaxSize()
                 .background(Color.White)
                 .padding(paddingValues)
-                .padding(vertical = 10.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // APP TITLE
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 10.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
             Text(
                 text = "Fit Cheq",
                 fontFamily = myTitleFont,
@@ -160,11 +164,12 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             Spacer(modifier = Modifier.height(14.dp))
+                }
 
             // CONTENT
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .weight(1f)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {

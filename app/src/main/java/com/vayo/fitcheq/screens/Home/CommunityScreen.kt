@@ -118,7 +118,7 @@ fun CommunityScreen(navController: NavController, authViewModel: AuthViewModel) 
         else context.resources.getIdentifier("${genderPrefix}_normal", "drawable", context.packageName)
 
     }
-    val usersToShow = if (userProfile?.gender == "male") {
+    val usersToShow = if (userProfile?.gender?.equals("male", ignoreCase = true) == true) {
         instagramUsers
     } else {
         indianFemaleUsers
@@ -445,7 +445,7 @@ fun CommunityScreen(navController: NavController, authViewModel: AuthViewModel) 
                }
                Spacer(modifier = Modifier.height(20.dp))
 
-               if(userProfile?.gender=="male") {
+               if(userProfile?.gender?.equals("male", ignoreCase = true) == true) {
                    Text(
                        text = "Indian Fashion Influencers",
                        fontFamily = myHeadingFont,
