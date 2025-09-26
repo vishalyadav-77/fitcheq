@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.FitCheq" parent="android:Theme.Material.Light.NoActionBar" />
+<!--    <style name="Theme.FitCheq" parent="android:Theme.Material.Light.NoActionBar" />-->
+    <style name="Theme.FitCheq" parent="Theme.Material3.Light.NoActionBar">
+
+    </style>
+
+    <style name="Theme.FitCheq.Splash" parent="Theme.SplashScreen">
+        <!-- Background color -->
+        <item name="windowSplashScreenBackground">@color/white</item>
+
+        <!-- Duration of splash animation (ms) -->
+        <item name="windowSplashScreenAnimationDuration">200</item>
+
+        <!-- After splash, switch to normal theme -->
+        <item name="postSplashScreenTheme">@style/Theme.FitCheq</item>
+    </style>
 </resources>
