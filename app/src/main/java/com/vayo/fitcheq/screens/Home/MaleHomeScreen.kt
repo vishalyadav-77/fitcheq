@@ -2,22 +2,20 @@ package com.vayo.fitcheq.screens.Home
 
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -30,27 +28,22 @@ import androidx.compose.ui.platform.LocalContext
 import com.vayo.fitcheq.data.model.maleoccasionList
 import kotlinx.coroutines.tasks.await
 import com.vayo.fitcheq.navigation.ScreenContainer
-import androidx.compose.foundation.lazy.items
-import androidx.navigation.compose.rememberNavController
 import com.vayo.fitcheq.AuthScreen
-import com.vayo.fitcheq.data.model.FitsCategory
 import com.vayo.fitcheq.data.model.malecategoryList
 import com.vayo.fitcheq.data.model.malefashionList
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.Dp
 import com.vayo.fitcheq.R
 import coil.compose.AsyncImage
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
 import com.vayo.fitcheq.data.model.maleSeasonList
 import com.vayo.fitcheq.ui.theme.modernShimmer
@@ -74,19 +67,30 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
     val myHeadingFont = FontFamily(
         Font(R.font.headings_kugile)
     )
-    val commentFont = FontFamily(
-        Font(R.font.comment_badscript_regular)
-    )
+    val activity = context as ComponentActivity
+
     val imageRouteMap = mapOf(
-        "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/oldmoney.webp" to "oldmoney",
+        "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/oldmoney_new.webp" to "oldmoney",
         "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/streetwear.webp" to "streetwear",
         "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/starboy.webp" to "starboy"
     )
-
+    // Sets system bar colors + icons
+    SideEffect {
+        activity.enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.light(
+                scrim = Color.White.toArgb(),
+                darkScrim = Color.White.toArgb()
+            ),
+            navigationBarStyle = SystemBarStyle.light(
+                scrim = Color.White.toArgb(),
+                darkScrim = Color.Black.toArgb()
+            )
+        )
+    }
     // Observe the userId changes to load or clear favorites
     LaunchedEffect(userId) {
         userId?.let {
-            homeViewModel.observeUser(authViewModel.currentUserId)  // Load favorites when user is logged in
+            homeViewModel.observeUser(authViewModel.currentUserId)
         } ?: run {
             homeViewModel.clearFavorites()
         }
@@ -130,7 +134,6 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                 userName = document.getString("name") ?: "Name not set"
             } else {
                 Toast.makeText(context, "Profile data missing", Toast.LENGTH_SHORT).show()
-//                navController.navigate("profile") // Redirect to profile creation
             }
         } catch (e: Exception) {
             // 4. Handle errors
@@ -156,15 +159,14 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                     .padding(vertical = 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-            Text(
-                text = "Fit Cheq",
-                fontFamily = myTitleFont,
-                fontSize = 26.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
-            Spacer(modifier = Modifier.height(14.dp))
-                }
+                Text(
+                    text = "Fit Cheq",
+                    fontFamily = myTitleFont,
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+            }
 
             // CONTENT
             Column(
@@ -209,7 +211,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
-                        .height(170.dp)
+                        .aspectRatio(2.4f)
                         .clickable {
                             navController.navigate(
                                 AuthScreen.OutfitDetails.createRoute(
@@ -339,20 +341,18 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 // Horizontal scrollable 2-row layout
-                LazyRow(
+                Row(
                     modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp)
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState())
+                        .padding(start = 16.dp, end = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    val chunkedCategories = malecategoryList.chunked(2) // two rows per column
-                    items(chunkedCategories.size) { index ->
-                        val itemsInColumn = chunkedCategories[index]
-
+                    val chunkedCategories = malecategoryList.chunked(2)
+                    chunkedCategories.forEach { itemsInColumn ->
                         Column(
                             verticalArrangement = Arrangement.spacedBy(12.dp),
-                            modifier = Modifier
-                                .width(100.dp) // ensures 4 max visible at once if LazyRow width ~ 400dp
+                            modifier = Modifier.width(100.dp)
                         ) {
                             itemsInColumn.forEach { category ->
                                 val onCardClick = {
@@ -413,8 +413,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                                                         cornerRadius = 0.dp
                                                     )
                                             )
-                                        }
-                                        else {
+                                        } else {
                                             Text(
                                                 text = category.title,
                                                 fontSize = 11.sp,
@@ -430,7 +429,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                                                     .padding(
                                                         horizontal = 6.dp,
                                                         vertical = 2.dp
-                                                    ) // internal padding inside bg
+                                                    )
                                             )
                                         }
                                     }
@@ -439,6 +438,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                         }
                     }
                 }
+
                 Spacer(modifier = Modifier.height(30.dp))
 
                 // FITS BY OCCASION
@@ -449,12 +449,14 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState())
+                        .padding(start = 16.dp, end = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(maleoccasionList, key = { it.title }) { occasion ->
+                    maleoccasionList.forEach { occasion ->
                         val onCardClick = {
                             val route = when (occasion.title) {
                                 "College" -> "college"
@@ -483,13 +485,11 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                         }
                         Card(
                             modifier = Modifier
-                                .width(130.dp)
-                                .height(150.dp)
+                                .width(150.dp)
+                                .aspectRatio(130f / 150f) // maintains the original height proportion
                                 .clickable(onClick = onCardClick),
                             shape = RoundedCornerShape(12.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = Color.White
-                            )
+                            colors = CardDefaults.cardColors(containerColor = Color.White)
                         ) {
                             Box(modifier = Modifier.fillMaxSize()) {
                                 var isImageLoading by remember { mutableStateOf(true) }
@@ -528,13 +528,14 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                                             .padding(
                                                 horizontal = 8.dp,
                                                 vertical = 4.dp
-                                            ) // internal padding inside bg
+                                            )
                                     )
                                 }
                             }
                         }
                     }
                 }
+
                 Spacer(modifier = Modifier.height(30.dp))
 
                 // FITS BY FASHION
@@ -545,12 +546,14 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState())
+                        .padding(start = 16.dp, end = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(malefashionList, key = { it.title }) { fashion ->
+                    malefashionList.forEach { fashion ->
                         val onCardClick = {
                             val route = when (fashion.title) {
                                 "Starboy" -> "starboy"
@@ -559,7 +562,6 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                                 "Old Money" -> "oldmoney"
                                 "Streetwear" -> "streetwear"
                                 "Minimalist" -> "minimalist"
-                                "Dark Academia" -> "dark"
                                 else -> ""
                             }
                             if (route.isNotEmpty()) {
@@ -613,6 +615,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                         }
                     }
                 }
+
                 Spacer(modifier = Modifier.height(30.dp))
             }
         }
