@@ -1,7 +1,6 @@
 package com.vayo.fitcheq.screens.Home
 
 
-import android.util.Log
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
@@ -114,7 +113,6 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
 
     // Clear previous data and start loading immediately
     LaunchedEffect(gender, fieldName, fieldValue) {
-        Log.d("OutfitDetailsScreen", "🔄 Screen params changed: gender=$gender, field=$fieldName, value=$fieldValue")
         filters = Filters()
         isInitialLoading = true
         isApplyingFilters = false
@@ -123,10 +121,7 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
         viewModel.clearOutfits()
 
         // Fetch filters and initial outfits
-        Log.d("OutfitDetailsScreen", "📡 Fetching available filters...")
         viewModel.fetchAvailableFilters(gender, fieldName, fieldValue)
-
-        Log.d("OutfitDetailsScreen", "📡 Fetching initial outfits...")
         viewModel.fetchOutfitsByFieldAndGender(context, fieldName, fieldValue, gender)
 
         isInitialLoading = false
@@ -135,7 +130,6 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
     // Load favorites when screen loads
     LaunchedEffect(Unit) {
         currentUser?.uid?.let { userId ->
-            Log.d("OutfitDetailsScreen", "❤️ Loading favorites for user: $userId")
             viewModel.loadFavorites(userId)
         }
     }
@@ -151,8 +145,6 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
     val fits = availableFilters.fits.toList()
     val types = availableFilters.types.toList()
 
-    Log.d("OutfitDetailsScreen", "🔍 Available filters - Categories: ${categories.size}, Brands: ${brands.size}, Colors: ${colors.size}, Types: ${types.size}, Fits: ${fits.size}")
-
     // Add this helper function to check if any filters are applied
     val hasActiveFilters = filters.categories.isNotEmpty() ||
             filters.websites.isNotEmpty() ||
@@ -161,11 +153,8 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
             filters.type != null ||
             filters.priceRange != 0f..20000f // assuming default range
 
-    Log.d("OutfitDetailsScreen", "🎯 Current filters - Categories: ${filters.categories}, Websites: ${filters.websites}, Colors: ${filters.colors}, Type: ${filters.type}, Fits: ${filters.fits}, HasActive: $hasActiveFilters")
-
     // Function to apply filters consistently
     val applyFilters = { newFilters: Filters ->
-        Log.d("OutfitDetailsScreen", "🔧 Applying filters: $newFilters")
         filters = newFilters
         isApplyingFilters = true
 
@@ -179,10 +168,8 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                         newFilters.priceRange != 0f..20000f
 
                 if (hasNewActiveFilters) {
-                    Log.d("OutfitDetailsScreen", "📡 Fetching filtered outfits...")
                     viewModel.fetchFilteredOutfits(context, fieldName, fieldValue, gender, newFilters, reset = true)
                 } else {
-                    Log.d("OutfitDetailsScreen", "📡 No filters active, fetching all outfits...")
                     viewModel.clearOutfits()
                     viewModel.fetchOutfitsByFieldAndGender(context, fieldName, fieldValue, gender)
                 }
@@ -203,13 +190,9 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                 val prefetchThreshold = 4 // 2 rows * 2 columns
 
                 if (total > 0 && lastVisibleIndex >= total - prefetchThreshold && !isLoading && !isApplyingFilters) {
-                    Log.d("OutfitDetailsScreen", "📄 Loading more items... lastVisible: $lastVisibleIndex, total: $total, hasActiveFilters: $hasActiveFilters")
-
                     if (hasActiveFilters) {
-                        Log.d("OutfitDetailsScreen", "📄 Loading more filtered items...")
                         viewModel.fetchFilteredOutfits(context, fieldName, fieldValue, gender, filters, reset = false)
                     } else {
-                        Log.d("OutfitDetailsScreen", "📄 Loading more unfiltered items...")
                         viewModel.fetchOutfitsByFieldAndGender(context, fieldName, fieldValue, gender, reset = false)
                     }
                 }
@@ -257,7 +240,6 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
         if (shouldResetPriceRange) {
             val newRange = 0f..maxPriceLimit
             if (newRange != filters.priceRange) {
-                Log.d("OutfitDetailsScreen", "💰 Resetting price range to: $newRange (maxLimit: $maxPriceLimit)")
                 val newFilters = filters.copy(priceRange = newRange)
                 filters = newFilters // Update local state without triggering new fetch
             }
@@ -356,20 +338,14 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                     val listToShow = if (categories.isNotEmpty() && categories.size > 1) categories else types
                     val isCategoryList = categories.isNotEmpty() && categories.size > 1
 
-                    Log.d("OutfitDetailsScreen", "🎨 Showing chips - isCategoryList: $isCategoryList, listToShow: $listToShow")
-
                     items(listToShow) { item ->
                         val chipTitle = item.replaceFirstChar { it.uppercase() }
                         val isSelected = if (isCategoryList) filters.categories.contains(item)
                         else filters.type == item
 
-                        Log.d("OutfitDetailsScreen", "🎯 Chip '$item' - selected: $isSelected, isCategoryList: $isCategoryList")
-
                         FilterChip(
                             selected = isSelected,
                             onClick = {
-                                Log.d("OutfitDetailsScreen", "🎯 Chip clicked: $item, currentlySelected: $isSelected")
-
                                 val newFilters = if (isCategoryList) {
                                     filters.copy(
                                         categories = if (isSelected) filters.categories - item
@@ -380,8 +356,6 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                                         type = if (isSelected) null else item
                                     )
                                 }
-
-                                Log.d("OutfitDetailsScreen", "🎯 New filters after chip click: $newFilters")
                                 applyFilters(newFilters)
                             },
                             label = {
@@ -422,7 +396,6 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
         {
             when {
                 isInitialLoading || (isLoading && outfits.isEmpty())-> {
-                    Log.d("OutfitDetailsScreen", "⏳ Showing initial loading...")
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -431,7 +404,6 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                     }
                 }
                 error != null -> {
-                    Log.e("OutfitDetailsScreen", "❌ Error state: $error")
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -444,7 +416,6 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                     }
                 }
                 hasActiveFilters && outfits.isEmpty() && !isLoading && !isApplyingFilters -> {
-                    Log.d("OutfitDetailsScreen", "🚫 No filtered results")
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -467,7 +438,6 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                             )
                             OutlinedButton(
                                 onClick = {
-                                    Log.d("OutfitDetailsScreen", "🔄 Clearing all filters")
                                     applyFilters(Filters())
                                 },
                                 modifier = Modifier.padding(top = 16.dp),
@@ -481,7 +451,6 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                     }
                 }
                 outfits.isEmpty() -> {
-                    Log.d("OutfitDetailsScreen", "📭 No outfits found")
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -495,8 +464,6 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                 }
 
                 else -> {
-                    Log.d("OutfitDetailsScreen", "📱 Displaying ${outfits.size} outfits")
-
                     Box(modifier = Modifier.fillMaxSize()) {
                         LazyVerticalGrid(
                             state = gridState,
@@ -735,10 +702,10 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                                                         filters.categories - category
                                                     }
                                                 )
-                                                Log.d("OutfitDetailsScreen", "🎯 Category filter changed: $category, selected: $selected, newFilters: $newFilters")
                                                 filters = newFilters
                                             }
                                         )
+                                        Spacer(modifier = Modifier.height(20.dp))
                                     }
                                 }
                                 "Brand" -> {
@@ -758,10 +725,10 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                                             isSelected = filters.websites.contains(brand),
                                             onSelectedChange = { selected ->
                                                 val newFilters = filters.copy(websites = if(selected) filters.websites + brand else filters.websites - brand)
-                                                Log.d("OutfitDetailsScreen", "🎯 Brand filter changed: $brand, selected: $selected")
                                                 filters = newFilters
                                             }
                                         )
+                                        Spacer(modifier = Modifier.height(20.dp))
                                     }
                                 }
                                 "Color" -> {
@@ -787,10 +754,10 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                                                         filters.colors - color
                                                     }
                                                 )
-                                                Log.d("OutfitDetailsScreen", "🎯 Color filter changed: $color, selected: $selected")
                                                 filters = newFilters
                                             }
                                         )
+                                        Spacer(modifier = Modifier.height(20.dp))
                                     }
                                 }
                                 "Price" -> {
@@ -800,7 +767,6 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                                             maxPrice = maxPriceLimit,
                                             priceRange = filters.priceRange,
                                             onRangeChange = { selectedRange ->
-                                                Log.d("OutfitDetailsScreen", "💰 Price range changed: $selectedRange")
                                                 filters = filters.copy(priceRange = selectedRange)
                                             }
                                         )
@@ -829,10 +795,10 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                                                         filters.fits - fit
                                                     }
                                                 )
-                                                Log.d("OutfitDetailsScreen", "🎯 Fit filter changed: $fit, selected: $selected")
                                                 filters = newFilters
                                             }
                                         )
+                                        Spacer(modifier = Modifier.height(20.dp))
                                     }
                                 }
                             }
@@ -867,7 +833,6 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                             contentPadding = PaddingValues(0.dp),
                             colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.Transparent,   contentColor = Color.Black),
                             onClick = {
-                                Log.d("OutfitDetailsScreen", "🔄 Clear button clicked")
                                 filters = Filters()
                             },
                             shape = RoundedCornerShape(8.dp)
@@ -880,7 +845,6 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                             .height(50.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color.Black,   contentColor = Color.White),
                             onClick = {
-                                Log.d("OutfitDetailsScreen", "✅ Apply button clicked with filters: $filters")
                                 coroutineScope.launch {
                                     sheetState.hide()
                                     showSheet = false
