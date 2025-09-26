@@ -52,11 +52,18 @@ data class AppliedFilters(
     val priceRange: ClosedFloatingPointRange<Float> = 0f..10000f
 )
 
-
 val outfitSizeMap = mapOf(
     "tshirt" to listOf("S", "M", "L", "XL"),
     "shirt" to listOf("S", "M", "L", "XL"),
     "jeans" to listOf("28", "30", "32", "34", "36"),
+    "trackpants" to listOf("S", "M", "L", "XL"),
+    "tanktops" to listOf("S", "M", "L", "XL"),
     "shoes" to listOf("6", "7", "8", "9", "10"),
-    "jacket" to listOf("S", "M", "L")
+    "jacket" to listOf("XS","S", "M", "L", "XL"),
+    "top" to listOf("S", "M", "L", "XL"),
+    "saree" to listOf("S", "M", "L", "XL"),
+    "dress" to listOf("S", "M", "L", "XL"),
+    "skirt" to listOf("S", "M", "L", "XL"),
+    "kurti" to listOf("S", "M", "L", "XL"),
+    "trousers" to listOf("S", "M", "L", "XL"),
 )
