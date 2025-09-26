@@ -1,13 +1,5 @@
 package com.vayo.fitcheq.screens.Home
 
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -22,16 +14,12 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -43,10 +31,7 @@ import com.vayo.fitcheq.AuthScreen
 import com.vayo.fitcheq.R
 import com.vayo.fitcheq.data.model.femalecategoryList
 import com.vayo.fitcheq.data.model.femaleoccasionList
-import com.vayo.fitcheq.data.model.malecategoryList
-import com.vayo.fitcheq.data.model.maleoccasionList
 import com.vayo.fitcheq.viewmodels.AuthViewModel
-import com.vayo.fitcheq.navigation.BottomNavigation
 import com.vayo.fitcheq.navigation.ScreenContainer
 import com.vayo.fitcheq.ui.theme.modernShimmer
 import kotlin.collections.chunked
@@ -55,11 +40,6 @@ import kotlin.text.isNotEmpty
 
 @Composable
 fun FemaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
-    val firestore = remember { FirebaseFirestore.getInstance() }
-    val currentUser = FirebaseAuth.getInstance().currentUser
-    var userName by remember { mutableStateOf("Loading...") }
-    var isLoading by remember { mutableStateOf(true) }
-    val context = LocalContext.current
     val isLoggedIn by authViewModel.authState.collectAsStateWithLifecycle()
     val userId by authViewModel.currentUserId.collectAsState()
     val myTitleFont = FontFamily(
@@ -102,7 +82,6 @@ fun FemaleHomeScreen(navController: NavController, authViewModel: AuthViewModel)
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
-                Spacer(modifier = Modifier.height(14.dp))
             }
 
             // CONTENT
@@ -400,16 +379,7 @@ fun FemaleHomeScreen(navController: NavController, authViewModel: AuthViewModel)
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(30.dp))
-
-                // FITS BY FASHION
-//                Text(
-//                    text = "Fits By Fashion",
-//                    fontFamily = myHeadingFont,
-//                    fontSize = 22.sp,
-//                    fontWeight = FontWeight.Bold
-//                )
-                Spacer(modifier = Modifier.height(30.dp))
+                Spacer(modifier = Modifier.height(40.dp))
             }
         }
     }
