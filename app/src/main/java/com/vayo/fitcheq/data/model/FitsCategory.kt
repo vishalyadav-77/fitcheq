@@ -1,6 +1,6 @@
 package com.vayo.fitcheq.data.model
 
-data class FitsCategory( val emoji: String? = null, val imageUrl: String? = null, val title: String)
+data class FitsCategory(val imageUrl: String? = null, val title: String,)
 
 val maleoccasionList = listOf(
     FitsCategory(title = "College", imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/occasion-images/college_c.webp"),
@@ -19,14 +19,24 @@ val malecategoryList = listOf(
     FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/tanktop_male.webp", title = "TankTops"),
     FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/gem_acc2.webp", title = "Accessories")
 )
+val femalecategoryList = listOf(
+    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/female/top1.webp", title =  "Tops"),
+    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/female/dress1.webp", title = "Dresses"),
+    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/female/jeans2.webp", title = "Jeans"),
+    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/female/trouser1.webp", title = "Trousers"),
+    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/female/kurti1.webp", title = "Kurti"),
+    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/female/saree1.webp", title = "Saree"),
+    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/female/skirt1.webp", title = "Skirts"),
+    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/female/tank1.webp", title = "TankTops"),
+    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/female/jacket1.webp", title = "Jacket"),
+    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/categories-assets/female/acc1.webp", title = "Accessories")
+)
 
 val femaleoccasionList = listOf(
-    FitsCategory(emoji = "📚", title = "College"),
-    FitsCategory(emoji = "❤️", title =  "Date"),
-    FitsCategory(emoji = "🤵", title = "Wedding"),
-    FitsCategory(emoji = "💼", title =  "Office"),
-    FitsCategory(emoji = "⛱️", title =  "Beach"),
-    FitsCategory(emoji = "🏋️", title = "Gym")
+    FitsCategory(title = "Office", imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/occasion-images/female/office1.webp"),
+    FitsCategory(title = "College", imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/occasion-images/female/college.webp"),
+    FitsCategory(title = "Date", imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/occasion-images/female/date.webp"),
+    FitsCategory(title = "Gym", imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/occasion-images/female/gym1.webp"),
 )
 
 val malefashionList = listOf(
@@ -36,7 +46,6 @@ val malefashionList = listOf(
     FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/starboy_final.webp", title = "Starboy"),
     FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/softboy_final.webp", title = "Soft Boy"),
     FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/y2k_final.webp", title = "Y2K"),
-    FitsCategory(imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/dark2_final.webp", title = "Dark Academia")
 )
 
 val maleSeasonList = listOf(
