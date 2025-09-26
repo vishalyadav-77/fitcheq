@@ -5,13 +5,10 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,7 +39,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.vayo.fitcheq.AuthScreen
 import com.vayo.fitcheq.R
 import com.vayo.fitcheq.data.model.BodyType
 import com.vayo.fitcheq.data.model.FitGuide
@@ -53,10 +49,8 @@ import com.vayo.fitcheq.data.model.UserProfile
 import com.vayo.fitcheq.data.model.indianFemaleUsers
 import com.vayo.fitcheq.data.model.indianInstaUsers
 import com.vayo.fitcheq.data.model.instagramUsers
-import com.vayo.fitcheq.data.model.maleoccasionList
 import com.vayo.fitcheq.viewmodels.AuthViewModel
 import com.vayo.fitcheq.navigation.ScreenContainer
-import com.vayo.fitcheq.viewmodels.MaleHomeViewModel
 import kotlinx.serialization.json.Json
 import com.vayo.fitcheq.data.model.utils.orDefault
 
