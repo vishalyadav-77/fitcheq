@@ -46,6 +46,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import coil.request.ImageRequest
 import com.vayo.fitcheq.AuthScreen
+import java.text.NumberFormat
+import java.util.Locale
 
 
 @Composable
@@ -124,11 +126,13 @@ fun SavedOutfitScreen(navController: NavController, viewModel: MaleHomeViewModel
                     items(savedOutfits) { outfit ->  // Changed from outfits to savedOutfits
                         val favoriteMap by viewModel.favoriteMap.collectAsState()
                         val isFavorite = favoriteMap[outfit.id] ?: false
-
-                        Card(colors = CardDefaults.cardColors(containerColor = Color.White),
+                        val priceNumber = outfit.price.toLongOrNull() ?: 0L
+                        val formattedPrice = NumberFormat.getNumberInstance(Locale("en", "IN"))
+                            .format(priceNumber)
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = Color.White),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(340.dp)
                                 .padding(horizontal = 4.dp, vertical = 4.dp)
                                 .clickable {
                                     navController.navigate(AuthScreen.ItemInfo.passOutfit(outfit))
@@ -143,7 +147,7 @@ fun SavedOutfitScreen(navController: NavController, viewModel: MaleHomeViewModel
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(240.dp)
+                                        .aspectRatio(4f / 5f) // adaptive like Card 1
                                 ) {
                                     AsyncImage(
                                         model = ImageRequest.Builder(LocalContext.current)
@@ -154,8 +158,7 @@ fun SavedOutfitScreen(navController: NavController, viewModel: MaleHomeViewModel
                                         contentDescription = outfit.title,
                                         contentScale = ContentScale.Crop,
                                         modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(240.dp)
+                                            .fillMaxSize()
                                             .clip(RoundedCornerShape(8.dp))
                                     )
                                     Icon(
@@ -185,20 +188,29 @@ fun SavedOutfitScreen(navController: NavController, viewModel: MaleHomeViewModel
                                         .padding(horizontal = 4.dp),
                                     verticalArrangement = Arrangement.spacedBy(2.dp)
                                 ) {
+                                    // ✅ Capitalize title like Card 1
+                                    val formattedTitle = outfit.title
+                                        .split(" ")
+                                        .joinToString(" ") { word -> word.replaceFirstChar { it.uppercase() } }
+
                                     Text(
-                                        text = outfit.title,
+                                        text = formattedTitle,
                                         fontWeight = FontWeight.SemiBold,
                                         fontSize = 14.sp,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
                                         modifier = Modifier
-                                            .weight(1f)
+                                            .fillMaxWidth()
                                             .basicMarquee()
                                             .focusable()
                                     )
 
+                                    // ✅ Spacer between title and price (Card 1 style)
+                                    Spacer(modifier = Modifier.width(4.dp))
+
+                                    // ✅ Use formattedPrice instead of raw outfit.price
                                     Text(
-                                        text = "₹${outfit.price}",
+                                        text = "₹${formattedPrice}",
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 14.sp,
                                     )
@@ -208,7 +220,7 @@ fun SavedOutfitScreen(navController: NavController, viewModel: MaleHomeViewModel
                                         horizontalArrangement = Arrangement.End
                                     ) {
                                         Text(
-                                            text = outfit.website,
+                                            text = outfit.website.toUpperCase(),
                                             fontSize = 12.sp,
                                             fontStyle = FontStyle.Italic,
                                             color = Color.DarkGray
@@ -217,6 +229,7 @@ fun SavedOutfitScreen(navController: NavController, viewModel: MaleHomeViewModel
                                 }
                             }
                         }
+
                     }
                     item(span = { GridItemSpan(2) }) {Spacer(modifier = Modifier.height(12.dp))}
                 }
