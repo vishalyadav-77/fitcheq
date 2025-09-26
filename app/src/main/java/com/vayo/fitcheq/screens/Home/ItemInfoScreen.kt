@@ -7,7 +7,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
@@ -19,8 +18,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -47,7 +45,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -57,18 +54,11 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import androidx.navigation.NavController
 import com.vayo.fitcheq.data.model.OutfitData
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
-import java.net.URLEncoder
 import androidx.compose.ui.res.colorResource
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -81,7 +71,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -90,12 +79,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.lifecycle.ViewModel
 import coil.ImageLoader
 import coil.request.CachePolicy
 import coil.request.ImageRequest
@@ -367,7 +355,6 @@ fun ItemInfoScreen(outfit: OutfitData, viewModel: MaleHomeViewModel,navControlle
                         colors = CardDefaults.cardColors(containerColor = Color.White),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(350.dp)
                             .padding(horizontal = 8.dp, vertical = 6.dp)
                             .clickable {
                                 navController.navigate(AuthScreen.ItemInfo.passOutfit(outfit)) {
@@ -384,15 +371,14 @@ fun ItemInfoScreen(outfit: OutfitData, viewModel: MaleHomeViewModel,navControlle
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(250.dp)
+                                    .aspectRatio(4f / 5f) // replaces fixed height
                             ) {
                                 AsyncImage(
                                     model = outfit.imageUrl,
                                     contentDescription = outfit.title,
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(240.dp)
+                                        .fillMaxSize()
                                         .clip(RoundedCornerShape(8.dp))
                                 )
                                 Icon(
@@ -413,7 +399,7 @@ fun ItemInfoScreen(outfit: OutfitData, viewModel: MaleHomeViewModel,navControlle
                                         }
                                 )
                             }
-                            Spacer(modifier = Modifier.height(4.dp))
+                            Spacer(modifier = Modifier.height(8.dp))
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -443,7 +429,7 @@ fun ItemInfoScreen(outfit: OutfitData, viewModel: MaleHomeViewModel,navControlle
                                     horizontalArrangement = Arrangement.End
                                 ) {
                                     Text(
-                                        text = outfit.website,
+                                        text = outfit.website.toUpperCase(),
                                         fontSize = 12.sp,
                                         fontStyle = FontStyle.Italic,
                                         color = Color.DarkGray
@@ -452,6 +438,7 @@ fun ItemInfoScreen(outfit: OutfitData, viewModel: MaleHomeViewModel,navControlle
                             }
                         }
                     }
+
                 }
             }
 
@@ -547,37 +534,53 @@ fun ImageCarousel(images: List<String>) {
 }
 
 @Composable
-fun BottomActionBar(outfit: OutfitData, viewmodel2: MaleHomeViewModel ){
+fun BottomActionBar(outfit: OutfitData, viewmodel2: MaleHomeViewModel) {
     val context = LocalContext.current
     val favoriteMap by viewmodel2.favoriteMap.collectAsState()
     val isFavorite = favoriteMap[outfit.id] ?: false
 
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    val horizontalPadding = 16.dp
+    val buttonHeight = 50.dp // fixed height for rectangle buttons
+    val iconSize = 22.dp     // favorite icon size
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp)
-            .background(color = Color.White)
+            .background(Color.White)
+            .padding(vertical = 8.dp) // vertical padding for the bar
     ) {
         Divider(
             modifier = Modifier.fillMaxWidth(),
             color = Color.LightGray,
             thickness = 0.3.dp
         )
+
         Row(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+                .fillMaxWidth()
+                .padding(horizontal = horizontalPadding, vertical = 8.dp), // added vertical padding
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            OutlinedButton(modifier = Modifier
-                .width(100.dp)
-                .height(50.dp),
+            // Favorite button
+            OutlinedButton(
+                modifier = Modifier
+                    .width((screenWidth * 0.28f).coerceIn(90.dp, 110.dp))
+                    .height(buttonHeight),
                 contentPadding = PaddingValues(0.dp),
-                colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.Transparent,   contentColor = Color.Black),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = Color.Black
+                ),
                 onClick = {
-                   //
+                    viewmodel2.toggleFavorite(outfit)
+                    Toast.makeText(
+                        context,
+                        if (isFavorite) "Removed from wishlist" else "Added to wishlist",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 },
                 shape = RoundedCornerShape(8.dp)
             ) {
@@ -585,32 +588,32 @@ fun BottomActionBar(outfit: OutfitData, viewmodel2: MaleHomeViewModel ){
                     imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                     contentDescription = "Favourite",
                     tint = Color.Black,
-                    modifier = Modifier.size(22.dp)
-                    .clickable {
-                    viewmodel2.toggleFavorite(outfit)
-                    Toast.makeText(
-                        context,
-                        if (isFavorite) "Removed from wishlist" else "Added to wishlist",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+                    modifier = Modifier.size(iconSize)
                 )
-
             }
 
-            Button(modifier = Modifier
-                .width(280.dp)
-                .height(50.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Black,   contentColor = Color.White),
+            // Buy button
+            Button(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(buttonHeight),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Black,
+                    contentColor = Color.White
+                ),
                 onClick = {
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(outfit.link))
                     context.startActivity(intent)
                 },
                 shape = RoundedCornerShape(8.dp)
             ) {
-                Text("BUY", fontWeight = FontWeight.Bold, color = Color.White)
+                Text(
+                    "BUY",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = Color.White
+                )
             }
         }
     }
 }
-
