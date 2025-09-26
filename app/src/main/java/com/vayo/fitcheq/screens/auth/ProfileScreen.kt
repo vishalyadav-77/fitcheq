@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -194,10 +195,9 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel, is
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(color = Color(0xFFF8E1AB))
+                .background(Color(0xFFF8E1AB))
                 .padding(horizontal = 8.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 painter = painterResource(R.drawable.ps_info),
@@ -210,9 +210,12 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel, is
             Text(
                 text = "We use this information to improve user experience & suggestions",
                 fontSize = 11.sp,
-                maxLines = 2,
                 fontWeight = FontWeight.Medium,
-                overflow = TextOverflow.Ellipsis
+                maxLines = 1,
+                overflow = TextOverflow.Clip, // important, avoid ellipsis
+                modifier = Modifier
+                    .weight(1f)
+                    .basicMarquee()
             )
         }
 
@@ -491,7 +494,7 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel, is
             }
             Spacer(modifier = Modifier.height(8.dp))
             // female row
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     SelectableCard(
                         text = BodyType.slim.displayName,
@@ -509,6 +512,15 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel, is
                         iconRes = R.drawable.female_normal
                     )
                     Text(BodyType.average.displayName, fontSize = 14.sp)
+                }
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    SelectableCard(
+                        text = BodyType.athletic.displayName,
+                        isSelected = bodyType == BodyType.athletic,
+                        onClick = { bodyType = BodyType.athletic },
+                        iconRes = R.drawable.female_normal
+                    )
+                    Text(BodyType.athletic.displayName, fontSize = 14.sp)
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     SelectableCard(
