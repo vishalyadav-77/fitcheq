@@ -42,7 +42,6 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -68,7 +67,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import com.vayo.fitcheq.AuthScreen
-import com.vayo.fitcheq.viewmodels.AuthViewModel
 import com.vayo.fitcheq.data.model.AgeGroup
 import com.vayo.fitcheq.data.model.BodyType
 import com.vayo.fitcheq.data.model.HeightGroup
@@ -119,7 +117,7 @@ fun SelectableCard(
 }
 
 @Composable
-fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel, isEditMode: Boolean = false) {
+fun ProfileScreen(navController: NavController, isEditMode: Boolean = false) {
     val context = LocalContext.current
     val firestore = FirebaseFirestore.getInstance()
     val currentUser = FirebaseAuth.getInstance().currentUser
@@ -596,7 +594,6 @@ fun ImageSelectableCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val contentColor = if (isSelected) Color(0xFF195184) else Color.Black
     val radioButtonColor = if (isSelected) Color(0xFF195184) else Color.Gray
 
     Card(

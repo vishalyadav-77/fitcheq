@@ -10,11 +10,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import com.vayo.fitcheq.data.model.OutfitData
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
@@ -79,13 +74,13 @@ fun AuthNavGraph(
             route = AuthScreen.UserProfile.route,
             enterTransition = { EnterTransition.None },
             exitTransition = { ExitTransition.None }
-        ) { ProfileScreen(navController, authViewModel, isEditMode = false) }
+        ) { ProfileScreen(navController, isEditMode = false) }
 
         // Edit profile
         composable(AuthScreen.EditProfile.route,
             enterTransition = { EnterTransition.None },
             exitTransition = { ExitTransition.None })
-        { ProfileScreen(navController, authViewModel, isEditMode = true) }
+        { ProfileScreen(navController, isEditMode = true) }
         
         composable(
             route = AuthScreen.MaleHome.route,
