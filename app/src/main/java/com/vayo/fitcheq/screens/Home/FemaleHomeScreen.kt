@@ -292,17 +292,20 @@ fun FemaleHomeScreen(navController: NavController, authViewModel: AuthViewModel)
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState())
+                        .padding(start = 16.dp, end = 16.dp), // replaces Spacer logic
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(femaleoccasionList, key = { it.title }) { occasion ->
+                    femaleoccasionList.forEach { occasion ->
                         val onCardClick = {
                             val route = when (occasion.title) {
                                 "College" -> "college"
                                 "Date" -> "date"
                                 "Office" -> "office"
+                                "Concert" -> "fest"
                                 "Gym" -> "gym"
                                 else -> ""
                             }
@@ -322,6 +325,7 @@ fun FemaleHomeScreen(navController: NavController, authViewModel: AuthViewModel)
                                 }
                             }
                         }
+
                         Card(
                             modifier = Modifier
                                 .width(150.dp)
@@ -344,9 +348,7 @@ fun FemaleHomeScreen(navController: NavController, authViewModel: AuthViewModel)
                                     onError = { isLoading = false }
                                 )
 
-                                // Only show text when image is loaded
                                 if (isLoading) {
-                                    // shimmer overlays until image is ready
                                     Box(
                                         modifier = Modifier
                                             .matchParentSize()
@@ -355,8 +357,7 @@ fun FemaleHomeScreen(navController: NavController, authViewModel: AuthViewModel)
                                                 cornerRadius = 0.dp
                                             )
                                     )
-                                }
-                                else {
+                                } else {
                                     Text(
                                         text = occasion.title,
                                         fontSize = 12.sp,
@@ -369,16 +370,14 @@ fun FemaleHomeScreen(navController: NavController, authViewModel: AuthViewModel)
                                                 color = Color.Black.copy(alpha = 0.6f),
                                                 shape = RoundedCornerShape(6.dp)
                                             )
-                                            .padding(
-                                                horizontal = 8.dp,
-                                                vertical = 4.dp
-                                            )
+                                            .padding(horizontal = 8.dp, vertical = 4.dp)
                                     )
                                 }
                             }
                         }
                     }
                 }
+
                 Spacer(modifier = Modifier.height(40.dp))
             }
         }
