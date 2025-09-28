@@ -1,7 +1,6 @@
 package com.vayo.fitcheq.screens.auth
 
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,13 +12,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.sharp.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.sharp.KeyboardArrowLeft
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
@@ -59,7 +56,7 @@ fun ResetPasswordScreen(navController: NavController, viewModel: AuthViewModel){
                     .size(45.dp)
                 ) {
                 Icon(
-                    imageVector = Icons.Sharp.KeyboardArrowLeft,
+                    imageVector = Icons.AutoMirrored.Sharp.KeyboardArrowLeft,
                     contentDescription = "back button",
                 )
             }
