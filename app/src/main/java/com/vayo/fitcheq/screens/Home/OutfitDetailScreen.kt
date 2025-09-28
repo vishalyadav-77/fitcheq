@@ -705,6 +705,8 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                                                 filters = newFilters
                                             }
                                         )
+                                    }
+                                    item {
                                         Spacer(modifier = Modifier.height(20.dp))
                                     }
                                 }
@@ -728,6 +730,8 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                                                 filters = newFilters
                                             }
                                         )
+                                    }
+                                    item {
                                         Spacer(modifier = Modifier.height(20.dp))
                                     }
                                 }
@@ -757,6 +761,8 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                                                 filters = newFilters
                                             }
                                         )
+                                    }
+                                    item {
                                         Spacer(modifier = Modifier.height(20.dp))
                                     }
                                 }
@@ -798,6 +804,8 @@ fun OutfitDetailsScreen(gender: String, fieldName: String,fieldValue: String, vi
                                                 filters = newFilters
                                             }
                                         )
+                                    }
+                                    item {
                                         Spacer(modifier = Modifier.height(20.dp))
                                     }
                                 }
