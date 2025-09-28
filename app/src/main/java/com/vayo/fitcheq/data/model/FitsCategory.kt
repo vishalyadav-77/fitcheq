@@ -37,6 +37,7 @@ val femaleoccasionList = listOf(
     FitsCategory(title = "College", imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/occasion-images/female/college.webp"),
     FitsCategory(title = "Date", imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/occasion-images/female/date.webp"),
     FitsCategory(title = "Gym", imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/occasion-images/female/gym1.webp"),
+    FitsCategory(title = "Concert", imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/occasion-images/female/concert.webp"),
 )
 
 val malefashionList = listOf(
