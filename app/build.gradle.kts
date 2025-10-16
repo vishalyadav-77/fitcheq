@@ -64,6 +64,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation ("com.google.firebase:firebase-auth-ktx:22.1.2")
     implementation ("com.google.firebase:firebase-bom:32.7.0")
+    implementation("com.google.android.recaptcha:recaptcha:18.4.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
     implementation("androidx.navigation:navigation-compose:2.7.2")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
