@@ -18,10 +18,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -531,86 +534,99 @@ fun ImageCarousel(images: List<String>) {
 }
 
 @Composable
-fun BottomActionBar(outfit: OutfitData, viewmodel2: MaleHomeViewModel) {
+fun BottomActionBar(
+    outfit: OutfitData,
+    viewmodel2: MaleHomeViewModel
+) {
     val context = LocalContext.current
     val favoriteMap by viewmodel2.favoriteMap.collectAsState()
     val isFavorite = favoriteMap[outfit.id] ?: false
 
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     val horizontalPadding = 16.dp
-    val buttonHeight = 50.dp // fixed height for rectangle buttons
-    val iconSize = 22.dp     // favorite icon size
+    val buttonHeight = 50.dp
+    val iconSize = 22.dp
+
+    // 👇 Get system navigation bar height automatically
+    val insets = WindowInsets.navigationBars.asPaddingValues()
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
-            .padding(vertical = 8.dp) // vertical padding for the bar
+            .padding(
+                start = horizontalPadding,
+                end = horizontalPadding,
+                top = 8.dp,
+                bottom = insets.calculateBottomPadding() + 8.dp // adds safe bottom space
+            )
     ) {
-        Divider(
-            modifier = Modifier.fillMaxWidth(),
-            color = Color.LightGray,
-            thickness = 0.3.dp
-        )
+        Column {
+            Divider(
+                modifier = Modifier.fillMaxWidth(),
+                color = Color.LightGray,
+                thickness = 0.3.dp
+            )
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = horizontalPadding, vertical = 8.dp), // added vertical padding
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            // Favorite button
-            OutlinedButton(
+            Row(
                 modifier = Modifier
-                    .width((screenWidth * 0.28f).coerceIn(90.dp, 110.dp))
-                    .height(buttonHeight),
-                contentPadding = PaddingValues(0.dp),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = Color.Transparent,
-                    contentColor = Color.Black
-                ),
-                onClick = {
-                    viewmodel2.toggleFavorite(outfit)
-                    Toast.makeText(
-                        context,
-                        if (isFavorite) "Removed from wishlist" else "Added to wishlist",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                },
-                shape = RoundedCornerShape(8.dp)
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                    contentDescription = "Favourite",
-                    tint = Color.Black,
-                    modifier = Modifier.size(iconSize)
-                )
-            }
+                // Favorite button
+                OutlinedButton(
+                    modifier = Modifier
+                        .width((screenWidth * 0.28f).coerceIn(90.dp, 110.dp))
+                        .height(buttonHeight),
+                    contentPadding = PaddingValues(0.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = Color.Black
+                    ),
+                    onClick = {
+                        viewmodel2.toggleFavorite(outfit)
+                        Toast.makeText(
+                            context,
+                            if (isFavorite) "Removed from wishlist" else "Added to wishlist",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    },
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Icon(
+                        imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                        contentDescription = "Favourite",
+                        tint = Color.Black,
+                        modifier = Modifier.size(iconSize)
+                    )
+                }
 
-            // Buy button
-            Button(
-                modifier = Modifier
-                    .weight(1f)
-                    .height(buttonHeight),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Black,
-                    contentColor = Color.White
-                ),
-                onClick = {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(outfit.link))
-                    context.startActivity(intent)
-                },
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text(
-                    "BUY",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    color = Color.White
-                )
+                // Buy button
+                Button(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(buttonHeight),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Black,
+                        contentColor = Color.White
+                    ),
+                    onClick = {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(outfit.link))
+                        context.startActivity(intent)
+                    },
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        "BUY",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        color = Color.White
+                    )
+                }
             }
         }
     }
 }
+
