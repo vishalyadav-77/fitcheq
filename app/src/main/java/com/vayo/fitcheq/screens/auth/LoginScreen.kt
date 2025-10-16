@@ -224,7 +224,7 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
                         }
                         else -> {
                             loginAttempted = true
-                            authViewModel.login(email, password, context)
+                            authViewModel.login(email.trim(), password.trim(), context)
                         }
                     }
                 },

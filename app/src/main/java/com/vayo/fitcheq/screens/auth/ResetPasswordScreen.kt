@@ -123,7 +123,7 @@ fun ResetPasswordScreen(navController: NavController, viewModel: AuthViewModel){
                     ),
                     shape = RoundedCornerShape(8.dp),
                     onClick = {
-                        viewModel.resetPassword(email,
+                        viewModel.resetPassword(email.trim(),
                             onSuccess = {
                             Toast.makeText(context, "Password reset email sent!", Toast.LENGTH_LONG).show()
                                 spamVisibility = true

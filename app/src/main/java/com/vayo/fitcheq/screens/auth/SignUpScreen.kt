@@ -233,7 +233,7 @@ fun SignUpScreen(navController: NavController, authViewModel: AuthViewModel) {
                     Toast.makeText(context, "Please enter password", Toast.LENGTH_SHORT).show()
                     }
                     else {
-                        authViewModel.signUp(email, password, navController)
+                        authViewModel.signUp(email.trim(), password.trim(), navController)
                     }
                 })
             {

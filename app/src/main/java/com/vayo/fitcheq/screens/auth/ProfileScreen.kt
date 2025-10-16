@@ -547,10 +547,10 @@ fun ProfileScreen(navController: NavController, isEditMode: Boolean = false) {
                     } else {
                         val userProfile = UserProfile(
                             uId = currentUser?.uid ?: "",
-                            name = name,
+                            name = name.trim(),
                             gender = gender,
-                            phone = phoneNumber,
-                            email = currentUser?.email ?: "",
+                            phone = phoneNumber.trim(),
+                            email = currentUser?.email?.trim() ?: "",
                             ageGroup = AgeGroup.valueOf(ageGroup.name),
                             occupation = occupation,
                             preferPlatform = PreferPlatform.valueOf(preferplatform.name),
