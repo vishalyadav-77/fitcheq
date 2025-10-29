@@ -15,14 +15,32 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.install.InstallStateUpdatedListener
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.InstallStatus
+import com.google.android.play.core.install.model.UpdateAvailability
+import com.google.android.material.snackbar.Snackbar
 import com.vayo.fitcheq.ui.theme.FitCheqTheme
 import com.vayo.fitcheq.viewmodels.AuthViewModel
 import com.vayo.fitcheq.viewmodels.MaleHomeViewModel
 
 class MainActivity : ComponentActivity() {
+    // --- Added for in-app updates ---
+    private val appUpdateManager by lazy { AppUpdateManagerFactory.create(this) }
+    private val UPDATE_REQUEST_CODE = 1001
+
+    private val updateListener = InstallStateUpdatedListener { state ->
+        if (state.installStatus() == InstallStatus.DOWNLOADED) {
+            showUpdateSnackbar()
+        }
+    }
+    // --------------------------------
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        checkForAppUpdate() // ✅ Check update early, before Compose loads
+
         setContent {
             FitCheqTheme {
                 val navController = rememberNavController()
@@ -81,4 +99,47 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+    // --- Added functions for in-app updates ---
+    private fun checkForAppUpdate() {
+        appUpdateManager.registerListener(updateListener)
+        val appUpdateInfoTask = appUpdateManager.appUpdateInfo
+
+        appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
+                appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)
+            ) {
+                appUpdateManager.startUpdateFlowForResult(
+                    appUpdateInfo,
+                    AppUpdateType.FLEXIBLE,
+                    this,
+                    UPDATE_REQUEST_CODE
+                )
+            }
+        }
+    }
+
+    private fun showUpdateSnackbar() {
+        Snackbar.make(
+            findViewById(android.R.id.content),
+            "New update downloaded",
+            Snackbar.LENGTH_INDEFINITE
+        ).setAction("Restart") {
+            appUpdateManager.completeUpdate()
+        }.show()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
+            if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
+                showUpdateSnackbar()
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        appUpdateManager.unregisterListener(updateListener)
+        super.onDestroy()
+    }
+    // -------------------------------------------
 }
