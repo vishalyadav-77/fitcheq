@@ -70,7 +70,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
     val activity = context as ComponentActivity
 
     val imageRouteMap = mapOf(
-        "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/oldmoney_new.webp" to "oldmoney",
+        "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/oldmoneynew.webp" to "oldmoney",
         "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/streetwear.webp" to "streetwear",
         "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/byfashion/starboy.webp" to "starboy"
     )
@@ -465,6 +465,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                                 "Wedding" -> "wedding"
                                 "Office" -> "office"
                                 "Gym" -> "gym"
+                                "Ethnic" -> "ethnic"
                                 else -> ""
                             }
                             if (route.isNotEmpty()) {
