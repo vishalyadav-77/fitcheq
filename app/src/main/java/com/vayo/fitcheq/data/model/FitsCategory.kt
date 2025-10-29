@@ -8,6 +8,7 @@ val maleoccasionList = listOf(
     FitsCategory(title = "Date", imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/occasion-images/date_c.webp"),
     FitsCategory(title = "Beach", imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/occasion-images/beach_c.webp"),
     FitsCategory(title = "Gym", imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/occasion-images/gym_c.webp"),
+    FitsCategory(title = "Ethnic", imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/occasion-images/ethnic.webp"),
     FitsCategory(title = "Wedding", imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/occasion-images/party_c.webp"),
 )
 val malecategoryList = listOf(
@@ -36,6 +37,7 @@ val femaleoccasionList = listOf(
     FitsCategory(title = "Office", imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/occasion-images/female/office1.webp"),
     FitsCategory(title = "College", imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/occasion-images/female/college.webp"),
     FitsCategory(title = "Date", imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/occasion-images/female/date.webp"),
+    FitsCategory(title = "Ethnic", imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/occasion-images/female/ethnic.webp"),
     FitsCategory(title = "Gym", imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/occasion-images/female/gym1.webp"),
     FitsCategory(title = "Concert", imageUrl = "https://cdn.jsdelivr.net/gh/vishalyadav-77/fitcheq-assests/occasion-images/female/concert.webp"),
 )
