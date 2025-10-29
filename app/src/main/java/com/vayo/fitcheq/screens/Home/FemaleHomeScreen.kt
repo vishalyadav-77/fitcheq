@@ -4,8 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -25,8 +23,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.vayo.fitcheq.AuthScreen
 import com.vayo.fitcheq.R
 import com.vayo.fitcheq.data.model.femalecategoryList
@@ -307,6 +303,7 @@ fun FemaleHomeScreen(navController: NavController, authViewModel: AuthViewModel)
                                 "Office" -> "office"
                                 "Concert" -> "fest"
                                 "Gym" -> "gym"
+                                "Ethnic" -> "ethnic"
                                 else -> ""
                             }
                             if (route.isNotEmpty()) {
