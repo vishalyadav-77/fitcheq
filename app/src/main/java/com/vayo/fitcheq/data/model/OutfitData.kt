@@ -49,7 +49,7 @@ data class AppliedFilters(
     val colors: Set<String> = emptySet(),
     val fits: Set<String> = emptySet(),
     val type: String? = null,
-    val priceRange: ClosedFloatingPointRange<Float> = 0f..10000f
+    val priceRange: ClosedFloatingPointRange<Float> = 0f..20000f
 )
 
 val outfitSizeMap = mapOf(
@@ -63,7 +63,8 @@ val outfitSizeMap = mapOf(
     "top" to listOf("S", "M", "L", "XL"),
     "saree" to listOf("S", "M", "L", "XL"),
     "dress" to listOf("S", "M", "L", "XL"),
-    "skirt" to listOf("S", "M", "L", "XL"),
+    "skirts" to listOf("S", "M", "L", "XL"),
     "kurti" to listOf("S", "M", "L", "XL"),
     "trousers" to listOf("S", "M", "L", "XL"),
+    "hoodie" to listOf("S", "M", "L", "XL"),
 )
