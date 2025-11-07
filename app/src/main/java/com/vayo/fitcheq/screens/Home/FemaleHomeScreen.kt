@@ -91,8 +91,7 @@ fun FemaleHomeScreen(navController: NavController, authViewModel: AuthViewModel)
                 // CAROUSEL TOP
                 Card(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(2.5f / 4f),
+                        .fillMaxWidth(),
                     shape = RoundedCornerShape(0.dp),
                 ) {
                     HomeImageCarousel(
@@ -207,6 +206,7 @@ fun FemaleHomeScreen(navController: NavController, authViewModel: AuthViewModel)
                                         "Accessories" -> "accessories"
                                         "TankTops" -> "tanktops"
                                         "Jacket" -> "jacket"
+                                        "Footwear" -> "footwear"
                                         else -> ""
                                     }
                                     if (route.isNotEmpty()) {

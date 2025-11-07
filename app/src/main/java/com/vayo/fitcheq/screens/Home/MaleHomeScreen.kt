@@ -37,6 +37,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.unit.Dp
@@ -178,8 +179,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                 // CAROUSEL TOP
                 Card(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(2.5f / 4f),
+                        .fillMaxWidth(),
                     shape = RoundedCornerShape(0.dp),
                 ) {
                     HomeImageCarousel(
@@ -258,7 +258,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                 Text(
                     text = "Fits By Season",
                     fontFamily = myHeadingFont,
-                    fontSize = 22.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(10.dp))
@@ -336,7 +336,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                 Text(
                     text = "Shop By Category",
                     fontFamily = myHeadingFont,
-                    fontSize = 22.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(10.dp))
@@ -364,6 +364,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                                         "Jacket" -> "jacket"
                                         "TankTops" -> "tanktops"
                                         "Accessories" -> "accessories"
+                                        "Footwear" -> "footwear"
                                         else -> ""
                                     }
                                     if (route.isNotEmpty()) {
@@ -445,7 +446,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                 Text(
                     text = "Fits By Occasion",
                     fontFamily = myHeadingFont,
-                    fontSize = 22.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(10.dp))
@@ -543,7 +544,7 @@ fun MaleHomeScreen(navController: NavController, authViewModel: AuthViewModel) {
                 Text(
                     text = "Fits By Fashion",
                     fontFamily = myHeadingFont,
-                    fontSize = 22.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(10.dp))
@@ -633,6 +634,9 @@ fun HomeImageCarousel(
     onImageClick: (String) -> Unit = {}
 ) {
     if (images.isEmpty()) return
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+    val imageHeight = screenHeight * 0.8f
 
     // Repeat images 10 times for "infinite" feel
     val block = images
@@ -676,7 +680,8 @@ fun HomeImageCarousel(
                 model = imageUrl,
                 contentDescription = "Carousel Image $page",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxWidth()
+                    .height(imageHeight)
                     .clickable{
                         onImageClick(imageUrl)
                     }
