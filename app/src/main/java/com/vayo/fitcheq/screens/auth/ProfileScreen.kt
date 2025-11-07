@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -178,7 +179,7 @@ fun ProfileScreen(navController: NavController, isEditMode: Boolean = false) {
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(WindowInsets.statusBars.asPaddingValues())
+            .systemBarsPadding()
     ) {
         Spacer(modifier = Modifier.Companion.height(10.dp))
         // TITLE
