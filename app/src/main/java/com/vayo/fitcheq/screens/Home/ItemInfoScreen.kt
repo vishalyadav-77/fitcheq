@@ -87,6 +87,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import coil.ImageLoader
 import coil.request.CachePolicy
 import coil.request.ImageRequest
+import com.google.gson.Gson
 import com.vayo.fitcheq.AuthScreen
 import com.vayo.fitcheq.data.model.brandMap
 import com.vayo.fitcheq.data.model.outfitSizeMap
@@ -166,7 +167,7 @@ fun ItemInfoScreen(outfit: OutfitData, viewModel: MaleHomeViewModel,navControlle
             ) {
                 // Image Carousel
                 item(span = { GridItemSpan(2) }) {
-                    ImageCarousel(imagesToUse)
+                    ImageCarousel(imagesToUse,navController)
                 }
                 // Outfit Data
                 item(span = { GridItemSpan(2) }) {
@@ -219,30 +220,34 @@ fun ItemInfoScreen(outfit: OutfitData, viewModel: MaleHomeViewModel,navControlle
                     ) {
                         Spacer(modifier = Modifier.height(18.dp))
 
-                        Text(text = "SIZE", fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                        Spacer(modifier = Modifier.height(6.dp))
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            sizeInfo?.forEach { size ->
-                                Box(
-                                    contentAlignment = Alignment.Center,
-                                    modifier = Modifier
-                                        .background(
-                                            color = Color.Black,
-                                            shape = RoundedCornerShape(6.dp)
+                        if (sizeInfo.isEmpty()){
+
+                        }else{
+                            Text(text = "SIZE", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                sizeInfo?.forEach { size ->
+                                    Box(
+                                        contentAlignment = Alignment.Center,
+                                        modifier = Modifier
+                                            .background(
+                                                color = Color.Black,
+                                                shape = RoundedCornerShape(6.dp)
+                                            )
+                                            .padding(horizontal = 16.dp, vertical = 10.dp)
+                                    ) {
+                                        Text(
+                                            text = size,
+                                            fontSize = 16.sp,
+                                            color = Color.White
                                         )
-                                        .padding(horizontal = 16.dp, vertical = 10.dp)
-                                ) {
-                                    Text(
-                                        text = size,
-                                        fontSize = 16.sp,
-                                        color = Color.White
-                                    )
+                                    }
                                 }
                             }
+                            Spacer(modifier = Modifier.height(18.dp))
                         }
-                        Spacer(modifier = Modifier.height(18.dp))
 
                         //SHIPPING
                         Row(
@@ -486,8 +491,11 @@ fun ItemInfoScreen(outfit: OutfitData, viewModel: MaleHomeViewModel,navControlle
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun ImageCarousel(images: List<String>) {
+fun ImageCarousel(images: List<String>,navController: NavController) {
     if (images.isEmpty()) return
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+    val imageHeight = screenHeight * 0.7f
 
     if (images.size == 1) {
         // Just one image, no swiping
@@ -496,7 +504,11 @@ fun ImageCarousel(images: List<String>) {
             contentDescription = "Product Image",
             modifier = Modifier
                 .fillMaxWidth()
-                .height(600.dp),
+                .height(imageHeight)
+                .clickable{
+                    val json = Uri.encode(Gson().toJson(images))
+                    navController.navigate("fullScreenImageViewer/$json/0")
+                },
             contentScale = ContentScale.Crop
         )
     } else {
@@ -517,8 +529,12 @@ fun ImageCarousel(images: List<String>) {
                     model = images[page],
                     contentDescription = "Product Image $page",
                     modifier = Modifier
-                        .fillMaxSize(),
-//                        .height(600.dp),
+                        .fillMaxWidth()
+                        .height(imageHeight)
+                        .clickable{
+                            val json = Uri.encode(Gson().toJson(images))
+                            navController.navigate("fullScreenImageViewer/$json/$page")
+                        },
                     contentScale = ContentScale.Crop
                 )
             }
